@@ -30,3 +30,15 @@
 *.exe
 *.out
 *.app
+
+# latex
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.run.xml
+*.xdv
+docs/*/auto
