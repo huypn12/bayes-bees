@@ -1,0 +1,72 @@
+\documentclass[notitlepage]{report}
+
+\usepackage[utf8]{inputenc}
+\usepackage{titling}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{biblatex}
+\addbibresource{proposal.bib}
+
+\title{Master Project Proposal}
+\author{Huy Phung\\University of Konstanz}
+\date{February 2020}
+
+\begin{document}
+\maketitle
+
+\section*{Abstract}
+  We consider the collective action of a bee colony. Each bee in a colony could
+  possibly sting after observing a threat in the surrounding
+  environment, and warn other bees by releasing {pheromone. By sensing
+  the pheromone released in the environment, other bees in the colony may also
+  sting. Since stinging leads to the termination of an individual bee, it
+  reduces the total defense capability as well. We studies how the actions of a
+  bee changes with regarding to its surrounding the environment.
+
+\section*{Introduction}
+The bee colony can be considered as agents (bees) interact with each other in a
+closed environment with the appearance of a factor \textit{pheromone}. Each
+agent in the colony observe the following two factors of the environment: (1)
+amount of pheromone and (2) number of other agents. Afterward, the agent has
+probability to commit an action, namely \textit{sting}. The agent is eliminated
+from environment after stinging. Under these assumption, we can see that a bee
+colony lose defense capability as its individuals become more aggresive. This
+project try to find out how environment affect the collective defense behaviour
+of a bee colony by parametric probabilistic modeling and adjust the model
+parameters by the data obtained from controlled experiments with bees.
+
+\section*{Project Description}
+First, we model the bee colony. Assume that each agent in the environment decide
+its next action based only on the current observation, we use Markov Chain to
+model the system. Under the assumption that the observation is conducted in
+discrete time, the model is \textit{DTMC}. However, \textit{CTMC} should be used
+since it can express the time properties of the colony more precisely. In order
+to model the collective behaviour of bees, we use \textit{synchronous product},
+which is a method to composite Markov Chains with an assumption that all
+transitions are taken together. If the order of each agents' state is important,
+we use \textit{asynchronous product}, where each transition is taken separately,
+which results in a larger set of states.\\
+The next problem we cope is \textit{parameters synthesis}. Since the transition
+probability on Markov is not known apriori, we use symbolic to represent them,
+then synthesize it with the data gained from experiments
+\cite{katoen2016probabilistic}. Currently in \cite{10.1007/978-3-030-28042-0_10}
+the authors are using SMT solvers to find safe intervals for model parameters
+with regarding to the experiments data of probability to be in certain states.
+We propose to apply Bayesian method \cite{10.1007/978-3-319-43425-4_3} to infer
+the parameters for DTMC and CTMC. The authors also uses Metropolis Hasting to
+calculate the safe region. We also want to compare the results from Bayesian
+inference to Metropolis Hasting.
+
+\section*{Expected Results}
+From \textit{probabilistic model checking} point, this project should (1) be
+capable of modeling the bee colony, and (2) infer the parameter from experiments
+data and possibly (3) checking properties of the model.\\
+Also, comparison must be conducted to evaluate the effectiveness of Bayesian
+inference in parameter synthesis to the current statistical method
+
+\section*{References}
+\printbibliography
+
+\end{document}

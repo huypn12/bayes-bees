@@ -1,0 +1,192 @@
+\documentclass[12pt]{article}
+
+\usepackage[utf8]{inputenc}
+
+% graphics
+\usepackage{graphicx}
+\usepackage[pdf]{graphviz}
+
+% math packages
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+
+% citation
+\usepackage{biblatex}
+\addbibresource{progress_1.bib}
+
+% title
+\title{Master Project on MCSS\\ Progress Report 1}
+\author{Huy Phung\\University of Konstanz}
+\date{\today}
+
+\setlength{\headheight}{23pt}
+\setlength{\parindent}{0.0in}
+\setlength{\parskip}{0.0in}
+
+
+\begin{document}
+\maketitle
+
+\section{Introduction}
+We consider the collective action of a bee colony. Each bee in a colony could
+possibly sting after observing a threat in the surrounding environment, and warn
+other bees by releasing pheromone. By sensing the pheromone released in the
+environment, other bees in the colony may also sting. Since stinging leads to
+the termination of an individual bee, it reduces the total defense capability as
+well. We studies how the actions of a bee changes with regarding to its
+surrounding the environment.\\
+In this progress report, the following points are being presented:
+\begin{enumerate}
+\item Description of the system
+\item Probability distribution of the number of stinging bees
+\item Markov chain formalization
+\item Parameter inference.
+\end{enumerate}
+
+\section{Formal description}
+There are 3 assumptions on the system:
+\begin{enumerate}
+\item Each bee release an unit amount of pheromone immediately after stinging.
+\item A bee dies after stinging and releasing pheromone. In the other words, no
+  bee can sting more than once.
+\item Stinging behaviour only depends on the concentration of pheromone in the
+  environment.
+\end{enumerate}
+Given $N$ bees, let $s:\{1,\ldots,N\}\rightarrow[0,1]$ be the probability of
+each bee sting given $i$ units of pheromone in the environment. \textit{Steady
+  state}
+
+The question we are concerning about is that, given a system, how many bees
+would sting in the steady state. Formally $Y$ is a discrete random variable
+indicates the number of dead bees at steady state, we want to find the
+probability distribution of $Y$
+Given $n$ bees in an isolated box. After stinging, each bee release unit
+$\Delta$ amount of pheromone and then dies. We denote that
+\begin{itemize}
+\item $s(i)$ is the probability of a bee sting at a pheromone level $i\Delta
+  (i\in \mathbb{N})$
+\end{itemize}
+
+Regarding the way we observe the deadbees, there are two types of experiment
+that will be described
+\begin{itemize}
+\item Synchronous
+\item Asynchronous
+\end{itemize}
+
+\subsection{Fully asynchronous experiment}
+In asynchronous experiment we assume that there is almost improbable for
+two bees to sting at exactly the same time, and any bees release pheromone
+immediately after its death. By that observation we can assume that each bee
+sting at different level of pheromone.\\
+
+\textbf{Lemma 1} In \textit{asynchronous model}, the probability of seeing $j$
+dead bees at the steady state is
+\begin{align}
+  P(Y=j) = {n\choose j}s(0)s(1)\ldots s(j-1)(1 - s(j))^{n-j} 
+\end{align}
+
+\textbf{Proof:} Since under asynchrnous assumption, we assume that at each
+pheromone level there is at most one bee sting. Thus, $j$ stinging bees must do
+so under different concentration of pheromone. Also under asynchronous update,
+at steady state there are at most $j$ amount of pheromone diffused in the
+environment. The other bees does not sting at any pheromone level from $0$ to
+$j$, thus we can see all of them as do not stinging at the highest level $j$.\\
+Selecting $j$ bees from $N$, each of them sting under pheromone level $0$ to
+$j$, then the other $n-j$ bees does not sting under pheromone $j$, we deliver
+Lemma 1 directly.\\
+
+
+\subsection{Fully synchronous experiment}
+In \textit{fully synchronous} experiment we assume that the number of
+stinging bees is only counted after a fixed amount of time, so that without loss
+of generality we can assume tha.pheromone diffuse
+almost immediately among the bee colony, and each bee decide to sting or not to
+sting immediately after sensing the pheromone concentration.\\
+Under the synchronous assumption, the Lemma 1 does not hold anymore. It is due
+to the fact that it is possible to have more than one bee sting given the same
+concentration of pheromone in the environment. Thus, we would like to construct
+the probability distribution in a different way.
+\textbf{Lemma 2}
+
+
+\section{System modeling using Markov Chain}
+
+
+\subsubsection{Discrete time Markov Chain}
+A \textit{Discrete Time Markov Chain} is a tuple, where
+\begin{itemize}
+\item a
+\item b
+  
+\end{itemize}
+
+\textit{Markov property}
+
+% Why do we consider Markov property on modeling the bees?
+
+\subsubsection{State spaces}
+
+\subsubsection{Transition probabilities}
+
+\subsubsection{}
+
+
+\section{Modeling with Markov chain}
+\subsection{Parameterized DTMC}
+
+
+parameter inference problem is defined as \cite{katoen2016probabilistic}
+
+\subsection{Statistical parameter inference}
+\subsubsection{Definition}
+Statistical method for parameter inference is presented in \cite{hajnal2019data}
+Input: distribution on steady state of number of dead bees Output:
+
+\subsubsection{Method description}
+Observing
+
+% briefly introduction of data based method for parameter inference
+
+\section{Bayesian inference}
+% what is a support
+\subsection{Bayesian parameter inference}
+Bayesian Formula:
+\begin{align*}
+  P(H|D) = \frac{P(D|H)P(H)}{P(D)}
+\end{align*}
+
+
+\textit{Prior distribution}
+
+
+\textit{Posterior distribution}
+
+
+\textit{Marginal distribution}
+
+
+
+\subsection{Posterior conjugation}
+% Problem: why do we need conjugation, which property of conjugation are we
+% interested in? tractability?
+
+
+\subsubsection{Conjugation of binary distribution}
+Lemma:
+\subsubsection{Conjugation of multinomial distribution}
+% multinomial distribution
+% dirichlet distribution
+% categorical distribution
+
+
+
+\subsubsection{Problem declaration}
+\subsubsection{Method description}
+
+\printbibliography
+
+\end{document}
+
+
