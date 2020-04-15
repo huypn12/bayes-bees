@@ -1,0 +1,132 @@
+PRISM
+=====
+
+Version: 4.5
+Date: Sun Apr 12 19:25:15 CEST 2020
+Memory limits: cudd=1g, java(heap)=1g
+Command line: prism die.pm die.props -param 'p=0:1'
+
+Parsing model file "die.pm"...
+
+Parsing properties file "die.props"...
+
+6 properties:
+(1) P=? [ F s=7&d=1 ]
+(2) P=? [ F s=7&d=2 ]
+(3) P=? [ F s=7&d=3 ]
+(4) P=? [ F s=7&d=4 ]
+(5) P=? [ F s=7&d=5 ]
+(6) P=? [ F s=7&d=6 ]
+
+Type:        DTMC
+Modules:     die 
+Variables:   s d 
+
+---------------------------------------------------------------------
+
+Parametric model checking: P=? [ F s=7&d=1 ]
+
+Building model (parametric engine)...
+
+Computing reachable states...
+Reachable states exploration and model construction done in 0.017 secs.
+
+States:      15 (1 initial)
+Transitions: 25
+
+Time for model construction: 0.017 seconds.
+
+Time for model checking: 0.02 seconds.
+
+Result (probability): ([0.0,1.0]): { p^2 | p + 1  }
+
+---------------------------------------------------------------------
+
+Parametric model checking: P=? [ F s=7&d=2 ]
+
+Building model (parametric engine)...
+
+Computing reachable states...
+Reachable states exploration and model construction done in 0.006 secs.
+
+States:      15 (1 initial)
+Transitions: 25
+
+Time for model construction: 0.006 seconds.
+
+Time for model checking: 0.009 seconds.
+
+Result (probability): ([0.0,1.0]): { ( -1 ) p^2 + p | p + 1  }
+
+---------------------------------------------------------------------
+
+Parametric model checking: P=? [ F s=7&d=3 ]
+
+Building model (parametric engine)...
+
+Computing reachable states...
+Reachable states exploration and model construction done in 0.005 secs.
+
+States:      15 (1 initial)
+Transitions: 25
+
+Time for model construction: 0.005 seconds.
+
+Time for model checking: 0.007 seconds.
+
+Result (probability): ([0.0,1.0]): { p^2 | p + 1  }
+
+---------------------------------------------------------------------
+
+Parametric model checking: P=? [ F s=7&d=4 ]
+
+Building model (parametric engine)...
+
+Computing reachable states...
+Reachable states exploration and model construction done in 0.004 secs.
+
+States:      15 (1 initial)
+Transitions: 25
+
+Time for model construction: 0.004 seconds.
+
+Time for model checking: 0.009 seconds.
+
+Result (probability): ([0.0,1.0]): { ( -1 ) p^3 + 2 p^2 - 2 p + 1  | p^2 + 1  }
+
+---------------------------------------------------------------------
+
+Parametric model checking: P=? [ F s=7&d=5 ]
+
+Building model (parametric engine)...
+
+Computing reachable states...
+Reachable states exploration and model construction done in 0.003 secs.
+
+States:      15 (1 initial)
+Transitions: 25
+
+Time for model construction: 0.003 seconds.
+
+Time for model checking: 0.002 seconds.
+
+Result (probability): ([0.0,1.0]): { 0 }
+
+---------------------------------------------------------------------
+
+Parametric model checking: P=? [ F s=7&d=6 ]
+
+Building model (parametric engine)...
+
+Computing reachable states...
+Reachable states exploration and model construction done in 0.004 secs.
+
+States:      15 (1 initial)
+Transitions: 25
+
+Time for model construction: 0.004 seconds.
+
+Time for model checking: 0.008 seconds.
+
+Result (probability): ([0.0,1.0]): { ( -1 ) p^2 + p | p^2 + 1  }
+
