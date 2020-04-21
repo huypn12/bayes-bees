@@ -42,3 +42,8 @@
 *.run.xml
 *.xdv
 docs/*/auto
+
+# jupyter
+.ipynb_checkpoints/
+.vscode/
+__pycache__/

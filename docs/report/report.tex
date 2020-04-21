@@ -1,0 +1,245 @@
+\documentclass[12pt]{article}
+
+\usepackage[utf8]{inputenc}
+
+% graphics
+\usepackage{graphicx}
+\usepackage[pdf]{graphviz}
+
+% math packages
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsthm}
+
+% citation
+\usepackage{biblatex}
+\addbibresource{progress_1.bib}
+
+% MACROS
+\newcommand*{\QED}{\hfill\ensuremath{\square}}
+\newcommand{\stirlingii}{\genfrac{\{}{\}}{0pt}{}}
+
+% title
+\title{Master Project on Modeling of Complex, Self-organizing systems\\Bayesian
+  Parameter Synthesis of Discrete Time Markov Chains}
+\author{Huy Phung\\University of Konstanz}
+\date{\today}
+
+\setlength{\headheight}{23pt}
+\setlength{\parindent}{0.0in}
+\setlength{\parskip}{0.0in}
+
+\begin{document}
+\maketitle
+
+\section{Abstract}
+The aim of this project is to use Bayesian method for parameter synthesis of
+Discrete Time Markov Chain (DTMC). Bayesian inference 
+
+
+
+\section{Preliminaries}
+\subsection{Discrete time Markov Chain}
+Markov process
+
+Discrete Time Markov Chain
+
+Definition and parameter inference problem is defined as
+\cite{katoen2016probabilistic}
+
+
+\subsection{Bayesian inference}
+\subsubsection{Prior and Posterior distribution}
+\subsubsection{Posterior conjugation}
+Conjugation of binomial distribution}
+Lemma: binomial distribution is conjugated to beta distribution
+Conjuga
+
+Conjugation of multinomial distribution
+% multinomial distribution dirichlet distribution categorical distribution
+Lemma: multinomial is conjugated to dirichlet distribution
+
+Summary t
+Conjugation tables:
+\subsubsection{Markov Chain Monte Carlo method}
+\sub
+
+
+\section{Modeling of bees colony}
+\subsection{Biological description}
+We consider the collective action of a bee colony. Each bee in a colony could
+possibly sting after observing a threat in the surrounding environment, and warn
+other bees by releasing pheromone. By sensing the pheromone released in the
+environment, other bees in the colony may also sting. Since stinging leads to
+the termination of an individual bee, it reduces the total defense capability as
+well. We studies how the actions of a bee changes with regarding to its
+surrounding the environment.\\
+There are 3 assumptions on the system:
+\begin{enumerate}
+\item Each bee release an unit amount of pheromone immediately after stinging.
+\item A bee dies after stinging and releasing pheromone. In the other words, no
+  bee can sting more than once.
+\item Stinging behaviour only depends on the concentration of pheromone in the
+  environment.
+\end{enumerate}
+Given $N$ bees, let $s:\{1,\ldots,N\}\rightarrow[0,1]$ be the probability of
+each bee sting given $i$ units of pheromone in the environment.\\
+
+The question we are concerning about is that, given a system, how many bees
+would sting in the steady state. Formally $Y$ is a discrete random variable
+indicates the number of dead bees at steady state, we want to find the
+probability distribution of $Y$ Given $n$ bees in an isolated box. After
+stinging, each bee release unit $\Delta$ amount of pheromone and then dies. We
+denote that
+\begin{itemize}
+\item $s(i)$ is the probability of a bee sting at a pheromone level $i\Delta
+  (i\in \mathbb{N})$
+\item At pheromone 
+\end{itemize}
+
+Regarding the way we observe the deadbees, there are two types of experiment
+that will be described
+\begin{itemize}
+\item Synchronous
+\item Asynchronous
+\end{itemize}
+
+\subsection{Synchronous and asynchronous system}
+
+
+\subsection{Markov chain modeling of synchronous system}
+
+\subsection{Frequentist approach}
+Statistical method for parameter inference is presented in \cite{hajnal2019data}
+Input: distribution on steady state of number of dead bees Output:
+
+\section{Implementation and results}
+\subsection{Data synthesize}
+Data synthesis for each model is to synthesize the probabitity of being in each
+BSCCs given a fixed set of parameter(\textit{true parameters})conducted as following:
+. For each DTMC
+
+
+\subsection{Experiment A: Bayesian inference with conjugation}
+This experiment is designed to show the convergence to true steady state
+distribution. 
+
+\subsection{Experiment B: Bayesian inference without conjugation}
+This experiment is designed
+
+\subsection{Performance}
+\textbf{Complexity: } For the first experiment, the complexity of updating steady state distribution
+is linear to the number of BSCCs. However, for the second experiment, the
+complexity grows faster.\\
+
+
+
+\section{Conclusion}
+
+
+% briefly introduction of data based method for parameter inference
+
+
+
+
+
+
+\section{Discussion and further development}
+
+
+
+\section{Introduction}
+In this progress report, the following points are being presented:
+\begin{enumerate}
+\item Description of the system
+\item Probability distribution of the number of stinging bees
+\item Markov chain formalization
+\item Parameter inference.
+\end{enumerate}
+
+\section{Formal description}
+
+\subsection{Fully asynchronous experiment}
+In asynchronous experiment we assume that there is almost improbable for two
+bees to sting at exactly the same time, and any bees release pheromone
+immediately after its death. By that observation we can assume that each bee
+sting at different level of pheromone.\\
+
+\textbf{Lemma 1} In \textit{asynchronous model}, the probability of seeing $j$
+dead bees at the steady state is
+\begin{align}
+  P(Y=j) = {n\choose j}s(0)s(1)\ldots s(j-1)(1 - s(j))^{n-j} 
+\end{align}
+
+\textbf{Proof:} Since under asynchrnous assumption, we assume that at each
+pheromone level there is at most one bee sting. Thus, $j$ stinging bees must do
+so under different concentration of pheromone. Also under asynchronous update,
+at steady state there are at most $j$ amount of pheromone diffused in the
+environment. The other bees does not sting at any pheromone level from $0$ to
+$j$, thus we can see all of them as do not stinging at the highest level $j$.\\
+Selecting $j$ bees from $N$, each of them sting under pheromone level $0$ to
+$j$, then the other $n-j$ bees does not sting under pheromone $j$, we deliver
+Lemma 1 directly. \QED
+
+
+\subsection{Fully synchronous experiment}
+In \textit{fully synchronous} experiment we assume that the number of stinging
+bees is only counted after a fixed amount of time, so that without loss of
+generality we can assume the pheromone diffuse almost immediately among the bee
+colony, and each bee decide to sting or not to sting immediately after sensing
+the pheromone concentration.\\
+Under the synchronous assumption, the Lemma 1 does not hold anymore. It is due
+to the fact that it is possible to have more than one bee sting given the same
+concentration of pheromone in the environment. Thus, we would like to construct
+the probability distribution in a different way.\\
+In order to construct a formula for fully synchronous setup, we use the
+following observations:
+\begin{enumerate}
+\item if there are $k$ bees stinging, the amount of pheromone in the environment
+  is $k$
+\item there are $k$ intervals of stinging corresponding to pheromone
+  amount of $k$, namely $(s(0),s(1)),\ldots,(s(k-1),s(k))$
+\item placing bees into intervals must be consecutive, namely there exist no empty
+  interval $(s(i),s(j))$ such that $(s(i-2),s(i-1))$ and $(s(j+1),s(j+2))$ are
+  non empty.
+\end{enumerate}
+Based on these observations, we may propose to use the following counting
+scheme for $k$ bees stinging: \textit{How many ways to place $k$ bees into
+  consecutive intervals starting from $(s(0),s(1))$?}.\\
+For a consecutive interval of size $l$, the number of ways to place $k$ bees
+into the interval such that there is no empty interval is the Stirling number of
+the Second type, namely:
+\begin{align*}
+  \stirlingii{k}{l} = \frac{1}{l!}\sum_{i=0}^{l}(-1)^i\binom{l}{i} (l - i)^k
+\end{align*}
+However, Stirling number of the Second kind assumes does not retain the
+information of which the partition (interval) labels, which we need to calculate
+the probability. We need to embed the information into our calculation, so that
+the probability of $k$ bees stinging within $l$ intervals is 
+\begin{align*}
+  \frac{1}{l!}\sum_{i=0}^{l}(-1)^i\binom{l}{i} (l - i)^k (1-s(i))^l
+\end{align*}
+\textit{Huy: I am not sure about this step, namely how I add the information of
+  the interval labels}
+By that we calculate the probability that given $n$ bees, $k$ bees among
+them stinging:
+\begin{align*}
+  P(Y=k) = \binom{n}{k} \sum_{i=0}^{k} \frac{1}{i!}\sum_{j=0}^{i}(-1)^j\binom{i}{j} (k - j)^i (1-s(i))^j
+\end{align*}
+
+However, this construction does not leads to the correct answer, e.g $(1-s_0)^2$
+for $P(Y=0)$.....
+
+
+\section{System modeling using Markov Chain}
+
+
+\subsubsection{Problem declaration}
+\subsubsection{Method description}
+
+\printbibliography
+
+\end{document}
+
+

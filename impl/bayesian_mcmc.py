@@ -1,160 +1,93 @@
 import sys
 
-import pymc3 as pm
 import numpy as np
 import scipy as sp
-import pandas as pd
+from scipy.stats import multinomial
 
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 
 isLogging = False
-"""
-Data synthesizer
-"""
 
-
-class KnuthDie(object):
-    def __init__(self, p=None):
-        super().__init__()
-        self.p = p if p is not None else 0.5
-        self.bscc_pdist = self.init_bscc_pdist()
-        self.bscc_dist = self.eval_bscc_pdist(self.bscc_pdist)
-
-    def init_bscc_pdist(self, ):
-        # parameterized distribution of being in BSCCs
-        pdist = [
-            'p**2 / (p + 1)',
-            '(( -1 )*p**2 + p) / (p + 1)',
-            '(p**2) / (p + 1)',
-            '(( -1 )* p**2 + p) / (p + 1)',
-            '(p**2 - 2*p + 1)  / (p + 1)',
-            '(( -1 )* p**2 + p) / (p + 1)',
-        ]
-        return pdist
-
-    def eval_bscc_pdist(self, pdist):
-        dist = []
-        for expr in self.bscc_pdist:
-            val = eval(expr, None, {'p': self.p})
-            dist.append(val)
-            # print("Expression {} evaluated to {}".format(expr, val))
-        # print("Sum = {}".format(sum(dist)))
-        return dist
-
-    def sample(self, sample_size: int = 1000):
-        """
-        Sample by categorical distribution
-        Later can be transformed into multinomial sample
-        """
-        categorical = np.random.choice(len(self.bscc_dist),
-                                       sample_size,
-                                       p=self.bscc_dist)
-        multinomial = [0] * len(self.bscc_dist)
-        for it in categorical:
-            multinomial[it] += 1
-        norm = sum(multinomial) * 1.0
-        frequency = [v / norm for v in multinomial]
-        return (categorical, multinomial, frequency)
-
-
-"""
-Interval solver
-Given:
-    p_1,...,p_k \in R
-    f(p_1,...,p_k) is a rational function
-Find
-    l_i <= p_i <= u_i for i in 1...k
-Constraint:
-    a <= f(p_1,...,p_k) <= b
-"""
-
-
-class IntervalSolver(object):
+class BayesianMcmc(object):
     def __init__(self):
         super().__init__()
-
-
-"""
-Parameter inference using Bayesian conjugation.
-From pymc3 only hpd is used. Easier to implement from scratch
-"""
-
-
-class BayesianMultinomialConjugated(object):
-    def __init__(self, ):
-        super().__init__()
-        self.estimated_params = {'alpha': None}
-        self.traces = None
-        self.data_source = KnuthDie(0.4)
-
-    def bayes(self, data, alpha):
-        new_alpha = [sum(x) for x in zip(alpha, data)]
-        estimated_p = alpha / sum(alpha)
-        return (new_alpha, estimated_p)
-
-    def estimate(self, data):
-        n_iter = 100
-        alpha = np.ones(K)
-        estimated_p = np.zeros(K)
-        traces = []
-        for sample in data:
-            alpha, estimated_p = bayes(data, alpha)
-            traces.append((alpha, estimated_p))
-
-    """
-    TODO: point and interval estimation
-    1. Point estimation: given estimated parameter P{BSCC = i}, estimate p (z3)
-    2. Interval estimation: given estimated HPD of P{BSCC = i}, estimate interval of p (space sampling/refining)
-    """
-
-
-"""
-Parametre inference without Ba
-"""
-
-
-class BayesianMc(object):
-    def __init__(self):
-        super().__init__()
-        self.estimated_params = {'alpha': None}
+        self.estimated_params = {
+        }
+        self.hyperparams = {
+            'alpha': 1,
+            'beta': 1,
+        }
         self.traces = []
+        self.mh_params = {
+            'chain_length': 1000,
+        }
 
-    def my_prior(self, p):
-        llk = [
-            p**2 / (p + 1),
-            ((-1) * p**2 + p) / (p + 1),
-            (p**2) / (p + 1),
-            ((-1) * p**2 + p) / (p + 1),
-            (p**2 - 2 * p + 1) / (p + 1),
-            ((-1) * p**2 + p) / (p + 1),
-        ]
-        return llk
+    # Proposed distribution: beta
+    def transition(self, p):
+        alpha = self.hyperparams['alpha']
+        beta = self.hyperparams['beta']
+        p_new = np.random.beta(alpha, beta)
+        while p_new == p:
+            p_new = np.random.beta(alpha, beta)
+        return p_new
 
-    def estimate(self, data):
-        with pm.Model() as model:
-            p = pm.Beta('p', alpha=2, beta=2)
-            props = self.my_prior(p)
-            model = pm.Multinomial('likelihood', n=6, p=props, observed=data)
-            step = pm.Metropolis()
-            trace = pm.sample(5000, step=step, tune=10000)
-            self.traces.append(trace)
-            print(pm.summary(trace))
+    def prior(self, p):
+        """
+        Alpha and Beta must be positive
+        This function is basically a filter. Given that the transition function would always give the valid alpha and beta,
+        it is questionable if this function ever returns 0
+        """
+        if p <= 0:
+            return 0
+        return 1
+
+    # Likelihood: multinomial with parameterized P
+    def log_likelihood(self, p, pfuncs, data):
+        # Log likelihood of multinomial distribution
+        P = [f(p) for f in pfuncs]
+        N = sum(data)
+        print(P)
+        print(multinomial(N, P).pmf(data))
+        return np.sum(np.log(multinomial(N, P).pmf(data)))
+
+    def acceptance_rule(self, llh, llh_new):
+        if llh < llh_new:
+            return True
+        else:
+            accept = np.random.uniform(0, 1)
+            print((llh_new - llh)) # nan, fix this, perhaps -Inf
+            return accept < np.exp(llh_new - llh)
+
+    def metropolis_hastings(self, pfuncs, data):
+        p = self.transition(0)
+        accepted = []
+        rejected = []   
+        for i in range(self.mh_params['chain_length']):
+            p_new = self.transition(p)    
+            p_llh = self.log_likelihood(p, pfuncs, data)
+            p_new_llh = self.log_likelihood(p_new, pfuncs, data) 
+            print(p_llh, " ", p_new_llh)
+            if (self.acceptance_rule(p_llh + np.log(self.prior(p)), p_new_llh+np.log(self.prior(p_new)))):            
+                p = p_new
+                accepted.append(p_new)
+            else:
+                rejected.append(p_new)
+        print(accepted)            
+        return np.array(accepted), np.array(rejected)
 
 
-def test_experiment():
-    experiment = KnuthDie(p=0.1)
-    (s, m, f) = experiment.sample(10000)
+from knuth_die.knuth_die import KnuthDie
+
+def main():
+    model = KnuthDie(p=0.1)
+    (s, m, f) = model.sample(10000)
     print("Sample categorical {}".format(s))
     print("Sample multinomial {}".format(m))
     print("Sample frequency   {}".format(f))
-    bayes = BayesianMc()
-    bayes.estimate(data=m)
 
-
-def main():
-    test_experiment()
-
+    bayes = BayesianMcmc()
+    bayes.metropolis_hastings(model.get_pfuncs(), m)
 
 if __name__ == "__main__":
     sys.exit(main())
