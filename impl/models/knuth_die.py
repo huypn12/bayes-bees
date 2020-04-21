@@ -43,6 +43,7 @@ class KnuthDie(object):
         return (categorical, multinomial, frequency)
 
 
+### UNIT TEST ###
 def test_experiment():
     experiment = KnuthDie(p=0.1)
     (s, m, f) = experiment.sample(10000)
@@ -52,7 +53,6 @@ def test_experiment():
 
 def main():
     test_experiment()
-
 
 if __name__ == "__main__":
     sys.exit(main())
