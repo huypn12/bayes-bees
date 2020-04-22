@@ -3,16 +3,11 @@ import sys
 import numpy as np
 import scipy as sp
 
-import matplotlib.pyplot as plt
-import matplotlib as mpl
 
 class BayesianConjugated(object):
     def __init__(self, N, P):
         super().__init__()
-        self.estimated_params = {
-            'N': N,
-            'P': P 
-            }
+        self.estimated_params = {'P': P}
         self.traces = []
 
     def bayes(self, data, alpha):
@@ -30,8 +25,14 @@ class BayesianConjugated(object):
         self.estimated_params['P'] = estimated_p
 
 
+## UNIT TEST ##
+def test():
+    pass
+
+
 def main():
     pass
+
 
 if __name__ == "__main__":
     sys.exit(main())
