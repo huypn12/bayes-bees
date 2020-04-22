@@ -1,32 +1,35 @@
-import sys
-
-import numpy as np
-import scipy as sp
-
 from .data_model import DataModel
 
-class KnuthDie(DataModel):
-    def __init__(self,):
-        super().__init__()
-        self.params_count = 1
-        self.bscc_pfuncs = [
-            lambda p: p[0]**2 / (p[0] + 1),
-            lambda p: ((-1) * p[0]**2 + p[0]) / (p[0] + 1),
-            lambda p: (p[0]**2) / (p[0] + 1),
-            lambda p: ((-1) * p[0]**2 + p[0]) / (p[0] + 1),
-            lambda p: (p[0]**2 - 2 * p[0] + 1) / (p[0] + 1),
-            lambda p: ((-1) * p[0]**2 + p[0]) / (p[0] + 1),
-        ]
+import sys
+import numpy as np
 
-    def get_params_count(self, ):
+class Bees2(DataModel):
+    def __init__(self):
+        super().__init__()
+        self.bscc_pfuncs = [
+            lambda p: self.f_bscc_0(p),
+            lambda p: self.f_bscc_1(p),
+            lambda p: self.f_bscc_2(p)
+        ]
+        self.params_count = 2
+
+    def f_bscc_0(self, p):
+        return p[0]**2 - 2*p[0] + 1
+
+    def f_bscc_1(self, p):
+        return (2* p[1] * p[0]**2 - 2 * p[0]**2 - 2 * p[1] * p[0] + 2 * p[0])
+
+    def f_bscc_2(self, p):
+        return (-2 * p[1] * p[0]**2 + p[0]**2 + 2 * p[1] * p[0])
+
+    def get_params_count(self,):
         return self.params_count
 
     def get_bscc_pfuncs(self, ):
         return self.bscc_pfuncs
 
     def eval_bscc_pfuncs(self, p):
-        return [f(p) for f in self.get_bscc_pfuncs()]
-
+        return [f(p) for f in self.bscc_pfuncs]
 
     def sample(self, params, sample_size: int = 1000):
         """
@@ -46,15 +49,16 @@ class KnuthDie(DataModel):
 
 ### UNIT TEST ###
 def main():
-    dmodel = KnuthDie()
+    dmodel = Bees2()
     (s, m, f) = dmodel.sample(
-        params=[0.1],
+        params=[0.1, 0.2],
         sample_size=10000
         )
+    print("Simplex assert:    {}".format(np.sum(dmodel.eval_bscc_pfuncs([0.1, 0.2]))))
     print("Sample categorical {}".format(s))
     print("Sample multinomial {}".format(m))
     print("Sample frequency   {}".format(f))
-    print("Simplex assert:    {}".format(np.sum(dmodel.eval_bscc_pfuncs([0.7]))))
+
 
 if __name__ == "__main__":
     sys.exit(main())

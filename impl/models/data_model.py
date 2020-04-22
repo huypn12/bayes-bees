@@ -1,6 +1,12 @@
-class Model(object):
+from abc import ABC, abstractmethod
+
+class DataModel(ABC):
     def __init__(self):
         super().__init__()
+
+    @abstractmethod
+    def get_params_count(self, ):
+        pass
 
     @abstractmethod
     def get_bscc_pfuncs(self, ):
@@ -11,5 +17,5 @@ class Model(object):
         pass
 
     @abstractmethod
-    def sample(self, sample_size):
+    def sample(self, p, sample_size):
         pass

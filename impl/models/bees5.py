@@ -1,6 +1,6 @@
 from .model import Model
 
-class Bees3(Model):
+class Bees3(DataModel):
     def __init__(self):
         super().__init__()
         self.bscc_pfuncs = [

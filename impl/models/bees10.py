@@ -31,6 +31,21 @@ class Bees3(Model):
     def f_bscc_4(self, p):
         pass
 
+    def f_bscc_5(self, p):
+        pass
+
+    def f_bscc_6(self, p):
+        pass
+
+    def f_bscc_7(self, p):
+        pass
+    
+    def f_bscc_8(self, p):
+        pass
+    
+    def f_bscc_9(self, p):
+        pass
+
     def get_bscc_pfuncs(self, ):
         return self.bscc_pfuncs
 
