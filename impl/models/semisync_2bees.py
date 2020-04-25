@@ -3,7 +3,7 @@ from .data_model import DataModel
 import sys
 import numpy as np
 
-class Bees2(DataModel):
+class Semisync2bees(DataModel):
     def __init__(self):
         super().__init__()
         self.bscc_pfuncs = [
@@ -49,7 +49,7 @@ class Bees2(DataModel):
 
 ### UNIT TEST ###
 def main():
-    dmodel = Bees2()
+    dmodel = Semisync2bees()
     (s, m, f) = dmodel.sample(
         params=[0.1, 0.2],
         sample_size=10000
