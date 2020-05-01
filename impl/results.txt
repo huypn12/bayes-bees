@@ -1,0 +1,29 @@
+Experiment with Knuth Die, p_true=[0.3]
+Finished in 2.791487798996968 seconds, chain length 50000
+Estimated parameter: [0.29861989]
+Log likelihood: -27.41557278658729
+AIC: 56.83114557317458
+
+Experiment with 2 bees, 2 params, semisync, p_true=[0.1, 0.2]
+Finished in 2.0310990789876087 seconds, chain length 50000
+Estimated parameter: [0.10183236 0.18434951]
+Log likelihood: -8.4331030579051
+AIC: 20.8662061158102
+
+Experiment with 5 bees, 5 params, semisync, p_true=[0.1, 0.2, 0.4, 0.5, 0.6]
+Finished in 7.2764098109910265 seconds, chain length 50000
+Estimated parameter: [0.10135125 0.21855681 0.52070207 0.45761621 0.57840823]
+Log likelihood: -70.33078101358842
+AIC: 150.66156202717684
+
+Experiment with 10 bees, 10 params, semisync, p_true=[0.1, 0.2, 0.4, 0.5, 0.6, 0.1, 0.2, 0.4, 0.5, 0.6]
+bayesian_mcmc.py:49: RuntimeWarning: invalid value encountered in log
+  likelihood += np.log(it[0]) * it[1]
+bayesian_mcmc.py:49: RuntimeWarning: divide by zero encountered in log
+  likelihood += np.log(it[0]) * it[1]
+Finished in 602.7453691669944 seconds, chain length 50000
+Estimated parameter: [0.11375671 0.14925181 0.3042601  0.57028791 0.81435131 0.10468808
+ 0.37077345 0.40401714 0.28729648 0.28731649]
+Log likelihood: -395.266357301065
+AIC: 810.53271460213
+

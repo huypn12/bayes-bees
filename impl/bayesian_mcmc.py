@@ -1,4 +1,6 @@
 import sys
+sys.setrecursionlimit(10**8)
+
 import numpy as np
 import scipy as sp
 from scipy.stats import multinomial
@@ -126,6 +128,7 @@ import timeit
 from models.knuth_die import KnuthDie
 from models.semisync_2bees import Semisync2bees
 from models.semisync_5bees import Semisync5bees
+from models.semisync_10bees import Semisync10bees
 
 def knuth_die_experiment():
     model = KnuthDie()
@@ -173,11 +176,27 @@ def bees_5_experiment():
     print('Log likelihood: {}'.format(mcmc.estimated_params['log_llh']))
     print('AIC: {}\n'.format(mcmc.estimated_params['AIC']))
 
+def bees_10_experiment():
+    model = Semisync10bees()
+    p_true = [0.1, 0.2, 0.4, 0.5, 0.6, 0.1, 0.2, 0.4, 0.5, 0.6]
+    print('Experiment with 10 bees, 10 params, semisync, p_true={}'.format(p_true))
+    (s, m, f) = model.sample(params=p_true, sample_size=10000)
+    mcmc = BayesianMcmc(model)
+    start_time = timeit.default_timer()
+    mcmc.estimate_p(m)
+    stop_time = timeit.default_timer()
+    print('Finished in {} seconds, chain length {}'.format(
+        stop_time - start_time, mcmc.mh_params['chain_length']))
+    print('Estimated parameter: {}'.format(mcmc.estimated_params['P']))
+    print('Log likelihood: {}'.format(mcmc.estimated_params['log_llh']))
+    print('AIC: {}\n'.format(mcmc.estimated_params['AIC']))
+
+
 def main():
     knuth_die_experiment()
     bees_2_experiment()
     bees_5_experiment()
-
+    bees_10_experiment()
 
 if __name__ == "__main__":
     sys.exit(main())

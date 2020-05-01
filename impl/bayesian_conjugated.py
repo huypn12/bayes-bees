@@ -23,25 +23,3 @@ class BayesianConjugated(object):
             self.traces.append((alpha, estimated_p))
         self.estimated_params['P'] = estimated_p
 
-
-## UNIT TEST ##
-import timeit
-
-from models.bees2 import Bees2
-
-def bees_2_experiment():
-    model = Bees2()
-    (s, m, f) = model.sample(params=[0.1, 0.2], sample_size=5)
-    bc = BayesianConjugated()
-    n_iter = 100
-    for i in range(0, n_iter):
-        pass
-
-
-
-def main():
-    bees_2_experiment()
-
-
-if __name__ == "__main__":
-    sys.exit(main())
