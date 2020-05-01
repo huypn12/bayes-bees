@@ -227,7 +227,7 @@ Generalize this conjugation, we also have Multinomial-Dirichlet conjugation.
 \end{proof}
 More detailed description in these cases can be found in \cite{tu2014dirichlet}
 and \cite{baron2019probability}. We summarize the necessary results in the following table:
-\begin{table}[]
+\begin{table}[H]
 \begin{tabular}{lllll}
 \cline{1-3}
 \multicolumn{1}{|l|}{Likelihood} & \multicolumn{1}{l|}{Prior} & \multicolumn{1}{l|}{Posterior parameters} &  &  \\ \cline{1-3}
@@ -499,7 +499,7 @@ is the number of experiment in which the population in steady-state is $i$
     \State Initialize $\alpha_0=\alpha_1=\ldots=\alpha_n=1$
     \State Initialize $p_0=p_1=\ldots=p_n=0$
     \State Update $\alpha_i = \alpha_i + a_i, 1 \leq i \leq n$
-    \State Update $p_i = \alpha_i + \sum_{i=1}^n \alpha_i, 1 \leq i \leq n$
+    \State Update $p_i = \alpha_i / \sum_{i=1}^n \alpha_i, 1 \leq i \leq n$
     \EndProcedure
   \end{algorithmic}
 \end{algorithm}
