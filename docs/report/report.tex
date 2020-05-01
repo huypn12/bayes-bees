@@ -11,9 +11,12 @@
 \usepackage{amsthm}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
-\usepackage{tikz}
 \usepackage{titling}
 \usepackage{listings}
+\usepackage{tikz}
+\usetikzlibrary{automata,arrows,positioning,calc}
+
+
 
 % citation
 \usepackage{biblatex}
@@ -36,6 +39,7 @@
   \vskip0.5em}%
 }
 
+\newcommand*{\oh}{\frac{1}{2}}
 % title
 \title{Bayesian parameter synthesis of Markov population models}
 \subtitle{Master Project on Modeling of Complex, Self-organizing systems}
@@ -49,6 +53,9 @@
 
 \begin{document}
 \maketitle
+\pagebreak
+\tableofcontents
+\pagebreak
 
 \begin{abstract}
   We study the collective behavior of a bee colony. Each bee in a colony could
@@ -342,8 +349,46 @@ In asynchronous experiment we assume that there is almost improbable for two
 bees to sting simultaneously, and any bees release pheromone immediately after
 its death. By that observation we can assume that each bee
 sting at different level of pheromone.\\
+\begin{figure}[H]
+  \centering 
+  \begin{tikzpicture}[->, >=stealth', auto, semithick, node distance=3cm]
+    \tikzstyle{every state}=[fill=white,draw=black,thick,text=black,scale=1]
+    \node[state]    (A)                     {init};
+    \node[state]    (B)[above right of=A]   {$\oh$};
+    \node[state]    (C)[below right of=A]   {$1$};
+    \node[state]    (D)[above right of=B]   {$\oh \oh$};
+    \node[state]    (E)[below of=D]         {$\oh 1$};
+    \node[state]    (F)[below of=E]         {$1 1$};
+    \node[state]    (G)[above right of=D]   {$\oh \oh \oh$};
+    \node[state]    (H)[below of=G]         {$\oh \oh 1$};
+    \node[state]    (I)[below of=H]         {$\oh 1 1$};
+    \node[state]    (J)[below of=I]         {$1 1 1$};
+    \node[state]    (K)[right of=H]         {$0 \oh 1$};
+    \node[state]    (L)[right of=I]         {$0 1 1$};
+    \node[state]    (M)[right of=K]         {$0 0 1$};
+    \path
+    (A) edge node{$1-p$} (B)
+    edge node{$p$} (C)
+    (B) edge node{$1-p$} (D)
+    edge node{$p$} (E)
+    (C) edge node{$1-p$} (E)
+    edge node{$p$} (F)
+    (D) edge node{$1-p$} (G)
+    edge node{$p$} (H)
+    (E) edge node{$1-p$} (H)
+    edge node{$p$} (I)
+    (F) edge node{$1-p$} (I)
+    edge node{$p$} (J)
+    (H) edge node{$1-q$} (K)
+    edge node{$q$} (I)
+    (I) edge node{$1-q$} (L)
+    edge node{$p$} (J)
+    (K) edge node{$1-q$} (M)
+    edge node{$p$} (L);
+  \end{tikzpicture}
+  \caption{Example asynchronous model of 3 bees, 2 parameters}
+\end{figure}
 
-%%TODO: image 
 
 \subsubsection*{Synchronous model}
 In \textit{fully synchronous} experiment we assume that the number of stinging
@@ -352,15 +397,63 @@ generality we can assume the pheromone diffuse almost immediately among the bee
 colony, and each bee decide to sting or not to sting immediately after sensing
 the pheromone concentration.\\
 
-%% TODO: image
+\begin{figure}[H]
+  \centering 
+\begin{tikzpicture}[->, >=stealth', auto, semithick, node distance=3cm]
+\tikzstyle{every state}=[fill=white,draw=black,thick,text=black,scale=1]
+\node[state]    (A)                     {init};
+\node[state]    (B)[right of=A]         {$\oh \oh 1 $};
+\node[state]    (C)[above of=B]         {$\oh \oh \oh$};
+\node[state]    (D)[below of=B]         {$\oh 1 1$};
+\node[state]    (E)[below of=D]         {$1 1 1$};
+\node[state]    (F)[right of=B]         {$0 0 1$};
+\node[state]    (G)[right of=D]         {$0 1 1$};
+\path
+(A) edge    node{$(1-p)^3$}        (B)
+    edge    node{$(3p(1-p)^2$}     (C)
+    edge    node{$3p(1-p)^2$}      (D)
+    edge    node{$p^3$}            (E)
+(B) edge    node{$(1-q)^2$}        (F)
+    edge    node{$(2q(1-q)$}       (G)
+    edge[bend left,below]    node{$q^2$}            (E)
+(D) edge    node{$(1-q)$}          (G)
+    edge    node{$q$}              (E); 
+  \end{tikzpicture}
+  \caption{Example synchronous model of 3 bees, 2 parameters.}
+\end{figure}
+
 
 
 \subsubsection*{Semi-synchronous model}
 In \textit{Semisynchronous model}, we assume that the behaviour is initally
 synchronous. That means, at the initial states we do synchronous update. From
 all succeeding states from initial states, the updates are of asynchronous semantics.
-
-%% TODO: image
+\begin{figure}[H]
+  \centering 
+  \begin{tikzpicture}[->, >=stealth', auto, semithick, node distance=3cm]
+    \tikzstyle{every state}=[fill=white,draw=black,thick,text=black,scale=1]
+    \node[state]    (A)                     {init};
+    \node[state]    (B)[right of=A]         {$\oh \oh 1 $};
+    \node[state]    (C)[above of=B]         {$\oh \oh \oh$};
+    \node[state]    (D)[below of=B]         {$\oh 1 1$};
+    \node[state]    (E)[below of=D]         {$1 1 1$};
+    \node[state]    (F)[right of=B]         {$0 \oh 1$};
+    \node[state]    (G)[right of=D]         {$0 1 1$};
+    \node[state]    (H)[right of=F]         {$0 1 1$};
+    \path
+(A) edge    node{$(1-p)^3$}        (B)
+    edge    node{$(3p(1-p)^2$}     (C)
+    edge    node{$3p(1-p)^2$}      (D)
+    edge    node{$p^3$}            (E)
+(B) edge    node{$1-q$}            (F)
+    edge    node{$q$}              (D)
+(D) edge    node{$(1-q)$}          (G)
+    edge    node{$q$}              (E)
+(F) edge    node{$q$}              (G)
+    edge    node{$1 - q$}          (H);
+  \end{tikzpicture}
+  \caption{Example semisynchronous model of 3 bees, 2 parameters}
+\end{figure}
 
 For a population of $n$ bees, all three types of models share two properties:
 \begin{enumerate}
@@ -526,8 +619,14 @@ experiment is on Jupyter Notebook file \texttt{visualization.ipynb}
 In order to compare with the work by \cite{hajnal2019data}, we also visualize
 the interval calculated by the following formula:
 \begin{align*}
-  \theta_i 
+  \theta_i \pm (z_{\alpha / 2}\sqrt{\frac{\theta_i(1-\theta_i)}{N}})
 \end{align*}
+where $N$ is the sample size. Experiment configurations:
+\begin{itemize}
+\item true model parameter: $[0.3, 0.25, 0.35, 0.45, 0.5]$
+\item tSCC distribution evaluation: $[0.1680, 0.1139, 0.2089, 0.2371, 0.1940, 0.0778]$ 
+\end{itemize}
+
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.6\textwidth,keepaspectratio]{figures/interval_estimation.png}
@@ -571,6 +670,17 @@ parameters respectively. All models are semi-synchronous.\\
 
 \end{lstlisting}
 
+\subsection{Notes on implementation}
+A script \texttt{parse\_prism.py} is include in folder \texttt{models} to parse
+PRISM polynomial string to a Python class template. This is to avoid calling
+expensive function \texttt{eval()} on runtime. Source code structure:
+\begin{itemize}
+\item \texttt{docs} folder contains final report
+\item \texttt{impl} folder contains python implementation and PRISM results
+  parsed to Python classes
+\item \texttt{examples} folder contains jupyter notebook examples.
+\end{itemize}
+
 \section{Conclusion}
 The goal of this project is to experiment Bayesian approach on parameter
 inference of Markov population models. The results shows that Bayesian inference
@@ -591,14 +701,6 @@ However, there are still problems
 \end{enumerate}
 However, we believe that the method can be developed further to overcome these limitations.
 
-\appendix
-Source code structure:
-\begin{itemize}
-\item \texttt{docs} folder contains final report
-\item \texttt{impl} folder contains python implementation and PRISM results
-  parsed to Python classes
-\item \texttt{examples} folder contains jupyter notebook examples.
-\end{itemize}
 
 \printbibliography
 

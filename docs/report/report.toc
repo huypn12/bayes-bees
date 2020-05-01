@@ -1,0 +1,43 @@
+\boolfalse {citerequest}\boolfalse {citetracker}\boolfalse {pagetracker}\boolfalse {backtracker}\relax 
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {1}Preliminaries}{3}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {1.1}Discrete time Markov Chain}{3}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {1.2}Bayesian inference}{5}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {1.2.1}Bayesian parameter estimation}{5}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {1.2.2}Posterior conjugation}{6}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {1.2.3}Markov Chain Monte Carlo method}{7}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {1.2.4}Bayesian Parameter Estimation}{9}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {2}Modeling of bees colony}{9}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.1}Biological description}{9}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.2}Markov population models for bee colony}{10}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {3}Bayesian parameter synthesis of Markov population model}{14}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.1}Data}{14}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.2}Inference of steady state distribution}{14}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.3}Inference of model parameters}{15}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.4}Accuracy measures}{16}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {4}Implementation and results}{16}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {4.1}Data synthesis}{17}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {4.2}Inference of steady state distribution}{18}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {4.3}Inference of model parameters}{19}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {4.4}Notes on implementation}{20}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {5}Conclusion}{20}%
