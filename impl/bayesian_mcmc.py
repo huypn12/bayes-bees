@@ -1,6 +1,7 @@
 import sys
 sys.setrecursionlimit(10**8)
 
+from pymc3.stats import hpd
 import numpy as np
 import scipy as sp
 from scipy.stats import multinomial
@@ -63,9 +64,19 @@ class BayesianMcmc(object):
     def estimate_p(self, data):
         self.metropolis_hastings(data)
         p_hat, log_llh = self.posterior_mean(data)
+        self.estimated_params['HPD'] = self.compute_hpd()
         self.estimated_params['P'] = p_hat
         self.estimated_params['log_llh'] = log_llh
         self.estimated_params['AIC'] = -2 * log_llh + 2 * self.data_model.get_params_count()
+
+    def compute_hpd(self, ):
+        params_count = self.data_model.get_params_count()
+        params_hpd = []
+        for i in range(0, params_count):
+            trace = [t[i] for t in self.traces]
+            h = hpd(np.asarray(trace), credible_interval=0.95)
+            params_hpd.append(h)
+        return params_hpd
 
     # E[p] = SUM(p * likelihood(p) * prior(p)) / SUM(likelihood(p) * prior(p))
     def posterior_mean(self, data):
@@ -96,15 +107,6 @@ class BayesianMcmc(object):
                 p = p_new
                 self.traces.append(p_new)
 
-    def compute_hpd(self, data, alpha):
-        # TODO: HPD self implementation
-        pass
-
-    def update_prior_hyperparams(self, ):
-        # TODO: update prior believes on alpha and beta using (p_hat = E[p])
-        # Posterior mean -> E[p^] m/m-1 alpha 
-        pass
-
 
 """
 Some notes on complexity of this estimation scheme:
@@ -130,11 +132,12 @@ from models.semisync_2bees import Semisync2bees
 from models.semisync_5bees import Semisync5bees
 from models.semisync_10bees import Semisync10bees
 
+
 def knuth_die_experiment():
     model = KnuthDie()
     p_true = [0.3]
     print('Experiment with Knuth Die, p_true={}'.format(p_true))
-    (s, m, f) = model.sample(params=[0.3], sample_size=10000)
+    (s, m, f) = model.sample(params=[0.3], trials_count=10000)
     # pass model in to get BSCC parameterized functions
     mcmc = BayesianMcmc(model)
     start_time = timeit.default_timer()
@@ -146,57 +149,10 @@ def knuth_die_experiment():
     print('Log likelihood: {}'.format(mcmc.estimated_params['log_llh']))
     print('AIC: {}\n'.format(mcmc.estimated_params['AIC']))
 
-def bees_2_experiment():
-    model = Semisync2bees()
-    p_true = [0.1, 0.2]
-    print('Experiment with 2 bees, 2 params, semisync, p_true={}'.format(p_true))
-    (s, m, f) = model.sample(params=p_true, sample_size=10000)
-    mcmc = BayesianMcmc(model)
-    start_time = timeit.default_timer()
-    mcmc.estimate_p(m)
-    stop_time = timeit.default_timer()
-    print('Finished in {} seconds, chain length {}'.format(
-        stop_time - start_time, mcmc.mh_params['chain_length']))
-    print('Estimated parameter: {}'.format(mcmc.estimated_params['P']))
-    print('Log likelihood: {}'.format(mcmc.estimated_params['log_llh']))
-    print('AIC: {}\n'.format(mcmc.estimated_params['AIC']))
-
-def bees_5_experiment():
-    model = Semisync5bees()
-    p_true = [0.1, 0.2, 0.4, 0.5, 0.6]
-    print('Experiment with 5 bees, 5 params, semisync, p_true={}'.format(p_true))
-    (s, m, f) = model.sample(params=p_true, sample_size=10000)
-    mcmc = BayesianMcmc(model)
-    start_time = timeit.default_timer()
-    mcmc.estimate_p(m)
-    stop_time = timeit.default_timer()
-    print('Finished in {} seconds, chain length {}'.format(
-        stop_time - start_time, mcmc.mh_params['chain_length']))
-    print('Estimated parameter: {}'.format(mcmc.estimated_params['P']))
-    print('Log likelihood: {}'.format(mcmc.estimated_params['log_llh']))
-    print('AIC: {}\n'.format(mcmc.estimated_params['AIC']))
-
-def bees_10_experiment():
-    model = Semisync10bees()
-    p_true = [0.1, 0.2, 0.4, 0.5, 0.6, 0.1, 0.2, 0.4, 0.5, 0.6]
-    print('Experiment with 10 bees, 10 params, semisync, p_true={}'.format(p_true))
-    (s, m, f) = model.sample(params=p_true, sample_size=10000)
-    mcmc = BayesianMcmc(model)
-    start_time = timeit.default_timer()
-    mcmc.estimate_p(m)
-    stop_time = timeit.default_timer()
-    print('Finished in {} seconds, chain length {}'.format(
-        stop_time - start_time, mcmc.mh_params['chain_length']))
-    print('Estimated parameter: {}'.format(mcmc.estimated_params['P']))
-    print('Log likelihood: {}'.format(mcmc.estimated_params['log_llh']))
-    print('AIC: {}\n'.format(mcmc.estimated_params['AIC']))
 
 
 def main():
     knuth_die_experiment()
-    bees_2_experiment()
-    bees_5_experiment()
-    bees_10_experiment()
 
 if __name__ == "__main__":
     sys.exit(main())
