@@ -1,0 +1,52 @@
+
+################################################################################
+INFO:root:Model: Knuth Die, 1 param
+INFO:root:True parameters: [0.3]
+INFO:root:Multinomial data: [683, 1633, 697, 1561, 3825, 1601]
+INFO:root:Distribution: [0.0683, 0.1633, 0.0697, 0.1561, 0.3825, 0.1601]
+INFO:root:Finished in 3.5610042379703373 seconds
+INFO:root:MCMC chain length: 50000
+INFO:root:Estimated parameter: [0.29729142]
+INFO:root:Highest posterior density interval: [array([0.29104061, 0.30402288])]
+INFO:root:Log likelihood: -22.893326076766243
+INFO:root:AIC: 47.786652153532486
+INFO:root:
+
+################################################################################
+INFO:root:Model: Semisynchronous, 2 bees, 2 params
+INFO:root:True parameters: [0.1, 0.2]
+INFO:root:Multinomial data: [8176, 1379, 445]
+INFO:root:Distribution: [0.8176, 0.1379, 0.0445]
+INFO:root:Finished in 2.30267017101869 seconds
+INFO:root:MCMC chain length: 50000
+INFO:root:Estimated parameter: [0.09615815 0.20456615]
+INFO:root:Highest posterior density interval: [array([0.03261196, 0.21480888]), array([0.1360519 , 0.52489239])]
+INFO:root:Log likelihood: -8.41899144735362
+INFO:root:AIC: 20.83798289470724
+INFO:root:
+
+################################################################################
+INFO:root:Model: Semisynchronous, 5 bees, 5 params
+INFO:root:True parameters: [0.1, 0.2, 0.4, 0.5, 0.6]
+INFO:root:Multinomial data: [5846, 1329, 1129, 955, 550, 191]
+INFO:root:Distribution: [0.5846, 0.1329, 0.1129, 0.0955, 0.055, 0.0191]
+INFO:root:Finished in 8.113703692972194 seconds
+INFO:root:MCMC chain length: 50000
+INFO:root:Estimated parameter: [0.09711239 0.20375497 0.38563277 0.5971854  0.35478696]
+INFO:root:Highest posterior density interval: [array([0.09051755, 0.4256031 ]), array([0.1463265 , 0.67705789]), array([0.09312432, 0.60550469]), array([0.1010707, 0.7447752]), array([0.14282423, 0.7756172 ])]
+INFO:root:Log likelihood: -68.19693962931342
+INFO:root:AIC: 146.39387925862684
+INFO:root:
+
+################################################################################
+INFO:root:Model: Semisynchronous, 10 bees, 10 models
+INFO:root:True parameters: [0.1, 0.2, 0.4, 0.5, 0.6, 0.1, 0.2, 0.4, 0.5, 0.6]
+INFO:root:Multinomial data: [3419, 529, 528, 716, 806, 3137, 652, 171, 34, 7, 1]
+INFO:root:Distribution: [0.3419, 0.0529, 0.0528, 0.0716, 0.0806, 0.3137, 0.0652, 0.0171, 0.0034, 0.0007, 0.0001]
+INFO:root:Finished in 573.9876290090033 seconds
+INFO:root:MCMC chain length: 50000
+INFO:root:Estimated parameter: [0.12489386 0.17917052 0.55555467 0.33110356 0.60337959 0.07395985
+ 0.45946612 0.31198486 0.53225409 0.35228818]
+INFO:root:Highest posterior density interval: [array([0.10349534, 0.69399652]), array([0.16099447, 0.79870836]), array([0.04476169, 0.83650799]), array([0.1989276 , 0.92826481]), array([0.31312953, 0.81002592]), array([0.0150231 , 0.62221689]), array([0.03421288, 0.90518561]), array([0.02713995, 0.82758569]), array([0.20101151, 0.89415371]), array([0.16646434, 0.74189364])]
+INFO:root:Log likelihood: -424.0159975016286
+INFO:root:AIC: 868.0319950032572
