@@ -17,5 +17,5 @@ class DataModel(ABC):
         pass
 
     @abstractmethod
-    def sample(self, p, sample_size):
+    def sample(self, p, trials_count):
         pass

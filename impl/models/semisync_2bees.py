@@ -6,6 +6,7 @@ import numpy as np
 class Semisync2bees(DataModel):
     def __init__(self):
         super().__init__()
+        self.name = "Semisynchronous, 2 bees, 2 params"
         self.bscc_pfuncs = [
             lambda p: self.f_bscc_0(p),
             lambda p: self.f_bscc_1(p),
@@ -22,6 +23,9 @@ class Semisync2bees(DataModel):
     def f_bscc_2(self, p):
         return (-2 * p[1] * p[0]**2 + p[0]**2 + 2 * p[1] * p[0])
 
+    def get_name(self, ):
+        return self.name
+        
     def get_params_count(self,):
         return self.params_count
 
@@ -31,15 +35,15 @@ class Semisync2bees(DataModel):
     def eval_bscc_pfuncs(self, p):
         return [f(p) for f in self.bscc_pfuncs]
 
-    def sample(self, params, sample_size: int = 1000):
+    def sample(self, params, trials_count: int = 1000):
         """
         Sample by categorical distribution
         Later can be transformed into multinomial sample
         """
         P = self.eval_bscc_pfuncs(params)
-        N = len(P)
-        categorical = np.random.choice(N, sample_size, p=P)
-        multinomial = [0] * N
+        bins_count = len(P)
+        categorical = np.random.choice(bins_count, trials_count, p=P)
+        multinomial = [0] * bins_count
         for it in categorical:
             multinomial[it] += 1
         norm = sum(multinomial) * 1.0
@@ -52,7 +56,7 @@ def main():
     dmodel = Semisync2bees()
     (s, m, f) = dmodel.sample(
         params=[0.1, 0.2],
-        sample_size=10000
+        trials_count=10000
         )
     print("Simplex assert:    {}".format(np.sum(dmodel.eval_bscc_pfuncs([0.1, 0.2]))))
     print("Sample categorical {}".format(s))

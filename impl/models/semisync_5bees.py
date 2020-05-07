@@ -6,6 +6,7 @@ import numpy as np
 class Semisync5bees(DataModel):
     def __init__(self):
         super().__init__()
+        self.name = 'Semisynchronous, 5 bees, 5 params'
         self.params_count = 5
         self.bscc_pfuncs = [
             lambda p: self.f_bscc_0(p),
@@ -16,6 +17,9 @@ class Semisync5bees(DataModel):
             lambda p: self.f_bscc_5(p)
         ]
 
+    def get_name(self, ):
+        return self.name
+
     def get_params_count(self):
         return self.params_count
 
@@ -25,15 +29,15 @@ class Semisync5bees(DataModel):
     def eval_bscc_pfuncs(self, p):
         return [f(p) for f in self.bscc_pfuncs]
 
-    def sample(self, params, sample_size: int = 1000):
+    def sample(self, params, trials_count: int = 1000):
         """
         Sample by categorical distribution
         Later can be transformed into multinomial sample
         """
         P = self.eval_bscc_pfuncs(params)
-        N = len(P)
-        categorical = np.random.choice(N, sample_size, p=P)
-        multinomial = [0] * N
+        bins_count = len(P)
+        categorical = np.random.choice(bins_count, trials_count, p=P)
+        multinomial = [0] * bins_count
         for it in categorical:
             multinomial[it] += 1
         norm = sum(multinomial) * 1.0
@@ -73,7 +77,7 @@ def main():
     dmodel = Semisync5bees()
     (s, m, f) = dmodel.sample(
         params=[0.1, 0.2, 0.4, 0.5, 0.6],
-        sample_size=10000
+        trials_count=10000
         )
     print("Simplex assert:    {}".format(np.sum(dmodel.eval_bscc_pfuncs([0.1, 0.2]))))
     print("Sample categorical {}".format(s))

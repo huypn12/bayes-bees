@@ -4,6 +4,7 @@ import numpy as np
 class Semisync10bees(object):
     def __init__(self):
         super().__init__()
+        self.name = 'Semisynchronous, 10 bees, 10 models'
         self.params_count = 10
         self.bscc_pfuncs = [
             lambda p: self.f_bscc_0(p),
@@ -19,6 +20,9 @@ class Semisync10bees(object):
             lambda p: self.f_bscc_10(p)
         ]
 
+    def get_name(self, ):
+        return self.name
+
     def get_params_count(self):
         return self.params_count
 
@@ -28,15 +32,15 @@ class Semisync10bees(object):
     def eval_bscc_pfuncs(self, p):
         return [f(p) for f in self.bscc_pfuncs]
 
-    def sample(self, params, sample_size: int = 1000):
+    def sample(self, params, trials_count: int = 1000):
         """
         Sample by categorical distribution
         Later can be transformed into multinomial sample
         """
         P = self.eval_bscc_pfuncs(params)
-        N = len(P)
-        categorical = np.random.choice(N, sample_size, p=P)
-        multinomial = [0] * N
+        bins_count = len(P)
+        categorical = np.random.choice(bins_count, trials_count, p=P)
+        multinomial = [0] * bins_count
         for it in categorical:
             multinomial[it] += 1
         norm = sum(multinomial) * 1.0
