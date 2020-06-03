@@ -64,6 +64,7 @@ class PrismBsccParser(object):
 
 
     def replace_var(self, bscc_str):
+        # adapted to new model r_0, ..., r_n
         #bscc_str = bscc_str.replace('p', r'p[0]')
         pattern = re.compile(r'([r])_(\d*)')
         bscc_str = pattern.sub(r"r[\2]", bscc_str)

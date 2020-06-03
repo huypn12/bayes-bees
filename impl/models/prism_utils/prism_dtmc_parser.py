@@ -8,13 +8,21 @@ class PrismDtmcParser(object):
         self.prism_model_file = prism_model_file
 
     def process(self,):
-        adj_list = extract_adj_list()
+        adj_list = self.extract_adj_list()
 
-    def process_state_string(self, sstate):
-        state_label = ''
-        return state_label
+    def process_state_label(self, sstate):
+        tokens = sstate.split('&')
+        is_bscc = False
+        if 'b=0' in tokens:
+            tokens.remove('b=0')
+        elif 'b=1' in tokens:
+            tokens.remove('b=1')
+            is_bscc = True
+        state_label = ','.join(tokens)
+        return state_label, is_bscc
 
-    def replace_selection_token(self, a_gcmd_str):
+
+    def replace_select_op(self, a_gcmd_str):
         # Replace '+' as successor state separation by '$' for easier parsing
         # since '+' is also used in symbolic expression
         gcmd_str = a_gcmd_str
@@ -32,11 +40,22 @@ class PrismDtmcParser(object):
             i += 1
         return gcmd_str
 
-    def process_gcommand(self, ):
+    def process_gcommand(self, gcmd_str):
         """
         [] a -> x : a' + y : a"
         """
-        pass
+        gcmd_str = self.clean_gcommand_line(gcmd_str)
+        # get successor state name
+        state_label, is_bscc = self.process_state_label(sstate)
+
+
+    def clean_gcommand_line(self, gcmd_line):
+        gcmd_line = self.replace_select_op(gcmd_line)
+        gcmd_line = gcmd_line.replace('[]', '')
+        gcmd_line = gcmd_line.replace('\'', '')
+        gcmd_line = gcmd_line.replace(' ', '')
+        return gcmd_line
+
 
     def extract_adj_list(self, ):
         lines = []
@@ -65,7 +84,8 @@ def test_process_gcmd():
     parser = PrismDtmcParser("")
     gcmd_str = gcmd_str.rstrip().lstrip()
     gcmd_str = parser.replace_selection_token(gcmd_str)
-    print(gcmd_str)
+    expected = """a0=3&a1 = 3&a2=3&b=0->1.0*r_0*r_0*r_0:a0=1&a1=1&a2=1$3.0*r_0*r_0*(1-r_0):a0=1&a1=1&a2=0$3.0*r_0*(1-r_0)*(1-r_0): (a0'=1) & (a1'=0) & (a2'=0) + 1.0*(1-r_0)*(1-r_0)*(1-r_0): (a0'=0) & (a1'=0) & (a2'=0);"""
+    assert(gcmd_str == expected)
 
 def main():
     test_process_gcmd()
