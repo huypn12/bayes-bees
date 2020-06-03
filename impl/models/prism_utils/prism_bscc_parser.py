@@ -1,6 +1,3 @@
-# Input: a .txt PRISM result file
-# Output: BSCC AST-parsed
-
 import re
 from asteval import Interpreter
 
@@ -50,12 +47,19 @@ class PrismBsccParser(object):
         return max_param_idx
 
 
+    def process_division(self, bscc_str):
+        if '|' not in bscc_str:
+            return bscc_str
+        bscc_str = bscc_str.replace('|', r')/(')
+        bscc_str = '({})'.format(bscc_str)
+        return bscc_str
+
+
     def replace_ops(self, bscc_str):
-        # 2-params model
-        bscc_str = bscc_str.replace('|', r'/')
         bscc_str = bscc_str.replace('{', r'(')
         bscc_str = bscc_str.replace('}', r')')
         bscc_str = bscc_str.replace('^', r'**')
+        bscc_str = self.process_division(bscc_str)
         return bscc_str
 
 
@@ -115,7 +119,7 @@ def test2():
     print(bscc_str_pfuncs[0])
     aeval = Interpreter()
     aeval.symtable['p'] = 0.3
-    aeval.symtable['q'] = 0.4
+    aeval.symtable['q'] = 0.7
     for i in range(0, len(bscc_ast_pfuncs)):
         try:
             print(aeval.run(bscc_ast_pfuncs[i]))
