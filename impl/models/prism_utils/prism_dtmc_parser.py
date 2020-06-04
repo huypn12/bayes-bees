@@ -19,8 +19,8 @@ class PrismDtmcParser(object):
 
     def get_pmc_desc(self,):
         return {
-            'pinit': self.init_ast_pfuncs,
-            'ptrans': self.trans_ast_pfuncs,
+            'init_ast_pfuncs': self.init_ast_pfuncs,
+            'trans_ast_pfuncs': self.trans_ast_pfuncs,
             'state_labels': self.state_list,
             'bscc_labels': self.bscc_list
         }
