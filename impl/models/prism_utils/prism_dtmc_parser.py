@@ -1,3 +1,4 @@
+import sys
 import re
 from asteval import Interpreter
 
@@ -6,14 +7,18 @@ class PrismDtmcParser(object):
     def __init__(self, prism_model_file):
         super().__init__()
         self.prism_model_file = prism_model_file
+        self.init_symbol = '3'
+        self.init_state_label = None
         self.state_list = []
         self.edge_list = []
         self.bscc_list = []
-
+        self.init_str_pfuncs = []
+        self.trans_str_pfuncs = []
 
     def process(self,):
         self.extract_adj_list()
-
+        self.build_init_vector()
+        self.build_trans_matrix()
 
     def process_state_label(self, sstate):
         sstate = sstate.replace('(', '').replace(')', '')
@@ -26,13 +31,11 @@ class PrismDtmcParser(object):
             is_bscc = True
         state_label = ','.join(tokens)
         return state_label, is_bscc
-    
 
     def process_expression(self, expr_str):
         pattern = re.compile(r'([r])_(\d*)')
         expr_str = pattern.sub(r"r[\2]", expr_str)
         return expr_str
-
 
     def replace_select_op(self, a_gcmd_str):
         # Replace '+' as successor state separation by '$' for easier parsing
@@ -45,13 +48,13 @@ class PrismDtmcParser(object):
                 j = 1
                 while i + j <= gcmd_str_end:
                     if gcmd_str[i + j] == "+":
-                        gcmd_str = gcmd_str[:i + j] + "$" + gcmd_str[i + j + 1:] 
+                        gcmd_str = gcmd_str[:i + j] + \
+                            "$" + gcmd_str[i + j + 1:]
                         i += j
                         break
                     j += 1
             i += 1
         return gcmd_str
-
 
     def process_gcommand_line(self, gcmd_str):
         """
@@ -63,18 +66,20 @@ class PrismDtmcParser(object):
         state_label, is_bscc = self.process_state_label(sstate)
         if state_label not in self.state_list:
             self.state_list.append(state_label)
-        for i in range(1, len(tokens)):
-            ttokens = tokens[i].split('$')
-            for ii in range(0, len(ttokens)):
-                next = ttokens[ii].split(':')
-                if len(next) == 1: #bscc lines
-                    next_state_label, is_bscc = self.process_state_label(next[0])
-                    if is_bscc: # redundant, just for clarity
-                        self.bscc_list.append(next_state_label)
-                    continue
-                expr_str = self.process_expression(next[0])
-                next_state_label , _= self.process_state_label(next[1])
-                self.edge_list.append((state_label, next_state_label, expr_str))
+        ttokens = tokens[1].split('$')
+        for i in range(0, len(ttokens)):
+            next = ttokens[i].split(':')
+            if len(next) == 1:  # bscc lines
+                next_state_label, is_bscc = self.process_state_label(next[0])
+                if is_bscc:  # redundant, just for clarity
+                    self.bscc_list.append(next_state_label)
+                if state_label != next_state_label:
+                    self.edge_list.append((state_label, next_state_label, '1'))
+                continue
+            expr_str = self.process_expression(next[0])
+            next_state_label, _ = self.process_state_label(next[1])
+            self.edge_list.append(
+                (state_label, next_state_label, expr_str))
 
 
     def clean_gcommand_line(self, gcmd_line):
@@ -86,7 +91,6 @@ class PrismDtmcParser(object):
             .replace(' ', '')
         return gcmd_line
 
-
     def extract_adj_list(self, ):
         lines = []
         with open(self.prism_model_file) as model_file:
@@ -97,13 +101,42 @@ class PrismDtmcParser(object):
             if line[0:2] == '[]':
                 self.process_gcommand_line(line)
 
+    def build_init_vector(self, ):
+        init_state_label = None
+        init_flag = '=' + self.init_symbol
+        for state_label in self.state_list:
+            if all(init_flag in s for s in state_label.split(',')):
+                init_state_label = state_label
+                break
+        self.state_list.remove(init_state_label)
+        self.init_str_pfuncs = ['0'] * len(self.state_list)
+        # (a,b,p) means a-[p]->b
+        for edge in self.edge_list:
+            if edge[0] == init_state_label:
+                i = self.state_list.index(edge[1])
+                self.init_str_pfuncs[i] = edge[2]
+        self.init_state_label = init_state_label
 
-    def to_trans_matrix(self, adj_list):
-        return []
+
+    def build_trans_matrix(self, ):
+        self.trans_str_pfuncs = [
+            ['0'] * len(self.state_list)
+            for i in range(0, len(self.state_list))
+        ]
+        for bscc in self.bscc_list:
+            i = self.state_list.index(bscc)
+            self.trans_str_pfuncs[i][i] = '1'
+        for edge in self.edge_list:
+            curr = edge[0]
+            if curr == self.init_state_label:
+                continue
+            i = self.state_list.index(curr)
+            nextt = edge[1]
+            j = self.state_list.index(nextt)
+            self.trans_str_pfuncs[i][j] = edge[2]
 
 
 ## UNIT TEST ##
-import sys 
 
 
 def test_gcmd_cleanup():
@@ -136,19 +169,32 @@ def test_expr():
 def test_extract_state():
     parser = PrismDtmcParser("bee_multiparam_synchronous_3.pm")
     parser.process()
-    print(parser.state_list)
-    print(parser.bscc_list)
+    print('State list\n', parser.state_list)
+    print('BSCC list\n', parser.bscc_list)
     for b in parser.bscc_list:
         assert(b in parser.state_list)
+    print('Edge list:')
     for e in parser.edge_list:
         print(e)
+
+
+def test_build_matrix():
+    parser = PrismDtmcParser("bee_multiparam_synchronous_3.pm")
+    parser.process()
+    print('Initial vector:')
+    for iv in parser.init_str_pfuncs:
+        print(iv)
+    print('Transition matrix:')
+    for row in parser.trans_str_pfuncs:
+        print(row)
+
 
 def main():
     test_gcmd_cleanup()
     test_state_label()
     test_expr()
     test_extract_state()
-
+    test_build_matrix()
 
 if __name__ == "__main__":
     sys.exit(main())
