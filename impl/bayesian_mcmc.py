@@ -15,7 +15,7 @@ class BayesianMcmc(object):
             'alpha': 2,
             'beta': 2,
         }
-        self.mh_params = {'chain_length': 50000, 'hpd_alpha': 0.94}
+        self.mh_params = {'chain_length': 50000, 'hpd_alpha': 0.95}
         self.traces = []
         self.data_model = model
         self.estimated_params = {}
@@ -148,8 +148,6 @@ def knuth_die_experiment():
     print('Estimated parameter: {}'.format(mcmc.estimated_params['P']))
     print('Log likelihood: {}'.format(mcmc.estimated_params['log_llh']))
     print('AIC: {}\n'.format(mcmc.estimated_params['AIC']))
-
-
 
 def main():
     knuth_die_experiment()
