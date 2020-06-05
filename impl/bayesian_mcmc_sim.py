@@ -7,7 +7,7 @@ from .bayesian_mcmc import BayesianMcmc
 
 class BayesianMcmcSim(BayesianMcmc):
     def log_likelihood(self, p, data):
-        P = self.data_model.simulate_bscc_pfuncs(p)
+        P = self.data_model.sample_run_chain(p, max_trials=1000)
         return self.llh(P, data)
 
     def posterior_mean(self, data):
@@ -15,7 +15,7 @@ class BayesianMcmcSim(BayesianMcmc):
         p_hat = np.zeros(self.data_model.get_params_count())
         margin = 0
         for p in self.traces:
-            P = self.data_model.simulate_bscc_pfuncs(p)
+            P = self.data_model.sample_run_chain(p, max_trials=1000)
             prior = 1
             for p_i in p:
                 prior *= beta(self.hyperparams['alpha'],
@@ -24,5 +24,5 @@ class BayesianMcmcSim(BayesianMcmc):
             margin += llh * prior
             p_hat = p_hat + np.array(p) * llh * prior
         p_hat = p_hat / margin
-        log_llh = self.np_llh(self.data_model.simulate_bscc_pfuncs(p_hat), data)
+        log_llh = self.np_llh(self.data_model.sample_run_chain(p_hat, max_trials=1000), data)
         return p_hat, log_llh

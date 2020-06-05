@@ -1,3 +1,4 @@
+import sys
 from .data_model import DataModel
 from .prism_utils.prism_bscc_parser import PrismBsccParser
 from .prism_utils.prism_dtmc_parser import PrismDtmcParser
@@ -9,33 +10,30 @@ from asteval import Interpreter
 class BeesModel(DataModel):
     def __init__(self):
         super().__init__()
-        self.aeval = Interpreter()
         self.state_labels = None
-        self.init_ast_pfuncs = None    
+        self.state_count = 0
+        self.init_ast_pfuncs = None
         self.trans_ast_pfuncs = None
         self.bscc_labels = None
         self.bscc_ast_pfuncs = None
+        self.bscc_count = 0
         self.is_evaluated = False
         self.bscc_eval = None
         self.init_eval = None
         self.trans_eval = None
         self.params_count = 0
-        
 
     def get_params_count(self,):
         return self.params_count
 
-
     def get_bscc_pfuncs(self, ):
         return self.bscc_ast_pfuncs
-
 
     @staticmethod
     def from_model_file(prism_model_filepath):
         parser = PrismDtmcParser(prism_model_filepath)
         parser.process()
         return parser.get_pmc_desc()
-        
 
     @staticmethod
     def from_result_file(prism_result_filepath):
@@ -43,27 +41,35 @@ class BeesModel(DataModel):
         parser.process()
         return parser.get_bscc_desc()
 
-
     @staticmethod
     def from_files(prism_model_filepath, prism_result_filepath):
         pmc_desc = BeesModel.from_model_file(prism_model_filepath)
         bscc_desc = BeesModel.from_result_file(prism_result_filepath)
         bees_model = BeesModel()
         bees_model.state_labels = pmc_desc['state_labels']
+        bees_model.state_count = len(pmc_desc['state_labels'])
         bees_model.init_ast_pfuncs = pmc_desc['init_ast_pfuncs']
+        bees_model.init_eval = [0] * bees_model.state_count
         bees_model.trans_ast_pfuncs = pmc_desc['trans_ast_pfuncs']
+        bees_model.trans_eval = [
+            [0] * bees_model.state_count
+            for i in range(0, bees_model.state_count)
+        ]
         bees_model.bscc_labels = bscc_desc['bscc_labels']
         bees_model.bscc_ast_pfuncs = bscc_desc['bscc_ast_pfuncs']
+        bees_model.bscc_count = len(bscc_desc['bscc_labels'])
+        bees_model.params_count = bscc_desc['params_count']
         return bees_model
 
-    def eval_bscc_pfuncs(self, p):
-        self.aeval.symtable['r'] = p
-        return [aeval.run(p) for f in self.bscc_pfuncs]
-
+    def eval_bscc_pfuncs(self, r):
+        aeval = Interpreter()
+        aeval.symtable['r'] = r
+        return [aeval.run(f) for f in self.bscc_ast_pfuncs]
 
     def sample(self, params, trials_count: int = 1000):
         # Sampling given BSCC functions
         P = self.eval_bscc_pfuncs(params)
+        self.bscc_eval = P
         bins_count = len(P)
         categorical = np.random.choice(bins_count, trials_count, p=P)
         multinomial = [0] * bins_count
@@ -73,28 +79,58 @@ class BeesModel(DataModel):
         frequency = [v / norm for v in multinomial]
         return (categorical, multinomial, frequency)
 
+    def eval_pmc_pfuncs(self, r):
+        aeval = Interpreter()
+        aeval.symtable['r'] = r
+        for i in range(0, self.state_count):
+            self.init_eval[i] = aeval.run(self.init_ast_pfuncs[i][j])
+        for i in range(0, self.state_count):
+            for j in range(0, self.state_count):
+                self.trans_eval[i][j] = aeval.run(self.trans_ast_pfuncs[i][j])
 
-    def run_chain(self, ):
-        pass
+    def run_chain(self, max_steps=1000):
+        bscc_label = ''
+        bscc_idx = -1
+        curr_state_idx = categorical = np.random.choice(self.state_count, 1, p=self.init_eval)[0]
+        for i in range(0, max_steps):
+            label = self.state_labels[curr_state_idx]
+            if label in self.bscc_labels:
+                bscc_label = label
+                bscc_idx = self.bscc_labels.index(label)
+                break
+            p_next = self.trans_eval[curr_state_idx]
+            next_state_idx = np.random.choice(self.state_count, 1, p=self.init_eval)[0]
+        return bscc_label, bscc_idx
 
-
-    def sample_run_chain(self, p):
+    def sample_run_chain(self, r, max_trials):
         # Sampling by running the parametric chain
-        assert(is_evaluated)
+        self.eval_pmc_pfuncs(r)
+        bins = [0] * self.state_count
+        for i in range(0, max_trials):
+            label, idx = run_chain()
+            if idx == -1: # discard the run
+                continue
+            bins[idx] += 1
+        norm = sum(bins) * 1.0
+        hist = [c / norm for c in bins]
+        return hist
+
 
 ## UNIT TEST ##
-import sys
+
 
 def test_bscc_label_match():
-    dtmc_parser = PrismDtmcParser('models/prism_utils/bee_multiparam_synchronous_3.pm')
-    bscc_parser = PrismBsccParser('models/prism_utils/bee_multiparam_synchronous_3.txt')
+    dtmc_parser = PrismDtmcParser(
+        'models/prism_utils/bee_multiparam_synchronous_3.pm')
+    bscc_parser = PrismBsccParser(
+        'models/prism_utils/bee_multiparam_synchronous_3.txt')
     dtmc_parser.process()
     bscc_parser.process()
     pmc = dtmc_parser.get_pmc_desc()
     bscc = bscc_parser.get_bscc_desc()
-    #size matching
+    # size matching
     assert(len(pmc['bscc_labels']) == len(bscc['bscc_labels']))
-    #index matching
+    # index matching
     for i in range(0, len(pmc['bscc_labels'])):
         assert(pmc['bscc_labels'][i] == bscc['bscc_labels'][i])
 
@@ -117,16 +153,21 @@ def test_bscc_sample():
     (s, m, f) = bees_model.sample(
         params=[0.1, 0.2, 0.3],
         trials_count=10000
-        )
-    print("Simplex assert:    {}".format(np.sum(bees_model.eval_bscc_pfuncs([0.1, 0.2, 0.3]))))
+    )
+    print("Simplex assert:    {}".format(
+        np.sum(bees_model.eval_bscc_pfuncs([0.1, 0.2, 0.3]))))
     print("Sample categorical {}".format(s))
     print("Sample multinomial {}".format(m))
     print("Sample frequency   {}".format(f))
 
+def test_chain_run():
+    pass
 
 def main():
     test_bscc_label_match()
     test_static_ctor()
+    test_bscc_sample()
+    test_chain_run()
 
 if __name__ == "__main__":
     sys.exit(main())
