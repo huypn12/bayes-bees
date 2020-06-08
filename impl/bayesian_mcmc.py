@@ -31,7 +31,8 @@ class BayesianMcmc(object):
         p_new = [0] * params_count
         for i in range(0, params_count):
             p_new[i] = np.random.beta(alpha, beta)
-        return p_new
+        # return p_new 
+        return sorted(p_new) # This line is glued to new model r0_,r_1,...,r_k
 
     def prior(self, p):
         eps = 1e-18
@@ -127,6 +128,7 @@ Experiment setup:
 ## UNIT TEST ##
 import timeit
 
+# Deprecated models; now switch to general BeesModel
 from models.knuth_die import KnuthDie
 from models.semisync_2bees import Semisync2bees
 from models.semisync_5bees import Semisync5bees
