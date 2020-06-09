@@ -26,6 +26,9 @@ class BeesModel(DataModel):
     def get_params_count(self,):
         return self.params_count
 
+    def get_bscc_count(self,):
+        return self.bscc_count
+
     def get_bscc_pfuncs(self, ):
         return self.bscc_ast_pfuncs
 
@@ -83,15 +86,15 @@ class BeesModel(DataModel):
         aeval = Interpreter()
         aeval.symtable['r'] = r
         for i in range(0, self.state_count):
-            self.init_eval[i] = aeval.run(self.init_ast_pfuncs[i][j])
+            self.init_eval[i] = aeval.run(self.init_ast_pfuncs[i])
         for i in range(0, self.state_count):
             for j in range(0, self.state_count):
                 self.trans_eval[i][j] = aeval.run(self.trans_ast_pfuncs[i][j])
 
-    def run_chain(self, max_steps=1000):
+    def run_chain(self, max_steps=100):
         bscc_label = ''
         bscc_idx = -1
-        curr_state_idx = categorical = np.random.choice(self.state_count, 1, p=self.init_eval)[0]
+        curr_state_idx = np.random.choice(self.state_count, 1, p=self.init_eval)[0]
         for i in range(0, max_steps):
             label = self.state_labels[curr_state_idx]
             if label in self.bscc_labels:
@@ -99,15 +102,15 @@ class BeesModel(DataModel):
                 bscc_idx = self.bscc_labels.index(label)
                 break
             p_next = self.trans_eval[curr_state_idx]
-            next_state_idx = np.random.choice(self.state_count, 1, p=self.init_eval)[0]
+            curr_state_idx = np.random.choice(self.state_count, 1, p=p_next)[0]
         return bscc_label, bscc_idx
 
     def sample_run_chain(self, r, max_trials):
         # Sampling by running the parametric chain
         self.eval_pmc_pfuncs(r)
-        bins = [0] * self.state_count
+        bins = [0] * self.bscc_count
         for i in range(0, max_trials):
-            label, idx = run_chain()
+            label, idx = self.run_chain()
             if idx == -1: # discard the run
                 continue
             bins[idx] += 1
@@ -117,7 +120,7 @@ class BeesModel(DataModel):
 
 
 ## UNIT TEST ##
-
+import sys, timeit
 
 def test_bscc_label_match():
     dtmc_parser = PrismDtmcParser(
@@ -154,14 +157,31 @@ def test_bscc_sample():
         params=[0.1, 0.2, 0.3],
         trials_count=10000
     )
-    print("Simplex assert:    {}".format(
-        np.sum(bees_model.eval_bscc_pfuncs([0.1, 0.2, 0.3]))))
-    print("Sample categorical {}".format(s))
-    print("Sample multinomial {}".format(m))
-    print("Sample frequency   {}".format(f))
+    print('Sampling with BSCC rational function.')
+    start_time = timeit.default_timer()
+    bscc_eval = bees_model.eval_bscc_pfuncs([0.1, 0.2, 0.3])
+    stop_time = timeit.default_timer()
+    print('Finished evaluation in {} seconds'.format(
+        stop_time - start_time))
+    print("\tSimplex assert:    {}".format(
+        np.sum(bscc_eval)))
+    print("\tSample categorical {}".format(s))
+    print("\tSample multinomial {}".format(m))
+    print("\tSample frequency   {}".format(f))
 
 def test_chain_run():
-    pass
+    print('Sampling with chain run')
+    dtmc_filepath = 'models/prism_utils/bee_multiparam_synchronous_3.pm'
+    bscc_filepath = 'models/prism_utils/bee_multiparam_synchronous_3.txt'
+    bees_model = BeesModel.from_files(dtmc_filepath, bscc_filepath)
+    r = [0.1, 0.2, 0.3]
+    start_time = timeit.default_timer()
+    h = bees_model.sample_run_chain(r, max_trials=1000)
+    stop_time = timeit.default_timer()
+    print('Finished in {} seconds, chain length {}'.format(
+        stop_time - start_time, 1000))
+    assert(sum(h) - 1.0 < 1e-5)
+    print('\tSample frequency:', h)
 
 def main():
     test_bscc_label_match()

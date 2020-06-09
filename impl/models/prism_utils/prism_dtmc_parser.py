@@ -43,9 +43,14 @@ class PrismDtmcParser(object):
         return state_label, is_bscc
 
     def process_expression(self, expr_str):
+        """
         pattern = re.compile(r'([r])_(\d*)')
         expr_str = pattern.sub(r"r[\2]", expr_str)
         return expr_str
+        """
+        return re.sub(r'([r])_(\d*)',
+                lambda match: match.group(1) + '[' + str(int(match.group(2))) + ']',
+                expr_str)
 
     def replace_select_op(self, a_gcmd_str):
         # Replace '+' as successor state separation by '$' for easier parsing
