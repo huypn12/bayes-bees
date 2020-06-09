@@ -13,10 +13,11 @@ class BayesianMcmcSim(BayesianMcmc):
     def __init__(self, model):
         super().__init__(model)
         self.hyperparams = {
-            'alpha': 5,
-            'beta': 1,
+            'alpha': 1.5,
+            'beta': 1.5,
         }
-        self.mh_params = {'chain_length': 500, 'hpd_alpha': 0.95}
+        self.mh_params = {'chain_length': 5000, 'hpd_alpha': 0.95}
+        self.max_trials = 100
 
     def transition(self, ):
         alpha = self.hyperparams['alpha']
@@ -31,7 +32,7 @@ class BayesianMcmcSim(BayesianMcmc):
         return sorted(p_new)
 
     def log_likelihood(self, p, data):
-        P = self.data_model.sample_run_chain(p, max_trials=1000)
+        P = self.data_model.sample_run_chain(p, max_trials=self.max_trials)
         return self.llh(P, data)
 
     def posterior_mean(self, data):
@@ -39,7 +40,7 @@ class BayesianMcmcSim(BayesianMcmc):
         p_hat = np.zeros(self.data_model.get_params_count())
         margin = 0
         for p in self.traces:
-            P = self.data_model.sample_run_chain(p, max_trials=1000)
+            P = self.data_model.sample_run_chain(p, max_trials=self.max_trials)
             prior = 1
             for p_i in p:
                 prior *= beta(self.hyperparams['alpha'],
@@ -49,7 +50,7 @@ class BayesianMcmcSim(BayesianMcmc):
             p_hat = p_hat + np.array(p) * llh * prior
         p_hat = p_hat / margin
         log_llh = self.np_llh(self.data_model.sample_run_chain(
-            p_hat, max_trials=1000), data)
+            p_hat, max_trials=self.max_trials*10), data)
         return p_hat, log_llh
 
 
@@ -73,7 +74,7 @@ def test_3bees():
     print('Finished in {} seconds, chain length {}'.format(
         stop_time - start_time, mcmc.mh_params['chain_length']))
     print('Estimated parameter: {}'.format(mcmc.estimated_params['P']))
-    print('Highest posterior density interval: {}'.format(bees_model.estimated_params['HPD']))
+    print('Highest posterior density interval: {}'.format(mcmc.estimated_params['HPD']))
     print('Log likelihood: {}'.format(mcmc.estimated_params['log_llh']))
     print('AIC: {}\n'.format(mcmc.estimated_params['AIC']))
 
