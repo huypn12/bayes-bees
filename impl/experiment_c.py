@@ -53,6 +53,7 @@ def summarize_inference_result(mcmc):
 
 
 def do_experiment_rational(model, data_m, mh_chain_length):
+    logging.info('...')
     logging.info('Metropolis Hastings, get BSCC by rational function evaluation')
     mcmc = BayesianMcmc(model)
     mcmc.mh_params['chain_length'] = mh_chain_length
@@ -65,6 +66,7 @@ def do_experiment_rational(model, data_m, mh_chain_length):
 
 
 def do_experiment_chainrun(model, data_m, mh_chain_length, mh_chain_run_factor):
+    logging.info('...')
     logging.info('Metropolis Hastings, get BSCC stats by chain running')
     mcmc = BayesianMcmcSim(model)
     mcmc.mh_params['chain_length'] = mh_chain_length
@@ -94,7 +96,7 @@ def do_experiment(model, p_true, trials_count, mh_chain_length, mh_chain_run_fac
 
 
 def test_mm3params():
-    logging.info('WARM UP TEST, 3 BEES')
+    logging.info('SINGLE TEST, 3 BEES')
     dtmc_filepath = 'models/prism_utils/bee_multiparam_synchronous_3.pm'
     bscc_filepath = 'models/prism_utils/bee_multiparam_synchronous_3.txt'
     model = BeesModel.from_files(dtmc_filepath, bscc_filepath)
@@ -103,7 +105,7 @@ def test_mm3params():
 
 
 def test_mm15params():
-    logging.info('WARM UP TEST, 3 BEES')
+    logging.info('SINGLE TEST, 15 BEES')
     dtmc_filepath = 'models/prism_utils/bee_multiparam_synchronous_15.pm'
     bscc_filepath = 'models/prism_utils/bee_multiparam_synchronous_15.txt'
     model = BeesModel.from_files(dtmc_filepath, bscc_filepath)
@@ -120,28 +122,27 @@ def small_batch():
          'models/prism_utils/bee_multiparam_synchronous_3.txt'),
         # 5 bees
         ('models/prism_utils/bee_multiparam_synchronous_5.pm',
-         'models/prism_utils/bee_multiparam_synchronous_5.txt'),
-        # 10 bees
-        ('models/prism_utils/bee_multiparam_synchronous_10.pm',
-         'models/prism_utils/bee_multiparam_synchronous_10.txt'),
-        # 10 bees
-        ('models/prism_utils/bee_multiparam_synchronous_15.pm',
-         'models/prism_utils/bee_multiparam_synchronous_15.txt')
+         'models/prism_utils/bee_multiparam_synchronous_5.txt')
     ]
-    
     mh_chain_length = [100, 200]
     mh_chain_run_factor = [100, 200]
     synthetic_data_trials = [100, 200]
-    for setting in itertools.product(model_files, synthetic_data_trials, mh_chain_length, mh_chain_run_factor):
-        files, trials_count, mh_chainLength, mh_chainRuns = setting
+    for setting in itertools.product(model_files, synthetic_data_trials, mh_chain_length):
+        files, trials_count, mh_chainLength = setting
         logging.info('{}'.format('-' * 80))
+        logging.info('MODEL INFO')
         logging.info('Model DTMC file {}'.format(files[0]))
         logging.info('Model BSCC file {}'.format(files[1]))
         model = BeesModel.from_files(*files)
         logging.info('#params {}, # BSCCs{}'.format(model.get_params_count(), model.get_bscc_count()))
-        true_params = rand_increasing_sequence(model.get_params_count())
-        do_experiment(model, true_params, trials_count, mh_chainLength, mh_chainRuns)
-
+        p_true = rand_increasing_sequence(model.get_params_count())
+        # do_experiment(model, true_params, trials_count, mh_chainLength, mh_chainRuns)
+        logging.info('True parameters: {}'.format(p_true))
+        (s, m, f) = model.sample(params=p_true, trials_count=trials_count)
+        summarize_data((s, m, f))
+        do_experiment_rational(model, m, mh_chainLength)
+        for chain_run_factor in mh_chain_run_factor:
+            do_experiment_chainrun(model, m, mh_chainLength, chain_run_factor)
 
 def large_batch():
     logging.info('LARGE BATCH, SETTINGS TEST')
@@ -160,23 +161,31 @@ def large_batch():
          'models/prism_utils/bee_multiparam_synchronous_15.txt')
     ]
 
-    mh_chain_length = [500, 5000, 50000]
+    mh_chain_length = [500, 1000]
     mh_chain_run_factor = [100, 1000]
-    synthetic_data_trials = [100, 1000]
-    for setting in itertools.product(model_files, synthetic_data_trials, mh_chain_length, mh_chain_run_factor):
-        files, trials_count, mh_chainLength, mh_chainRuns = setting
+    synthetic_data_trials = [100, 10000]
+    for setting in itertools.product(model_files, synthetic_data_trials, mh_chain_length):
+        files, trials_count, mh_chainLength = setting
+        logging.info('{}'.format('-' * 80))
+        logging.info('MODEL INFO')
         logging.info('Model DTMC file {}'.format(files[0]))
         logging.info('Model BSCC file {}'.format(files[1]))
         model = BeesModel.from_files(*files)
-        logging.info('#params {}, # BSCCs{}'.format(model.get_params_count(), model.get_bscc_count()))
-        true_params = rand_increasing_sequence(model.get_params_count())
-        do_experiment(model, true_params, trials_count, mh_chainLength, mh_chainRuns)
+        logging.info('#params={}, #BSCCs={}'.format(model.get_params_count(), model.get_bscc_count()))
+        p_true = rand_increasing_sequence(model.get_params_count())
+        # do_experiment(model, true_params, trials_count, mh_chainLength, mh_chainRuns)
+        logging.info('True parameters: {}'.format(p_true))
+        (s, m, f) = model.sample(params=p_true, trials_count=trials_count)
+        summarize_data((s, m, f))
+        do_experiment_rational(model, m, mh_chainLength)
+        for chain_run_factor in mh_chain_run_factor:
+            do_experiment_chainrun(model, m, mh_chainLength, chain_run_factor)
 
 
 def main():
-    test_mm15params()
+    # test_mm15params()
     # small_batch()
-
+    large_batch()
 
 if __name__ == "__main__":
     sys.exit(main())
