@@ -110,7 +110,11 @@ class BeesModel(DataModel):
         self.eval_pmc_pfuncs(r)
         bins = [0] * self.bscc_count
         for i in range(0, max_trials):
-            label, idx = self.run_chain()
+            try:
+                label, idx = self.run_chain()
+            except Exception as ex:
+                print(self.init_eval)
+                print(self.trans_eval)
             if idx == -1: # discard the run
                 continue
             bins[idx] += 1
@@ -124,9 +128,9 @@ import sys, timeit
 
 def test_bscc_label_match():
     dtmc_parser = PrismDtmcParser(
-        'models/prism_utils/bee_multiparam_synchronous_3.pm')
+        'models/prism/bee_multiparam_synchronous_3.pm')
     bscc_parser = PrismBsccParser(
-        'models/prism_utils/bee_multiparam_synchronous_3.txt')
+        'models/prism/bee_multiparam_synchronous_3.txt')
     dtmc_parser.process()
     bscc_parser.process()
     pmc = dtmc_parser.get_pmc_desc()
@@ -139,8 +143,8 @@ def test_bscc_label_match():
 
 
 def test_static_ctor():
-    dtmc_filepath = 'models/prism_utils/bee_multiparam_synchronous_3.pm'
-    bscc_filepath = 'models/prism_utils/bee_multiparam_synchronous_3.txt'
+    dtmc_filepath = 'models/prism/bee_multiparam_synchronous_3.pm'
+    bscc_filepath = 'models/prism/bee_multiparam_synchronous_3.txt'
     bees_model = BeesModel.from_files(dtmc_filepath, bscc_filepath)
     assert(len(bees_model.state_labels) == 11)
     assert(len(bees_model.init_ast_pfuncs) == 11)
@@ -150,8 +154,8 @@ def test_static_ctor():
 
 
 def test_bscc_sample():
-    dtmc_filepath = 'models/prism_utils/bee_multiparam_synchronous_3.pm'
-    bscc_filepath = 'models/prism_utils/bee_multiparam_synchronous_3.txt'
+    dtmc_filepath = 'models/prism/bee_multiparam_synchronous_3.pm'
+    bscc_filepath = 'models/prism/bee_multiparam_synchronous_3.txt'
     bees_model = BeesModel.from_files(dtmc_filepath, bscc_filepath)
     (s, m, f) = bees_model.sample(
         params=[0.1, 0.2, 0.3],
@@ -171,8 +175,8 @@ def test_bscc_sample():
 
 def test_chain_run():
     print('Sampling with chain run')
-    dtmc_filepath = 'models/prism_utils/bee_multiparam_synchronous_3.pm'
-    bscc_filepath = 'models/prism_utils/bee_multiparam_synchronous_3.txt'
+    dtmc_filepath = 'models/prism/bee_multiparam_synchronous_3.pm'
+    bscc_filepath = 'models/prism/bee_multiparam_synchronous_3.txt'
     bees_model = BeesModel.from_files(dtmc_filepath, bscc_filepath)
     r = [0.1, 0.2, 0.3]
     start_time = timeit.default_timer()

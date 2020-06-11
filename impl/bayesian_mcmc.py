@@ -129,17 +129,16 @@ Experiment setup:
 import timeit
 
 # Deprecated models; now switch to general BeesModel
-from models.knuth_die import KnuthDie
-from models.semisync_2bees import Semisync2bees
-from models.semisync_5bees import Semisync5bees
-from models.semisync_10bees import Semisync10bees
+from models.bees_model import BeesModel
 
-
-def knuth_die_experiment():
-    model = KnuthDie()
-    p_true = [0.3]
-    print('Experiment with Knuth Die, p_true={}'.format(p_true))
-    (s, m, f) = model.sample(params=[0.3], trials_count=10000)
+def test_3bees():
+    dtmc_filepath = 'models/prism/bee_multiparam_synchronous_3.pm'
+    bscc_filepath = 'models/prism/bee_multiparam_synchronous_3.txt'
+    model = BeesModel.from_files(dtmc_filepath, bscc_filepath)
+    p_true = [0.2, 0.5, 0.7]
+    (s, m, f) = model.sample(params=p_true, trials_count=10000)
+    print("Data multinomial: {}".format(m))
+    print("Data histogram: {}".format(f))
     # pass model in to get BSCC parameterized functions
     mcmc = BayesianMcmc(model)
     start_time = timeit.default_timer()
@@ -152,7 +151,7 @@ def knuth_die_experiment():
     print('AIC: {}\n'.format(mcmc.estimated_params['AIC']))
 
 def main():
-    knuth_die_experiment()
+    test_3bees()
 
 if __name__ == "__main__":
     sys.exit(main())
