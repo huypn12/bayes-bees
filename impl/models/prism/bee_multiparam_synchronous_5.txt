@@ -1,0 +1,133 @@
+PRISM
+=====
+
+Version: 4.4
+Date: Wed Jul 24 17:09:04 CEST 2019
+Hostname: Thunder
+Memory limits: cudd=1g, java(heap)=910.5m
+Command line: prism 'd:\Git\mpm\models\bee_multiparam_synchronous_5.pm' 'd:\Git\mpm\properties\prop_5.pctl' -javamaxmem 43g -param 'r_0=0:1,r_1=0:1,r_2=0:1,r_3=0:1,r_4=0:1'
+
+Parsing model file "d:\Git\mpm\models\bee_multiparam_synchronous_5.pm"...
+
+Parsing properties file "d:\Git\mpm\properties\prop_5.pctl"...
+
+6 properties:
+(1) P=? [ F (a0=0)&(a1=0)&(a2=0)&(a3=0)&(a4=0)&(b=1) ]
+(2) P=? [ F (a0=1)&(a1=0)&(a2=0)&(a3=0)&(a4=0)&(b=1) ]
+(3) P=? [ F (a0=1)&(a1=1)&(a2=0)&(a3=0)&(a4=0)&(b=1) ]
+(4) P=? [ F (a0=1)&(a1=1)&(a2=1)&(a3=0)&(a4=0)&(b=1) ]
+(5) P=? [ F (a0=1)&(a1=1)&(a2=1)&(a3=1)&(a4=0)&(b=1) ]
+(6) P=? [ F (a0=1)&(a1=1)&(a2=1)&(a3=1)&(a4=1)&(b=1) ]
+
+Type:        DTMC
+Modules:     multi_param_bee_agents_5 
+Variables:   a0 a1 a2 a3 a4 b 
+
+---------------------------------------------------------------------
+
+Parametric model checking: P=? [ F (a0=0)&(a1=0)&(a2=0)&(a3=0)&(a4=0)&(b=1) ]
+
+Building model (parametric engine)...
+
+Computing reachable states...
+Reachable states exploration and model construction done in 0.129 secs.
+
+States:      23 (1 initial)
+Transitions: 48
+
+Time for model construction: 0.129 seconds.
+
+Time for model checking: 0.031 seconds.
+
+Result (probability): ([0.0,1.0],[0.0,1.0],[0.0,1.0],[0.0,1.0],[0.0,1.0]): { ( -1 ) r_0^5 + 5 r_0^4 - 10 r_0^3 + 10 r_0^2 - 5 r_0 + 1  }
+
+---------------------------------------------------------------------
+
+Parametric model checking: P=? [ F (a0=1)&(a1=0)&(a2=0)&(a3=0)&(a4=0)&(b=1) ]
+
+Building model (parametric engine)...
+
+Computing reachable states...
+Reachable states exploration and model construction done in 0.053 secs.
+
+States:      23 (1 initial)
+Transitions: 48
+
+Time for model construction: 0.053 seconds.
+
+Time for model checking: 0.021 seconds.
+
+Result (probability): ([0.0,1.0],[0.0,1.0],[0.0,1.0],[0.0,1.0],[0.0,1.0]): { 5 r_1^4 * r_0 - 20 r_1^3 * r_0 + 30 r_1^2 * r_0 - 20 r_1 * r_0 + 5 r_0 }
+
+---------------------------------------------------------------------
+
+Parametric model checking: P=? [ F (a0=1)&(a1=1)&(a2=0)&(a3=0)&(a4=0)&(b=1) ]
+
+Building model (parametric engine)...
+
+Computing reachable states...
+Reachable states exploration and model construction done in 0.042 secs.
+
+States:      23 (1 initial)
+Transitions: 48
+
+Time for model construction: 0.042 seconds.
+
+Time for model checking: 0.028 seconds.
+
+Result (probability): ([0.0,1.0],[0.0,1.0],[0.0,1.0],[0.0,1.0],[0.0,1.0]): { 10 r_2^3 * r_0^2 - 20 r_2^3 * r_1 * r_0 - 30 r_2^2 * r_0^2 + 60 r_2^2 * r_1 * r_0 + 30 r_2 * r_0^2 - 60 r_2 * r_1 * r_0 - 10 r_0^2 + 20 r_1 * r_0 }
+
+---------------------------------------------------------------------
+
+Parametric model checking: P=? [ F (a0=1)&(a1=1)&(a2=1)&(a3=0)&(a4=0)&(b=1) ]
+
+Building model (parametric engine)...
+
+Computing reachable states...
+Reachable states exploration and model construction done in 0.042 secs.
+
+States:      23 (1 initial)
+Transitions: 48
+
+Time for model construction: 0.042 seconds.
+
+Time for model checking: 0.038 seconds.
+
+Result (probability): ([0.0,1.0],[0.0,1.0],[0.0,1.0],[0.0,1.0],[0.0,1.0]): { 10 r_3^2 * r_0^3 - 30 r_3^2 * r_2 * r_0^2 - 30 r_3^2 * r_1^2 * r_0 + 60 r_3^2 * r_2 * r_1 * r_0 - 20 r_3 * r_0^3 + 60 r_3 * r_2 * r_0^2 + 60 r_3 * r_1^2 * r_0 - 120 r_3 * r_2 * r_1 * r_0 + 10 r_0^3 - 30 r_2 * r_0^2 - 30 r_1^2 * r_0 + 60 r_2 * r_1 * r_0 }
+
+---------------------------------------------------------------------
+
+Parametric model checking: P=? [ F (a0=1)&(a1=1)&(a2=1)&(a3=1)&(a4=0)&(b=1) ]
+
+Building model (parametric engine)...
+
+Computing reachable states...
+Reachable states exploration and model construction done in 0.047 secs.
+
+States:      23 (1 initial)
+Transitions: 48
+
+Time for model construction: 0.047 seconds.
+
+Time for model checking: 0.054 seconds.
+
+Result (probability): ([0.0,1.0],[0.0,1.0],[0.0,1.0],[0.0,1.0],[0.0,1.0]): { 5 r_4 * r_0^4 - 20 r_4 * r_3 * r_0^3 - 30 r_4 * r_2^2 * r_0^2 + 60 r_4 * r_3 * r_2 * r_0^2 - 20 r_4 * r_1^3 * r_0 + 60 r_4 * r_3 * r_1^2 * r_0 + 60 r_4 * r_2^2 * r_1 * r_0 - 120 r_4 * r_3 * r_2 * r_1 * r_0 - 5 r_0^4 + 20 r_3 * r_0^3 + 30 r_2^2 * r_0^2 - 60 r_3 * r_2 * r_0^2 + 20 r_1^3 * r_0 - 60 r_3 * r_1^2 * r_0 - 60 r_2^2 * r_1 * r_0 + 120 r_3 * r_2 * r_1 * r_0 }
+
+---------------------------------------------------------------------
+
+Parametric model checking: P=? [ F (a0=1)&(a1=1)&(a2=1)&(a3=1)&(a4=1)&(b=1) ]
+
+Building model (parametric engine)...
+
+Computing reachable states...
+Reachable states exploration and model construction done in 0.028 secs.
+
+States:      23 (1 initial)
+Transitions: 48
+
+Time for model construction: 0.031 seconds.
+
+Time for model checking: 0.052 seconds.
+
+Result (probability): ([0.0,1.0],[0.0,1.0],[0.0,1.0],[0.0,1.0],[0.0,1.0]): { r_0^5 - 5 r_4 * r_0^4 - 10 r_3^2 * r_0^3 + 20 r_4 * r_3 * r_0^3 - 10 r_2^3 * r_0^2 + 30 r_4 * r_2^2 * r_0^2 + 30 r_3^2 * r_2 * r_0^2 - 60 r_4 * r_3 * r_2 * r_0^2 - 5 r_1^4 * r_0 + 20 r_4 * r_1^3 * r_0 + 30 r_3^2 * r_1^2 * r_0 - 60 r_4 * r_3 * r_1^2 * r_0 + 20 r_2^3 * r_1 * r_0 - 60 r_4 * r_2^2 * r_1 * r_0 - 60 r_3^2 * r_2 * r_1 * r_0 + 120 r_4 * r_3 * r_2 * r_1 * r_0 }
+
