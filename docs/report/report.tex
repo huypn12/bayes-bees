@@ -295,7 +295,7 @@ algorithm, the discrete form of posterior mean is used:
   \hat{\theta} = \mathbf{E}[\theta] = \sum_\theta \theta \pi(\theta|D)
 \end{align*}
 \begin{definition}[Bayesian Credible Set]
-  Set C is a $(1 − \alpha)100\%$ credible set for the parameter $\theta$ if the posterior
+  Set C is a $(1 − \alpha )100\%$ credible set for the parameter $\theta$ if the posterior
   probability for $\theta$ to belong to C equals $(1 − \alpha)$.
   \begin{align*}
     P(\theta \in C | D) = \int_C \pi(\theta|D) d\theta = 1 - \alpha
@@ -409,8 +409,8 @@ the pheromone concentration.\\
 \node[state]    (F)[right of=B]         {$0 0 1$};
 \node[state]    (G)[right of=D]         {$0 1 1$};
 \path
-(A) edge    node{$(1-p)^3$}        (B)
-    edge    node{$(3p(1-p)^2$}     (C)
+(A) edge    node{$(1-p)^3$}        (C)
+    edge    node{$3p(1-p)^2$}     (B)
     edge    node{$3p(1-p)^2$}      (D)
     edge    node{$p^3$}            (E)
 (B) edge    node{$(1-q)^2$}        (F)
@@ -511,7 +511,7 @@ model parameters. However, it can support the parameter estimation presented
 \cite{hajnal2019data} to estimate the model parameters with narrower credible
 set.
 
-\subsection{Inference of model parameters}
+\subsection{Inference of model parameters using rational functions}
 We can also use Bayesian inference to estimate pMC model parameters directly.
 Given a pMC $\mathcal{M}$ with $\theta=(\theta_1,\ldots,\theta_k)$ as its model
 parameters. Since $\theta_i \in [0,1]$, we can assume that $\theta_i$ are of
@@ -556,6 +556,50 @@ Metropolis-Hastings to sample from it.
   \end{algorithmic}
 \end{algorithm}
 
+\subsection{Inference of model parameters using chain runs}
+We can also use Bayesian inference to estimate pMC model parameters directly.
+Given a pMC $\mathcal{M}$ with $\theta=(\theta_1,\ldots,\theta_k)$ as its model
+parameters. Since $\theta_i \in [0,1]$, we can assume that $\theta_i$ are of
+$Beta(\alpha, \beta)$ distribution. Note that $\alpha, \beta$ are
+hyperparameters and must be selected manually. Also note that
+$\theta_1,\ldots,\theta_k$ are not simplex, thus it is not possible to use
+Dirichlet prior. \\
+In this method, since there is no possible use of posterior conjugation, thus
+the hyperparameters estimation is hard and not in the scope of this project. Let
+$f_i = P (FG\quad tSCC_i)$ are polynomial functions of steady-state
+distribution, we denote $\epsilon_i = f_i(\theta)$ as evaluations of the
+polynomial function with a concrete assignment of $\theta$. The steady-state
+distribution has then $Multinomial(N, \epsilon = (\epsilon_0,\ldots,\epsilon_n))$ with $N$
+is the sample size of experiment data $D$. The posterior distribution has the
+following form:
+\begin{align*}
+  \pi(\theta|D) \sim Multinomial(N, (\epsilon_0,\ldots,\epsilon_n))\pi(\theta_1)\ldots\pi(\theta_k)
+\end{align*}
+As the posterior $\pi(\theta|D)$ has no analytical form, we use
+Metropolis-Hastings to sample from it.
+\begin{algorithm}[H]
+  \caption{Estimation of model parameters given a sample $D$}\label{exp_b}
+  \begin{algorithmic}[1]
+    \Procedure{Estimate $\theta$}{$S$}
+    \State Select hyperparameter $\alpha, \beta$
+    \State Select $Beta(\alpha, \beta)$ as proposal distribution (transition
+    kernel) for $\theta_i, 1\leq i \leq n$
+    \State Initialize $\theta$
+    \While{maxIteration not reached}
+    \State Evaluate $\epsilon = (f_0(\theta),\ldots,f_n(\theta))$
+    \State $L \leftarrow Multinomial(D|\epsilon)$
+    \State Draw $\theta'$ from the proposal distribution.
+    \State Evaluate $\epsilon' = (f_0(\theta),\ldots,f_n(\theta))$
+    \State $L' \leftarrow P(D|\epsilon')$
+    \If{ $\ln(L') - \ln(L) > 0$ }
+    \State  $\theta = \theta'$ (accept $\theta'$)
+    \Else
+    \State with probability $\epsilon$ accept $\theta'$ (avoiding local maxima)
+    \EndIf
+    \EndWhile
+    \EndProcedure
+  \end{algorithmic}
+\end{algorithm}
 
 \subsection{Accuracy measures}
 In order to evaluate the accuracy of parameter point inference, we have to
@@ -637,7 +681,7 @@ where $N$ is the sample size. Experiment configurations:
 \end{figure}
 
 
-\subsection{Inference of model parameters}
+\subsection{Inference of model parameters with rational functions}
 This experiment is conducted in 2, 5, and 10 bees population models of 2, 5, and 10
 parameters respectively. All models are semi-synchronous.\\
 \begin{lstlisting}
@@ -671,6 +715,8 @@ parameters respectively. All models are semi-synchronous.\\
   AIC: 810.53271460213
 
 \end{lstlisting}
+
+\subsection{Inference of model parameters with chain running}
 
 \subsection{Notes on implementation}
 A script \texttt{parse\_prism.py} is include in folder \texttt{models} to parse

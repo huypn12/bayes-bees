@@ -12,7 +12,7 @@ from models.semisync_10bees import Semisync10bees
 
 from bayesian_mcmc import BayesianMcmc
 
-def summarize_data(sample: (list, list, list)):
+def summarize_data(sample):
     (s, m, f) = sample
     logging.info("Multinomial data: {}".format(m))
     logging.info("Distribution: {}".format(f))

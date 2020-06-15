@@ -220,35 +220,30 @@ def evaluation_time():
         p_true = rand_increasing_sequence(model.get_params_count())
         logging.info('True parameters: {}'.format(p_true))
 
-        for trials_count in max_trials:
-            logging.info('Sample with BSCC Evaluation')
-            start_time = timeit.default_timer()
-            (s, m, f) = model.sample(params=p_true, trials_count=trials_count)
-            stop_time = timeit.default_timer()
-            elapsed_time = stop_time - start_time
-            logging.info('Finished in {} seconds'.format(elapsed_time))
-            logging.info(
-                'Synthetic data, number of trials: {}'.format(trials_count))
-            summarize_data((s, m, f))
+
+        logging.info('Sample with BSCC Evaluation')
+        start_time = timeit.default_timer()
+        (s, m, f) = model.sample(params=p_true, trials_count=1)
+        stop_time = timeit.default_timer()
+        elapsed_time = stop_time - start_time
+        logging.info('Finished in {} seconds'.format(elapsed_time))
 
         logging.info('...')
 
         for factor in mh_chain_run_factor:
-            logging.info('Sample with chain run')
+            trials_count = factor * model.get_bscc_count()
+            logging.info('Sample with {} chain run'.format(trials_count))
             start_time = timeit.default_timer()
-            h = model.sample_run_chain(p_true, max_trials=1000)
+            h = model.sample_run_chain(p_true, max_trials=trials_count)
             stop_time = timeit.default_timer()
             elapsed_time = stop_time - start_time
             logging.info('Finished in {} seconds'.format(elapsed_time))
-            logging.info(
-                'Synthetic data, number of trials: {}'.format(trials_count))
-            logging.info('Data histogram: {}'.format(f))
 
 
 def main():
-    test_mm10params()
+    # test_mm10params()
     # small_batch()
-    #evaluation_time()
+    evaluation_time()
     #large_batch()
 
 

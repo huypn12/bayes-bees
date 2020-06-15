@@ -4,7 +4,7 @@ from bayesian_mcmc_linear import BayesianMcmcLinear
 import sys, timeit
 
 
-def test_3bees():
+def run_linear_3bees():
     dtmc_filepath = 'models/prism/bee_multiparam_synchronous_3.pm'
     bscc_filepath = 'models/prism/bee_multiparam_synchronous_3.txt'
     model = BeesLinearModel.from_files(dtmc_filepath, bscc_filepath)
@@ -25,7 +25,7 @@ def test_3bees():
     print('AIC: {}\n'.format(mcmc.estimated_params['AIC']))
 
 def main():
-    test_3bees()
+    run_linear_3bees()
 
 if __name__ == "__main__":
     sys.exit(main())
