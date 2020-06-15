@@ -1,5 +1,25 @@
+import sys, threading
 import re
 from asteval import Interpreter
+
+
+kDefaultRecursionLimit = 10**9
+kDefaultThrStacksize = 2**27
+
+class StackHungryCtx(object):
+    def __init__(self, _recursion_limit, _thr_stacksize):
+        self.old_recursion_limit = sys.getrecursionlimit()
+        self.old_thr_stacksize = threading.stack_size()
+        self.recursion_limit = _recursion_limit
+        self.thr_stacksize = _thr_stacksize
+        
+    def __enter__(self):
+        sys.setrecursionlimit(self.recursion_limit)
+        threading.stack_size(self.thr_stacksize)
+
+    def __exit__(self, type, value, tb):
+        sys.setrecursionlimit(self.old_recursion_limit)
+        threading.stack_size(self.old_thr_stacksize)
 
 
 class PrismBsccParser(object):
@@ -25,10 +45,17 @@ class PrismBsccParser(object):
 
 
     def process(self,):
+        with StackHungryCtx(kDefaultRecursionLimit, kDefaultThrStacksize):
+            thr = threading.Thread(target=self.thr_process)
+            thr.start()
+            thr.join()
+
+
+    def thr_process(self,):
         with open(self.prism_result_file, "r") as fptr:
             lines = fptr.readlines()
-
         max_param_idx = 0
+        print(sys.getrecursionlimit())
         aeval = Interpreter()
         for line in lines:
             if len(line) > 7:
@@ -113,9 +140,12 @@ class PrismBsccParser(object):
     
 
 ## UNIT TEST ##
-import resource, sys 
-resource.setrlimit(resource.RLIMIT_STACK, (2**29,-1))
-sys.setrecursionlimit(10**9)
+
+import os
+if os.name == 'posix':
+    import resource
+    resource.setrlimit(resource.RLIMIT_STACK, (2**29,-1))
+
 
 def eval_bscc_ast_pfuncs(bscc_ast_pfuncs, r):
     aeval = Interpreter()
@@ -123,7 +153,7 @@ def eval_bscc_ast_pfuncs(bscc_ast_pfuncs, r):
     return [aeval.run(f) for f in bscc_ast_pfuncs]
 
 def test_15bees():
-    parser = PrismBsccParser("bee_multiparam_synchronous_15.txt")
+    parser = PrismBsccParser("models/prism/bee_multiparam_synchronous_10.txt")
     parser.process()
     bscc_ast_pfuncs = parser.bscc_ast_pfuncs
     bscc_str_pfuncs = parser.bscc_str_pfuncs
@@ -157,7 +187,7 @@ def test_stress():
 
 def main():
     test_15bees()
-    test_stress()
+    #   test_stress()
 
 if __name__ == "__main__":
     sys.exit(main())
