@@ -46,12 +46,13 @@ class PrismBsccParser(object):
 
     def process(self,):
         with StackHungryCtx(kDefaultRecursionLimit, kDefaultThrStacksize):
-            thr = threading.Thread(target=self.thr_process)
+            print(sys.getrecursionlimit())
+            thr = threading.Thread(target=self._process)
             thr.start()
             thr.join()
 
 
-    def thr_process(self,):
+    def _process(self,):
         with open(self.prism_result_file, "r") as fptr:
             lines = fptr.readlines()
         max_param_idx = 0
@@ -144,7 +145,8 @@ class PrismBsccParser(object):
 import os
 if os.name == 'posix':
     import resource
-    resource.setrlimit(resource.RLIMIT_STACK, (2**29,-1))
+    #sys.setrecursionlimit(kDefaultRecursionLimit)
+    #resource.setrlimit(resource.RLIMIT_STACK, (2**29,-1))
 
 
 def eval_bscc_ast_pfuncs(bscc_ast_pfuncs, r):
