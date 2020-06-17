@@ -60,8 +60,8 @@ class BayesianMcmcSim(BayesianMcmc):
 def test_3bees():
     max_trials = 1000
     print('Metropolis-Hasting, sampling with chain run, {} trials'.format(max_trials))
-    dtmc_filepath = 'models/prism_utils/bee_multiparam_synchronous_3.pm'
-    bscc_filepath = 'models/prism_utils/bee_multiparam_synchronous_3.txt'
+    dtmc_filepath = 'models/prism/bee_multiparam_synchronous_3.pm'
+    bscc_filepath = 'models/prism/bee_multiparam_synchronous_3.txt'
     bees_model = BeesModel.from_files(dtmc_filepath, bscc_filepath)
     r = [0.1, 0.2, 0.3]
     print('True parameters: {}'.format(r))
