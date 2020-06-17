@@ -1,9 +1,8 @@
 import sys
-sys.setrecursionlimit(10**8)
-
 from pymc3.stats import hpd
 import numpy as np
 import scipy as sp
+import math
 from scipy.stats import multinomial
 from scipy.stats import beta
 
@@ -42,8 +41,8 @@ class BayesianMcmc(object):
 
     # Likelihood: multinomial with parameterized P
     def log_likelihood(self, p, data):
-        P = self.data_model.eval_bscc_pfuncs(p)
-        return self.llh(P, data)
+        bscc_p = self.data_model.eval_bscc_pfuncs(p)
+        return self.llh(bscc_p, data)
 
     def llh(self, P, data):
         likelihood = 0
@@ -84,6 +83,7 @@ class BayesianMcmc(object):
         N = np.sum(data)
         p_hat = np.zeros(self.data_model.get_params_count())
         margin = 0
+        print(self.traces)
         for p in self.traces:
             P = self.data_model.eval_bscc_pfuncs(p)
             prior = 1
@@ -91,21 +91,27 @@ class BayesianMcmc(object):
                 prior *= beta(self.hyperparams['alpha'],
                               self.hyperparams['beta']).pdf(p_i)
             llh = multinomial(N, P).pmf(data)
+            print(P, ' ', data)
             margin += llh * prior
-            p_hat = p_hat + np.array(p) * llh * prior
-        print(p_hat)
+            p_hat += np.array(p) * llh * prior
+        print(p_hat, ' ', margin)
         p_hat = p_hat / margin
         log_llh = self.np_llh(self.data_model.eval_bscc_pfuncs(p_hat), data)
         return p_hat, log_llh
 
     def metropolis_hastings(self, data):
+        print(self.hyperparams)
         p = self.transition()
         for i in range(self.mh_params['chain_length']):
             p_new = self.transition()
             llh = self.log_likelihood(p, data)
             new_llh = self.log_likelihood(p_new, data)
+            if math.isnan(llh) or math.isnan(new_llh):
+                i -= 1
+                continue
             if (self.is_accepted(llh + np.log(self.prior(p)),
                                  new_llh + np.log(self.prior(p_new)))):
+                print(llh, ' ', new_llh)
                 p = p_new
                 self.traces.append(p_new)
 

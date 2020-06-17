@@ -7,13 +7,19 @@ from scipy.stats import beta
 
 
 class BayesianMcmcLinear(BayesianMcmc):
-    def __init__(self, model: BeesLinearModel):
-        super().__init__(model)
-        self.hyperparams = {
-            'alpha': 2,
-            'beta': 5,
-        }
+
+    def transition(self):
+        alpha = self.hyperparams['alpha']
+        beta = self.hyperparams['beta']
+        params_count = self.data_model.get_params_count()
+        p_new = [0] * params_count
+        for i in range(0, params_count):
+            p_new[i] = np.random.beta(alpha, beta)
+        return p_new
+
     
     def log_likelihood(self, p, data):
         chain_p = self.data_model.eval_chain_params(p)
-        return super().log_likelihood(chain_p, data)
+        llh = super().log_likelihood(chain_p, data)
+        return llh
+

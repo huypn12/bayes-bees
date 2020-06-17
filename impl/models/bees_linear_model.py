@@ -6,7 +6,6 @@ from asteval import Interpreter
 class BeesLinearModel(BeesModel):
     def __init__(self):
         super().__init__()
-        self.linear_params = []
         self.chain_params_count = 0
 
     @staticmethod
@@ -20,7 +19,6 @@ class BeesLinearModel(BeesModel):
         return linear_model
 
     def eval_chain_params(self, linear_r):
-        self.linear_params = linear_r
         return [linear_r[0] * i + linear_r[1] for i in range(0, self.chain_params_count)]
 
     def eval_pmc_pfuncs(self, linear_r):
