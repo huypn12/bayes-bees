@@ -2,8 +2,6 @@ from bayesian_mcmc import BayesianMcmc
 from models.bees_linear_model import BeesLinearModel
 
 import numpy as np
-from scipy.stats import multinomial
-from scipy.stats import beta
 
 
 class BayesianMcmcLinear(BayesianMcmc):

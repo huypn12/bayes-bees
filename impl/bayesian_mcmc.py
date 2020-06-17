@@ -91,10 +91,8 @@ class BayesianMcmc(object):
                 prior *= beta(self.hyperparams['alpha'],
                               self.hyperparams['beta']).pdf(p_i)
             llh = multinomial(N, P).pmf(data)
-            print(P, ' ', data)
             margin += llh * prior
             p_hat += np.array(p) * llh * prior
-        print(p_hat, ' ', margin)
         p_hat = p_hat / margin
         log_llh = self.np_llh(self.data_model.eval_bscc_pfuncs(p_hat), data)
         return p_hat, log_llh
