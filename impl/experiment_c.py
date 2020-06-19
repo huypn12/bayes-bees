@@ -243,8 +243,8 @@ def evaluation_time():
 def main():
     # test_mm10params()
     # small_batch()
-    evaluation_time()
-    #large_batch()
+    # evaluation_time()
+    large_batch()
 
 
 if __name__ == "__main__":

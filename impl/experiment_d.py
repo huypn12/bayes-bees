@@ -3,6 +3,10 @@ from bayesian_mcmc_linear import BayesianMcmcLinear
 
 import sys, timeit
 
+"""
+Experiment D: Experiment with linear model
+"""
+
 
 def run_linear_3bees():
     dtmc_filepath = 'models/prism/bee_multiparam_synchronous_3.pm'
@@ -28,6 +32,10 @@ def run_linear_3bees():
     print('Estimated parameter: {}'.format(mcmc.estimated_params['P']))
     print('Log likelihood: {}'.format(mcmc.estimated_params['log_llh']))
     print('AIC: {}\n'.format(mcmc.estimated_params['AIC']))
+
+
+def run_linear_10bees():
+    pass
 
 def main():
     run_linear_3bees()

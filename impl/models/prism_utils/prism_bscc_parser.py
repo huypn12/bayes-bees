@@ -2,9 +2,13 @@ import sys, threading
 import re
 from asteval import Interpreter
 
+import os
+if os.name == 'posix':
+    import resource
+    resource.setrlimit(resource.RLIMIT_STACK, (2**29,-1))
 
 kDefaultRecursionLimit = 10**9
-kDefaultThrStacksize = 2**27
+kDefaultThrStacksize = 0x2000000
 
 class StackHungryCtx(object):
     def __init__(self, _recursion_limit, _thr_stacksize):
@@ -55,7 +59,6 @@ class PrismBsccParser(object):
         with open(self.prism_result_file, "r") as fptr:
             lines = fptr.readlines()
         max_param_idx = 0
-        print(sys.getrecursionlimit())
         aeval = Interpreter()
         for line in lines:
             if len(line) > 7:
@@ -63,7 +66,10 @@ class PrismBsccParser(object):
                     param_idx, bscc_str = self.process_result_line(line)
                     if param_idx > max_param_idx:
                         max_param_idx = param_idx
-                    bscc_expr = aeval.parse(bscc_str)
+                    try:
+                        bscc_expr = aeval.parse(bscc_str)
+                    except Exception as ex:
+                        sys.exit(ex)
                     self.bscc_str_pfuncs.append(bscc_str)
                     self.bscc_ast_pfuncs.append(bscc_expr)
                 elif line[0:30] == 'Parametric model checking: P=?':
@@ -141,10 +147,6 @@ class PrismBsccParser(object):
 
 ## UNIT TEST ##
 
-import os
-if os.name == 'posix':
-    import resource
-    resource.setrlimit(resource.RLIMIT_STACK, (2**29,-1))
 
 
 def eval_bscc_ast_pfuncs(bscc_ast_pfuncs, r):
