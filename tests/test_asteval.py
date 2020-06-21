@@ -1,6 +1,7 @@
+import pytest
 from asteval import Interpreter
-
 import sys
+
 
 class RecursionLimit:
     def __init__(self, limit):

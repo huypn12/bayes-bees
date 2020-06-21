@@ -8,6 +8,10 @@ from asteval import Interpreter
 
 
 class BeesModel(DataModel):
+    BSCC_CHAINRUN = 0
+    BSCC_RFUNCS = 1
+
+
     def __init__(self):
         super().__init__()
         self.state_labels = None
@@ -22,6 +26,7 @@ class BeesModel(DataModel):
         self.init_eval = None
         self.trans_eval = None
         self.params_count = 0
+        self.bscc_eval_mode = BSCC_CHAINRUN
 
     def get_params_count(self,):
         return self.params_count
@@ -68,6 +73,16 @@ class BeesModel(DataModel):
         aeval = Interpreter()
         aeval.symtable['r'] = r
         return [aeval.run(f) for f in self.bscc_ast_pfuncs]
+
+    def eval_bscc_sample(self, runs_count):
+        pass
+
+    
+    def eval_bscc(self, chain_params=None, runs_count=None):
+        if self.bscc_eval_mode == BeesModel.BSCC_RFUNCS:
+            assert(chain_params != None)
+            return self.eval_bscc_pfuncs(chain_params)
+        return self.eval_bscc_sample(runs_count)
 
     def sample(self, params, trials_count: int = 1000):
         # Sampling given BSCC functions
