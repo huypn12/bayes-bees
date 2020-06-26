@@ -45,19 +45,20 @@ class PrismDtmcParser(object):
         return state_label, is_bscc
 
     def simplify_expression(self, expr_str):
-        return sympy.factor(expr_str)
-
-    def process_expression(self, expr_str):
-        """
-        pattern = re.compile(r'([r])_(\d*)')
-        expr_str = pattern.sub(r"r[\2]", expr_str)
-        return expr_str
-        """
-        if self.can_simplify:
-            expr_str = self.simplify_expression(expr_str)
+        return str(sympy.factor(expr_str))
+ 
+    def replace_var(self, expr_str):
         return re.sub(r'([r])_(\d*)',
                       lambda match: match.group(1) + '[' + str(int(match.group(2))) + ']',
                       expr_str)
+
+    def process_expression(self, expr_str):
+        if self.can_simplify:
+            # Simplification using sympy factor() must be done before
+            # replacing variable names by array references
+            expr_str = self.simplify_expression(expr_str)
+        expr_str = self.replace_var(expr_str)
+        return expr_str
 
     def replace_select_op(self, a_gcmd_str):
         # Replace '+' as successor state separation by '$' for easier parsing
