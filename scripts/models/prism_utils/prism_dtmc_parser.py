@@ -1,5 +1,6 @@
 import sys
 import re
+import sympy
 from asteval import Interpreter
 
 
@@ -16,6 +17,7 @@ class PrismDtmcParser(object):
         self.init_ast_pfuncs = []
         self.trans_str_pfuncs = []
         self.trans_ast_pfuncs = []
+        self.can_simplify = False
 
     def get_pmc_desc(self,):
         return {
@@ -42,15 +44,20 @@ class PrismDtmcParser(object):
         state_label = ','.join(tokens)
         return state_label, is_bscc
 
+    def simplify_expression(self, expr_str):
+        return sympy.factor(expr_str)
+
     def process_expression(self, expr_str):
         """
         pattern = re.compile(r'([r])_(\d*)')
         expr_str = pattern.sub(r"r[\2]", expr_str)
         return expr_str
         """
+        if self.can_simplify:
+            expr_str = self.simplify_expression(expr_str)
         return re.sub(r'([r])_(\d*)',
-                lambda match: match.group(1) + '[' + str(int(match.group(2))) + ']',
-                expr_str)
+                      lambda match: match.group(1) + '[' + str(int(match.group(2))) + ']',
+                      expr_str)
 
     def replace_select_op(self, a_gcmd_str):
         # Replace '+' as successor state separation by '$' for easier parsing
@@ -97,7 +104,6 @@ class PrismDtmcParser(object):
             self.edge_list.append(
                 (state_label, next_state_label, expr_str))
 
-
     def clean_gcommand_line(self, gcmd_line):
         gcmd_line = self.replace_select_op(gcmd_line)
         gcmd_line = gcmd_line\
@@ -111,7 +117,6 @@ class PrismDtmcParser(object):
         lines = []
         with open(self.prism_model_file) as model_file:
             lines = model_file.readlines()
-        adj_list = {}
         for line in lines:
             line = line.rstrip().lstrip()
             if line[0:2] == '[]':
@@ -121,7 +126,7 @@ class PrismDtmcParser(object):
         init_state_label = None
         init_flag = '=' + self.init_symbol
         for state_label in self.state_list:
-            tokens = state_label.split(',')[:-1] #except the b flag
+            tokens = state_label.split(',')[:-1]  # except the b flag
             if all(init_flag in s for s in tokens):
                 init_state_label = state_label
                 break
@@ -133,7 +138,6 @@ class PrismDtmcParser(object):
                 i = self.state_list.index(edge[1])
                 self.init_str_pfuncs[i] = edge[2]
         self.init_state_label = init_state_label
-
 
     def build_trans_matrix(self, ):
         self.trans_str_pfuncs = [
@@ -152,7 +156,6 @@ class PrismDtmcParser(object):
             j = self.state_list.index(nextt)
             self.trans_str_pfuncs[i][j] = edge[2]
 
-
     def parse_str2ast(self, ):
         aeval = Interpreter()
         # Parse init vector to AST expressions
@@ -161,71 +164,9 @@ class PrismDtmcParser(object):
         for i, s in enumerate(self.init_str_pfuncs):
             self.init_ast_pfuncs[i] = aeval.parse(s)
         # Parse transition matrix to AST expressions
-        self.trans_ast_pfuncs = [[None] * state_count for i in range(0, state_count)]
+        self.trans_ast_pfuncs = [[None] * state_count
+                                 for i in range(0, state_count)]
         for i in range(0, state_count):
             for j in range(0, state_count):
                 self.trans_ast_pfuncs[i][j] = aeval.parse(
                     self.trans_str_pfuncs[i][j])
-
-
-## UNIT TEST ##
-def test_gcmd_cleanup():
-    parser = PrismDtmcParser("")
-    gcmd_str = """a0 = 3 & a1 = 3  & a2 = 3  & b = 0 -> 1.0*r_0*r_0*r_0: (a0'=1) & (a1'=1) & (a2'=1) + 3.0*r_0*r_0*(1-r_0): (a0'=1) & (a1'=1) & (a2'=0) + 3.0*r_0*(1-r_0)*(1-r_0): (a0'=1) & (a1'=0) & (a2'=0) + 1.0*(1-r_0)*(1-r_0)*(1-r_0): (a0'=0) & (a1'=0) & (a2'=0);"""
-    gcmd_str = gcmd_str.rstrip().lstrip()
-    gcmd_str = parser.clean_gcommand_line(gcmd_str)
-    gcmd_str = parser.replace_select_op(gcmd_str)
-    assert(gcmd_str == 'a0=3&a1=3&a2=3&b=0->1.0*r_0*r_0*r_0:(a0=1)&(a1=1)&(a2=1)$3.0*r_0*r_0*(1-r_0):(a0=1)&(a1=1)&(a2=0)$3.0*r_0*(1-r_0)*(1-r_0):(a0=1)&(a1=0)&(a2=0)$1.0*(1-r_0)*(1-r_0)*(1-r_0):(a0=0)&(a1=0)&(a2=0)')
-
-
-def test_state_label():
-    parser = PrismDtmcParser("")
-    sstate = 'a0 = 3 & a1 = 3  & a2 = 3  & b = 0'
-    sstate = parser.clean_gcommand_line(sstate)
-    state_label, _ = parser.process_state_label(sstate)
-    assert(state_label == 'a0=3,a1=3,a2=3,b=0')
-    sstate = "(a0'=1) & (a1'=1) & (a2'=1)"
-    sstate = parser.clean_gcommand_line(sstate)
-    state_label, _ = parser.process_state_label(sstate)
-    assert(state_label == 'a0=1,a1=1,a2=1,b=0')
-
-
-def test_expr():
-    parser = PrismDtmcParser("")
-    expr_str = '3.0*r_0*r_0*(1-r_0)'
-    assert(parser.process_expression(expr_str) == '3.0*r[0]*r[0]*(1-r[0])')
-
-
-def test_extract_state():
-    parser = PrismDtmcParser("bee_multiparam_synchronous_3.pm")
-    parser.process()
-    print('State list\n', parser.state_list)
-    print('BSCC list\n', parser.bscc_list)
-    for b in parser.bscc_list:
-        assert(b in parser.state_list)
-    print('Edge list:')
-    for e in parser.edge_list:
-        print(e)
-
-
-def test_build_matrix():
-    parser = PrismDtmcParser("bee_multiparam_synchronous_3.pm")
-    parser.process()
-    print('Initial vector:')
-    for iv in parser.init_str_pfuncs:
-        print(iv)
-    print('Transition matrix:')
-    for row in parser.trans_str_pfuncs:
-        print(row)
-
-
-def main():
-    test_gcmd_cleanup()
-    test_state_label()
-    test_expr()
-    test_extract_state()
-    test_build_matrix()
-
-
-if __name__ == "__main__":
-    sys.exit(main())
