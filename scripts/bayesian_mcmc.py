@@ -14,7 +14,7 @@ class BayesianMcmc(object):
             'alpha': 2,
             'beta': 2,
         }
-        self.mh_params = {'chain_length': 5000, 'hpd_alpha': 0.95}
+        self.mh_params = {'chain_length': 1000, 'hpd_alpha': 0.95}
         self.traces = []
         self.traces_bscc_dist = []
         self.data_model = model
@@ -97,7 +97,6 @@ class BayesianMcmc(object):
         hdi_max = x[min_idx+interval_idx_inc]
         return hdi_min, hdi_max
 
-
     # E[p] = SUM(p * likelihood(p) * prior(p)) / SUM(likelihood(p) * prior(p))
     def posterior_mean(self, data):
         N = np.sum(data)
@@ -133,6 +132,6 @@ class BayesianMcmc(object):
                 p = p_new
                 bscc_dist = bscc_dist_new
                 self.traces.append(p_new)
-                self.traces_bscc_dist.append()
+                self.traces_bscc_dist.append(bscc_dist)
 
 

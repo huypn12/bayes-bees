@@ -78,6 +78,9 @@ class BeesModel(DataModel):
     def get_bscc_pfuncs(self, ):
         return self.bscc_ast_pfuncs
 
+    def set_chainruns_count(self, c):
+        self.chainruns_count = c
+
     def eval_bscc_pfuncs(self,):
         aeval = Interpreter()
         aeval.symtable['r'] = self.params
@@ -86,7 +89,7 @@ class BeesModel(DataModel):
     def eval_bscc(self, chain_params):
         self.set_params(chain_params)
         bscc_dist = None
-        if self.bscc_eval_mode == BeesModel.BSCC_RFUNCS:
+        if self.bscc_eval_mode == BeesModel.BSCC_MODE_PFUNCS:
             bscc_dist = self.eval_bscc_pfuncs()
         else:
             _, bscc_dist = self.eval_bscc_chainrun()
@@ -113,17 +116,19 @@ class BeesModel(DataModel):
                 self.trans_eval[i][j] = aeval.run(self.trans_ast_pfuncs[i][j])
 
     def do_bounded_chainrun(self,):
-        steps_count = math.ceil(math.log2(self.state_count)) + 2
+        steps_count = math.ceil(math.log2(self.state_count)) + 5
         state_idx = np.random.choice(self.state_count, 1, p=self.init_eval)[0]
         for i in range(0, steps_count):
             p_next = self.trans_eval[state_idx]
             state_idx = np.random.choice(self.state_count, 1, p=p_next)[0]
-        return state_idx
+        state_label = self.state_labels[state_idx]
+        bscc_idx = self.bscc_labels.index(state_label)
+        return bscc_idx
 
     def do_unbounded_chainrun(self,):
         bscc_idx = -1
         state_idx = np.random.choice(self.state_count, 1, p=self.init_eval)[0]
-        max_steps = 1e6
+        max_steps = int(1e6)
         for i in range(0, max_steps):
             label = self.state_labels[state_idx]
             if label in self.bscc_labels:
@@ -144,7 +149,7 @@ class BeesModel(DataModel):
         dist = [c / norm for c in multinomial]
         return (multinomial, dist)
 
-    def sample_bscc_chainruns(self, trials_count):
+    def sample_bscc_chainrun(self, trials_count):
         self.chainruns_count = trials_count
         # For chainrun scheme:
         #   the evaluation itself contains a multinomial sample
