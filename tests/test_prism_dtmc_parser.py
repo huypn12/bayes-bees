@@ -37,6 +37,8 @@ def test_extract_state(dtmc_parser):
 
 
 def test_extract_bscc(dtmc_parser):
+    dtmc_parser.process()
+    assert(len(dtmc_parser.bscc_list) == 4)
     for b in dtmc_parser.bscc_list:
         assert(b in dtmc_parser.state_list)
 
