@@ -53,7 +53,6 @@ class PrismBsccParser(object):
 
     def process(self,):
         with StackHungryCtx(kDefaultRecursionLimit, kDefaultThrStacksize):
-            print(sys.getrecursionlimit())
             thr = threading.Thread(target=self._process)
             thr.start()
             thr.join()
@@ -123,8 +122,11 @@ class PrismBsccParser(object):
     def replace_var(self, bscc_str):
         # adapted to new model r_0, ..., r_n
         # bscc_str = bscc_str.replace('p', r'p[0]')
-        pattern = re.compile(r'([r])_(\d*)')
-        bscc_str = pattern.sub(r"r[\2]", bscc_str)
+        # pattern = re.compile(r'([r])_(\d*)')
+        # bscc_str = pattern.sub(r"r[\2]", bscc_str)
+        bscc_str = re.sub(r'([r])_(\d*)',
+                          lambda match: match.group(1) + '[' + str(int(match.group(2))) + ']',
+                          bscc_str)
         return bscc_str
 
     def replace_implicit_ops(self, bscc_str):
@@ -144,54 +146,3 @@ class PrismBsccParser(object):
         bscc_str = self.replace_var(bscc_str)
         param_idx = self.get_max_param_idx(bscc_str)
         return param_idx, bscc_str
-    
-
-## UNIT TEST ##
-
-
-def eval_bscc_ast_pfuncs(bscc_ast_pfuncs, r):
-    aeval = Interpreter()
-    aeval.symtable['r'] = r
-    return [aeval.run(f) for f in bscc_ast_pfuncs]
-
-def test_15bees():
-    parser = PrismBsccParser("models/prism/bee_multiparam_synchronous_10.txt")
-    parser.process()
-    bscc_ast_pfuncs = parser.bscc_ast_pfuncs
-    bscc_str_pfuncs = parser.bscc_str_pfuncs
-    print(parser.params_count)
-    r = [
-        0.01, 0.02, 0.03, 0.04, 0.05,
-        0.06, 0.07, 0.08, 0.09, 0.1,
-        0.11, 0.12, 0.13, 0.14, 0.15
-    ]
-    eval_bscc = eval_bscc_ast_pfuncs(bscc_ast_pfuncs, r)
-    print(eval_bscc)
-
-def test_stress():
-    parser = PrismBsccParser("synchronous_40.txt")
-    try:
-        parser.process()
-    except Exception as ex:
-        raise ex
-    bscc_ast_pfuncs = parser.bscc_ast_pfuncs
-    bscc_str_pfuncs = parser.bscc_str_pfuncs
-    print(bscc_str_pfuncs[0])
-    aeval = Interpreter()
-    aeval.symtable['p'] = 0.3
-    aeval.symtable['q'] = 0.7
-    for i in range(0, len(bscc_ast_pfuncs)):
-        try:
-            print(aeval.run(bscc_ast_pfuncs[i]))
-        except Exception as ex:
-            print(i)
-
-
-def main():
-    test_15bees()
-    #   test_stress()
-
-if __name__ == "__main__":
-    sys.exit(main())
-
-
