@@ -10,16 +10,17 @@ if os.name == 'posix':
     import resource
     resource.setrlimit(resource.RLIMIT_STACK, (2**29, -1))
 """
-kDefaultRecursionLimit = 10**9
-kDefaultThrStacksize = 0x20000000
 
 
-class StackHungryCtx(object):
-    def __init__(self, _recursion_limit, _thr_stacksize):
+class DeepRecursionCtx(object):
+    kRecursionLimit = 10**9
+    kThrStacksize = 0x20000000
+    
+    def __init__(self, ):
         self.old_recursion_limit = sys.getrecursionlimit()
         self.old_thr_stacksize = threading.stack_size()
-        self.recursion_limit = _recursion_limit
-        self.thr_stacksize = _thr_stacksize
+        self.recursion_limit = DeepRecursionCtx.kRecursionLimit
+        self.thr_stacksize = DeepRecursionCtx.kRecursionLimit
 
     def __enter__(self):
         sys.setrecursionlimit(self.recursion_limit)
@@ -53,7 +54,7 @@ class PrismBsccParser(object):
         }
 
     def process(self,):
-        with StackHungryCtx(kDefaultRecursionLimit, kDefaultThrStacksize):
+        with DeepRecursionCtx():
             thr = threading.Thread(target=self._process)
             thr.start()
             thr.join()
