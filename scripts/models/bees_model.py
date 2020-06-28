@@ -3,6 +3,7 @@ from .prism_utils.prism_bscc_parser import PrismBsccParser
 from .prism_utils.prism_dtmc_parser import PrismDtmcParser
 
 import math
+import multiprocessing as mp
 import numpy as np
 from asteval import Interpreter
 
@@ -98,7 +99,9 @@ class BeesModel(DataModel):
 
     def sample_bscc_pfuncs(self, trials_count=1000):
         bins_count = len(self.bscc_eval)
-        categorical = np.random.choice(bins_count, trials_count, p=self.bscc_eval)
+        categorical = np.random.choice(bins_count,
+                                       trials_count,
+                                       p=self.bscc_eval)
         multinomial = [0] * bins_count
         for it in categorical:
             multinomial[it] += 1
@@ -138,13 +141,28 @@ class BeesModel(DataModel):
             state_idx = np.random.choice(self.state_count, 1, p=p_next)[0]
         return bscc_idx
 
+    def _do_task_chainrun(self, _count):
+        multinomial = [0] * self.bscc_count
+        for i in range(0, _count):
+            idx = self.do_unbounded_chainrun()
+            multinomial[idx] += 1
+        return multinomial
+
     def eval_bscc_chainrun(self,):
         # Sampling by running the parametric chain
         self.eval_pmc_pfuncs()
         multinomial = [0] * self.bscc_count
+        """ sequential code
         for i in range(0, self.chainruns_count):
             idx = self.do_unbounded_chainrun()
             multinomial[idx] += 1
+        """
+        total, quant = self.chainruns_count, 1000
+        p, q = divmod(total, quant)
+        tasks = [quant] * p + [q] if q != 0 else [quant] * p
+        with mp.Pool(processes=(mp.cpu_count() + 1)) as ppool:
+            results = ppool.map(self._do_task_chainrun, tasks)
+            multinomial = [sum(x) for x in zip(*results)]
         norm = sum(multinomial) * 1.0
         dist = [c / norm for c in multinomial]
         return (multinomial, dist)
