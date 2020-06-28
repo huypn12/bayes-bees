@@ -3,9 +3,10 @@ from asteval import Interpreter
 import sys
 
 
-class RecursionLimit:
-    def __init__(self, limit):
-        self.limit = limit
+class DeepRecursionCtx():
+    kExtendedLimit = 10**9
+    def __init__(self, ):
+        self.limit = kExtendedLimit
         self.old_limit = sys.getrecursionlimit()
 
     def __enter__(self):
@@ -15,6 +16,8 @@ class RecursionLimit:
         sys.setrecursionlimit(self.old_limit)
 
 def test_eval(expr_str):
-    extended_rlimit = 10 ** 8
-    with RecursionLimit(extended_rlimit):
-         pass
+    aeval = Interpreter()
+    expr_str = "r[0]**4 * r[1]**2" + r[2]
+    with DeepRecursionCtx:
+        
+         
