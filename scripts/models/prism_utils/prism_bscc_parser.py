@@ -4,13 +4,14 @@ import re
 import sympy
 from asteval import Interpreter
 
+"""
 import os
 if os.name == 'posix':
     import resource
     resource.setrlimit(resource.RLIMIT_STACK, (2**29, -1))
-
+"""
 kDefaultRecursionLimit = 10**9
-kDefaultThrStacksize = 0x2000000
+kDefaultThrStacksize = 0x20000000
 
 
 class StackHungryCtx(object):
@@ -71,7 +72,8 @@ class PrismBsccParser(object):
                     try:
                         bscc_expr = aeval.parse(bscc_str)
                     except Exception as ex:
-                        sys.exit(ex)
+                        raise(ex)
+                        # sys.exit(ex)
                     self.bscc_str_pfuncs.append(bscc_str)
                     self.bscc_ast_pfuncs.append(bscc_expr)
                 elif line[0:30] == 'Parametric model checking: P=?':
@@ -82,7 +84,7 @@ class PrismBsccParser(object):
                     self.bscc_labels.append(bscc_label)
 
         self.params_count = max_param_idx + 1
- 
+
     def process_bscc_label(self, sbscc):
         sbscc = sbscc.replace('(', '').replace(')', '')
         tokens = sbscc.split('&')
