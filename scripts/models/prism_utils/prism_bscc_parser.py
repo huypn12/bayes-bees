@@ -1,14 +1,18 @@
-import sys, threading
+import sys
+import threading
 import re
+import sympy
 from asteval import Interpreter
 
+"""
 import os
 if os.name == 'posix':
     import resource
-    resource.setrlimit(resource.RLIMIT_STACK, (2**29,-1))
-
+    resource.setrlimit(resource.RLIMIT_STACK, (2**29, -1))
+"""
 kDefaultRecursionLimit = 10**9
-kDefaultThrStacksize = 0x2000000
+kDefaultThrStacksize = 0x20000000
+
 
 class StackHungryCtx(object):
     def __init__(self, _recursion_limit, _thr_stacksize):
@@ -16,7 +20,7 @@ class StackHungryCtx(object):
         self.old_thr_stacksize = threading.stack_size()
         self.recursion_limit = _recursion_limit
         self.thr_stacksize = _thr_stacksize
-        
+
     def __enter__(self):
         sys.setrecursionlimit(self.recursion_limit)
         threading.stack_size(self.thr_stacksize)
@@ -31,14 +35,15 @@ class PrismBsccParser(object):
     PRISM model checker, symbolic model checking result interpretation
     into Python expressions
     """
+
     def __init__(self, prism_result_file):
         super().__init__()
         self.prism_result_file = prism_result_file
         self.bscc_labels = []
         self.bscc_str_pfuncs = []
-        self.bscc_ast_pfuncs = [] 
-        self.params_count = 0 
-
+        self.bscc_ast_pfuncs = []
+        self.can_simplify = False
+        self.params_count = 0
 
     def get_bscc_desc(self, ):
         return {
@@ -47,14 +52,11 @@ class PrismBsccParser(object):
             'params_count': self.params_count
         }
 
-
     def process(self,):
         with StackHungryCtx(kDefaultRecursionLimit, kDefaultThrStacksize):
-            print(sys.getrecursionlimit())
             thr = threading.Thread(target=self._process)
             thr.start()
             thr.join()
-
 
     def _process(self,):
         with open(self.prism_result_file, "r") as fptr:
@@ -63,14 +65,15 @@ class PrismBsccParser(object):
         aeval = Interpreter()
         for line in lines:
             if len(line) > 7:
-                if line[0:6] == 'Result':    
+                if line[0:6] == 'Result':
                     param_idx, bscc_str = self.process_result_line(line)
                     if param_idx > max_param_idx:
                         max_param_idx = param_idx
                     try:
                         bscc_expr = aeval.parse(bscc_str)
                     except Exception as ex:
-                        sys.exit(ex)
+                        raise(ex)
+                        # sys.exit(ex)
                     self.bscc_str_pfuncs.append(bscc_str)
                     self.bscc_ast_pfuncs.append(bscc_expr)
                 elif line[0:30] == 'Parametric model checking: P=?':
@@ -82,7 +85,6 @@ class PrismBsccParser(object):
 
         self.params_count = max_param_idx + 1
 
-
     def process_bscc_label(self, sbscc):
         sbscc = sbscc.replace('(', '').replace(')', '')
         tokens = sbscc.split('&')
@@ -91,12 +93,10 @@ class PrismBsccParser(object):
             is_bscc = True
         bscc_label = ','.join(tokens)
         return bscc_label, is_bscc
-    
 
     def process_result_line(self, line):
         res_str = line.split(':')[2].rstrip("\n").lstrip(" ")
         return self.process_bscc_str(res_str)
-
 
     def get_max_param_idx(self, pfunc_str):
         max_param_idx = 0 
@@ -107,14 +107,12 @@ class PrismBsccParser(object):
                 max_param_idx = idx
         return max_param_idx
 
-
     def process_division(self, bscc_str):
         if '|' not in bscc_str:
             return bscc_str
         bscc_str = bscc_str.replace('|', r')/(')
         bscc_str = '({})'.format(bscc_str)
         return bscc_str
-
 
     def replace_ops(self, bscc_str):
         bscc_str = bscc_str.replace('{', r'(')
@@ -123,78 +121,28 @@ class PrismBsccParser(object):
         bscc_str = self.process_division(bscc_str)
         return bscc_str
 
-
     def replace_var(self, bscc_str):
-        # adapted to new model r_0, ..., r_n
         bscc_str = bscc_str.replace('p', r'p[0]')
         bscc_str = re.sub(r'([q])(\d*)',
-                lambda match: match.group(1) + '[' + str(int(match.group(2))) + ']',
-                bscc_str)
+                          lambda match: 'p' + '[' + str(int(match.group(2))) + ']', bscc_str)
         # pattern = re.compile(r'([q])(\d*)')
         # bscc_str = pattern.sub(r"r[\2]", bscc_str)
         return bscc_str
 
-
-    def replace_implicit_op(self, bscc_str):
+    def replace_implicit_ops(self, bscc_str):
         pattern = re.compile(r'(\d|\)) ([a-z])')
         bscc_str = pattern.sub(r"\1 * \2", bscc_str)
         return bscc_str
 
+    def simplify(self, bscc_str):
+        if self.can_simplify:
+            return sympy.factor(bscc_str)
+        return bscc_str
 
     def process_bscc_str(self, bscc_str):
         bscc_str = self.replace_ops(bscc_str)
+        bscc_str = self.replace_implicit_ops(bscc_str)
+        bscc_str = self.simplify(bscc_str)
         bscc_str = self.replace_var(bscc_str)
-        bscc_str = self.replace_implicit_op(bscc_str)
         param_idx = self.get_max_param_idx(bscc_str)
         return param_idx, bscc_str
-    
-
-## UNIT TEST ##
-
-
-def eval_bscc_ast_pfuncs(bscc_ast_pfuncs, r):
-    aeval = Interpreter()
-    aeval.symtable['r'] = r
-    return [aeval.run(f) for f in bscc_ast_pfuncs]
-
-def test_15bees():
-    parser = PrismBsccParser("models/prism/bee_multiparam_synchronous_10.txt")
-    parser.process()
-    bscc_ast_pfuncs = parser.bscc_ast_pfuncs
-    bscc_str_pfuncs = parser.bscc_str_pfuncs
-    print(parser.params_count)
-    r = [
-        0.01, 0.02, 0.03, 0.04, 0.05,
-        0.06, 0.07, 0.08, 0.09, 0.1,
-        0.11, 0.12, 0.13, 0.14, 0.15
-    ]
-    eval_bscc = eval_bscc_ast_pfuncs(bscc_ast_pfuncs, r)
-    print(eval_bscc)
-
-def test_stress():
-    parser = PrismBsccParser("synchronous_40.txt")
-    try:
-        parser.process()
-    except Exception as ex:
-        raise ex
-    bscc_ast_pfuncs = parser.bscc_ast_pfuncs
-    bscc_str_pfuncs = parser.bscc_str_pfuncs
-    print(bscc_str_pfuncs[0])
-    aeval = Interpreter()
-    aeval.symtable['p'] = 0.3
-    aeval.symtable['q'] = 0.7
-    for i in range(0, len(bscc_ast_pfuncs)):
-        try:
-            print(aeval.run(bscc_ast_pfuncs[i]))
-        except Exception as ex:
-            print(i)
-
-
-def main():
-    test_15bees()
-    #   test_stress()
-
-if __name__ == "__main__":
-    sys.exit(main())
-
-
