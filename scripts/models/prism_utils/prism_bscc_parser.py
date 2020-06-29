@@ -4,23 +4,21 @@ import re
 import sympy
 from asteval import Interpreter
 
-"""
 import os
 if os.name == 'posix':
     import resource
     resource.setrlimit(resource.RLIMIT_STACK, (2**29, -1))
-"""
 
 
 class DeepRecursionCtx(object):
-    kRecursionLimit = 10**9
-    kThrStacksize = 0x20000000
-    
+    kRecursionLimit = 10**4
+    kThrStacksize = 2**29
+
     def __init__(self, ):
         self.old_recursion_limit = sys.getrecursionlimit()
         self.old_thr_stacksize = threading.stack_size()
         self.recursion_limit = DeepRecursionCtx.kRecursionLimit
-        self.thr_stacksize = DeepRecursionCtx.kRecursionLimit
+        self.thr_stacksize = DeepRecursionCtx.kThrStacksize
 
     def __enter__(self):
         sys.setrecursionlimit(self.recursion_limit)
@@ -55,6 +53,7 @@ class PrismBsccParser(object):
 
     def process(self,):
         with DeepRecursionCtx():
+            print(sys.getrecursionlimit())
             thr = threading.Thread(target=self._process)
             thr.start()
             thr.join()
@@ -83,7 +82,6 @@ class PrismBsccParser(object):
                     sbscc = sbscc.rstrip().lstrip()
                     bscc_label, _ = self.process_bscc_label(sbscc)
                     self.bscc_labels.append(bscc_label)
-
         self.params_count = max_param_idx + 1
 
     def process_bscc_label(self, sbscc):
@@ -100,8 +98,8 @@ class PrismBsccParser(object):
         return self.process_bscc_str(res_str)
 
     def get_max_param_idx(self, pfunc_str):
-        max_param_idx = 0 
-        pattern = re.compile("(r)\[(\d*)\]")
+        max_param_idx = 0
+        pattern = re.compile(r"(r)\[(\d*)\]")
         for pp in re.finditer(pattern, pfunc_str):
             idx = int(pp.group(2))
             if idx > max_param_idx:
@@ -122,14 +120,16 @@ class PrismBsccParser(object):
         bscc_str = self.process_division(bscc_str)
         return bscc_str
 
+    def replace_var_old_bees(self, bscc_str):
+        bscc_str = bscc_str.replace('p', r'p[0]')
+        bscc_str = re.sub(r'([q])(\d*)',
+                          lambda match: 'p' + '[' + str(int(match.group(2))) + ']', bscc_str)
+        return bscc_str
+
     def replace_var(self, bscc_str):
-        # adapted to new model r_0, ..., r_n
-        # bscc_str = bscc_str.replace('p', r'p[0]')
-        # pattern = re.compile(r'([r])_(\d*)')
-        # bscc_str = pattern.sub(r"r[\2]", bscc_str)
+        # bscc_str = bscc_str.replace('r', r'r[0]')
         bscc_str = re.sub(r'([r])_(\d*)',
-                          lambda match: match.group(1) + '[' + str(int(match.group(2))) + ']',
-                          bscc_str)
+                          lambda match: 'r' + '[' + str(int(match.group(2))) + ']', bscc_str)
         return bscc_str
 
     def replace_implicit_ops(self, bscc_str):
