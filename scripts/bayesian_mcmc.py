@@ -1,7 +1,7 @@
-import config
+from scripts import config
 
 import sys
-from pymc3.stats import hpd
+# from pymc3.stats import hpd
 import numpy as np
 import scipy as sp
 import math
@@ -75,7 +75,8 @@ class BayesianMcmc(object):
         params_hpd = []
         for i in range(0, params_count):
             trace = [t[i] for t in self.traces]
-            h = hpd(np.asarray(trace), credible_interval=0.95)
+            # h = hpd(np.asarray(trace), credible_interval=0.95)
+            h = self._compute_hpd(np.asarray(trace), credible_interval=0.95)
             params_hpd.append(h)
         return params_hpd
 
@@ -85,8 +86,8 @@ class BayesianMcmc(object):
         """
 
         n = len(x)
-        cred_mass = 1.0-alpha
-
+        cred_mass = alpha
+        x = np.sort(np.asarray(x))
         interval_idx_inc = int(np.floor(cred_mass*n))
         n_intervals = n - interval_idx_inc
         interval_width = x[interval_idx_inc:] - x[:n_intervals]
