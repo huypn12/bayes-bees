@@ -1,3 +1,5 @@
+from scripts import config
+
 import sys
 import re
 import sympy
@@ -46,10 +48,18 @@ class PrismDtmcParser(object):
 
     def simplify_expression(self, expr_str):
         return str(sympy.factor(expr_str))
- 
+
+    def replace_var_old_bees(self, expr_str):
+        expr_str = expr_str.replace('p', r'p[0]')
+        expr_str = re.sub(r'([q])(\d*)',
+                          lambda match: 'p' + '[' + str(int(match.group(2))) + ']', expr_str)
+        return expr_str
+
     def replace_var(self, expr_str):
+        if config.models['use_old_model']:
+            return self.replace_var_old_bees(expr_str)
         return re.sub(r'([r])_(\d*)',
-                      lambda match: match.group(1) + '[' + str(int(match.group(2))) + ']',
+                      lambda match: 'r' + '[' + str(int(match.group(2))) + ']',
                       expr_str)
 
     def process_expression(self, expr_str):

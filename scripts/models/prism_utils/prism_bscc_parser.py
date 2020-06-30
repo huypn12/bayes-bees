@@ -1,3 +1,5 @@
+from scripts import config
+
 import sys
 import threading
 import re
@@ -127,7 +129,8 @@ class PrismBsccParser(object):
         return bscc_str
 
     def replace_var(self, bscc_str):
-        # bscc_str = bscc_str.replace('r', r'r[0]')
+        if config.models['use_old_model']:
+            return self.replace_var_old_bees(bscc_str)
         bscc_str = re.sub(r'([r])_(\d*)',
                           lambda match: 'r' + '[' + str(int(match.group(2))) + ']', bscc_str)
         return bscc_str

@@ -1,3 +1,5 @@
+import config
+
 import sys
 from pymc3.stats import hpd
 import numpy as np
@@ -32,7 +34,7 @@ class BayesianMcmc(object):
         for i in range(0, params_count):
             p_new[i] = np.random.beta(alpha, beta)
         # Old model p, q0, q1,...,qk-1
-        if self.data_model.is_params_increasing:
+        if config.models['use_old_model']:
             return sorted(p_new)
         # New model r0_,r_1,...,r_k
         return p_new

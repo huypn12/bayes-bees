@@ -1,6 +1,7 @@
 from .data_model import DataModel
 from .prism_utils.prism_bscc_parser import PrismBsccParser
 from .prism_utils.prism_dtmc_parser import PrismDtmcParser
+from scripts import config
 
 import math
 import multiprocessing as mp
@@ -84,7 +85,10 @@ class BeesModel(DataModel):
 
     def eval_bscc_pfuncs(self,):
         aeval = Interpreter()
-        aeval.symtable['r'] = self.params
+        if config.models['use_old_model']:
+            aeval.symtable['p'] = self.params
+        else:
+            aeval.symtable['r'] = self.params
         return [aeval.run(f) for f in self.bscc_ast_pfuncs]
 
     def eval_bscc(self, chain_params):
@@ -111,7 +115,10 @@ class BeesModel(DataModel):
 
     def eval_pmc_pfuncs(self, ):
         aeval = Interpreter()
-        aeval.symtable['r'] = self.params
+        if config.models['use_old_model']:
+            aeval.symtable['p'] = self.params
+        else:
+            aeval.symtable['r'] = self.params
         for i in range(0, self.state_count):
             self.init_eval[i] = aeval.run(self.init_ast_pfuncs[i])
         for i in range(0, self.state_count):
