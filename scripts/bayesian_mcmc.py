@@ -137,4 +137,18 @@ class BayesianMcmc(object):
                 self.traces.append(p_new)
                 self.traces_bscc_dist.append(bscc_dist)
 
-
+    def summarize(self, ):
+        summary = ''
+        summary += 'Data model: \n' + self.data_model.summarize() + '\n'
+        summary += '....\n'
+        summary += 'Prior: Beta(alpha={},beta={})'.format(self.hyperparams['alpha'],
+                                                          self.hyperparams['beta'])
+        summary += 'Chain length: {}'.format(self.mh_params['chain_length'])
+        summary += 'Estimated parameters: \n'
+        for it in zip(self.estimated_params['P'], self.estimated_params['HPD']):
+            p = it[0],
+            l_hpd, u_hpd = it[1]
+            summary += '\t P[{}] {:16.5f} ; HPD ({:16.5f}{:16.5f})\n'.format(p, l_hpd, u_hpd)
+        summary += 'Log-likelihood: {16.5f}'.format(self.estimated_params['log_llh'])
+        summary += 'AIC: {16.5f}'.format(self.estimated_params['AIC'])
+        return summary

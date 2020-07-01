@@ -189,3 +189,11 @@ class BeesModel(DataModel):
         else:
             sample = self.sample_bscc_chainrun(trials_count)
         return sample
+
+    def summarize(self, ):
+        summary = ''
+        summary += 'Markov population model of: \n\t {} states \n\t {} BSCCs\n'.format(self.state_count, self.bscc_count)
+        summary += 'P(BSCC) evaluation mode: ' + \
+            ('Rational function' if self.bscc_eval_mode == BeesModel.BSCC_MODE_PFUNCS else \
+             'Chain run') + '\n'
+        return summary
