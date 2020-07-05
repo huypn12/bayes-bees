@@ -1,6 +1,5 @@
-from bayesian_mcmc import BayesianMcmc
-from bayesian_mcmc_sim import BayesianMcmcSim
-from models.bees_model import BeesModel
+from scripts.bayesian_mcmc import BayesianMcmc
+from scripts.models.bees_model import BeesModel
 
 import itertools
 import logging
@@ -15,20 +14,20 @@ logging.basicConfig(filename='experiment_c.log', level=logging.INFO)
 def synthesize_data():
     logging.info('DATA SYNTHESIZING')
     logging.info('Note that this will run only once')
-    model_files = [
-        # 3 bees
-        ('models/prism/bee_multiparam_synchronous_3.pm',
-         'models/prism/bee_multiparam_synchronous_3.txt'),
-        # 5 bees
-        ('models/prism/bee_multiparam_synchronous_5.pm',
-         'models/prism/bee_multiparam_synchronous_5.txt'),
-        # 10 bees
-        ('models/prism/bee_multiparam_synchronous_10.pm',
-         'models/prism/bee_multiparam_synchronous_10.txt'),
-        # 10 bees
-        ('models/prism/bee_multiparam_synchronous_15.pm',
-         'models/prism/bee_multiparam_synchronous_15.txt')
-    ]
+    """
+    ('models/prism/bee_multiparam_synchronous_3.pm',
+    'models/prism/bee_multiparam_synchronous_3.txt'),
+    ('models/prism/bee_multiparam_synchronous_5.pm',
+    'models/prism/bee_multiparam_synchronous_5.txt'),
+    ('models/prism/bee_multiparam_synchronous_10.pm',
+    'models/prism/bee_multiparam_synchronous_10.txt'),
+    ('models/prism/bee_multiparam_synchronous_15.pm',
+    'models/prism/bee_multiparam_synchronous_15.txt')
+    """
+    bscc_file  = 'models/prism/bee_multiparam_synchronous_10.pm'
+    model_file = 'models/prism/bee_multiparam_synchronous_10.txt'
+    bees_model = BeesModel.from_files(model_file, bscc_file)
+    
 
 
 def summarize_data(sample: (list, list, list)):
