@@ -10,11 +10,13 @@ import os
 if os.name == 'posix':
     import resource
     resource.setrlimit(resource.RLIMIT_STACK, (2**29, -1))
+    sys.setrecursionlimit(10**9)
+    threading.stack_size(2**29)
 
 
 class DeepRecursionCtx(object):
-    kRecursionLimit = 10**4
-    kThrStacksize = 2**29
+    kRecursionLimit = 10**8
+    kThrStacksize = 0x1000000
 
     def __init__(self, ):
         self.old_recursion_limit = sys.getrecursionlimit()
@@ -43,7 +45,6 @@ class PrismBsccParser(object):
         self.bscc_labels = []
         self.bscc_str_pfuncs = []
         self.bscc_ast_pfuncs = []
-        self.can_simplify = False
         self.params_count = 0
 
     def get_bscc_desc(self, ):
@@ -54,8 +55,7 @@ class PrismBsccParser(object):
         }
 
     def process(self,):
-        with DeepRecursionCtx():
-            print(sys.getrecursionlimit())
+        with DeepRecursionCtx() as ctx:
             thr = threading.Thread(target=self._process)
             thr.start()
             thr.join()
@@ -131,6 +131,7 @@ class PrismBsccParser(object):
     def replace_var(self, bscc_str):
         if config.models['use_old_model']:
             return self.replace_var_old_bees(bscc_str)
+        assert bscc_str is not None
         bscc_str = re.sub(r'([r])_(\d*)',
                           lambda match: 'r' + '[' + str(int(match.group(2))) + ']', bscc_str)
         return bscc_str
@@ -141,8 +142,8 @@ class PrismBsccParser(object):
         return bscc_str
 
     def simplify(self, bscc_str):
-        if self.can_simplify:
-            return sympy.factor(bscc_str)
+        if config.models['use_sympy']:
+            return str(sympy.factor(bscc_str))
         return bscc_str
 
     def process_bscc_str(self, bscc_str):

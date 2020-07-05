@@ -1,9 +1,36 @@
 from scripts import config
 
-import sys
 import re
 import sympy
 from asteval import Interpreter
+
+import sys
+import threading
+import os
+if os.name == 'posix':
+    import resource
+    resource.setrlimit(resource.RLIMIT_STACK, (2**29, -1))
+    sys.setrecursionlimit(10**9)
+    threading.stack_size(2**29)
+
+
+class DeepRecursionCtx(object):
+    kRecursionLimit = 10**9
+    kThrStacksize = 0x100000000
+
+    def __init__(self, ):
+        self.old_recursion_limit = sys.getrecursionlimit()
+        self.old_thr_stacksize = threading.stack_size()
+        self.recursion_limit = DeepRecursionCtx.kRecursionLimit
+        self.thr_stacksize = DeepRecursionCtx.kThrStacksize
+
+    def __enter__(self):
+        sys.setrecursionlimit(self.recursion_limit)
+        threading.stack_size(self.thr_stacksize)
+
+    def __exit__(self, type, value, tb):
+        sys.setrecursionlimit(self.old_recursion_limit)
+        threading.stack_size(self.old_thr_stacksize)
 
 
 class PrismDtmcParser(object):
@@ -19,7 +46,6 @@ class PrismDtmcParser(object):
         self.init_ast_pfuncs = []
         self.trans_str_pfuncs = []
         self.trans_ast_pfuncs = []
-        self.can_simplify = False
 
     def get_pmc_desc(self,):
         return {
@@ -47,7 +73,9 @@ class PrismDtmcParser(object):
         return state_label, is_bscc
 
     def simplify_expression(self, expr_str):
-        return str(sympy.factor(expr_str))
+        if config.models['use_sympy']:
+            return str(sympy.factor(expr_str))
+        return expr_str
 
     def replace_var_old_bees(self, expr_str):
         expr_str = expr_str.replace('p', r'p[0]')
@@ -63,10 +91,9 @@ class PrismDtmcParser(object):
                       expr_str)
 
     def process_expression(self, expr_str):
-        if self.can_simplify:
-            # Simplification using sympy factor() must be done before
-            # replacing variable names by array references
-            expr_str = self.simplify_expression(expr_str)
+        # Simplification using sympy factor() must be done before
+        # replacing variable names by array references
+        expr_str = self.simplify_expression(expr_str)
         expr_str = self.replace_var(expr_str)
         return expr_str
 
@@ -167,7 +194,7 @@ class PrismDtmcParser(object):
             j = self.state_list.index(nextt)
             self.trans_str_pfuncs[i][j] = edge[2]
 
-    def parse_str2ast(self, ):
+    def _parse_str2ast(self, ):
         aeval = Interpreter()
         # Parse init vector to AST expressions
         state_count = len(self.state_list)
@@ -181,3 +208,9 @@ class PrismDtmcParser(object):
             for j in range(0, state_count):
                 self.trans_ast_pfuncs[i][j] = aeval.parse(
                     self.trans_str_pfuncs[i][j])
+
+    def parse_str2ast(self,):
+        with DeepRecursionCtx() as ctx:
+            thr = threading.Thread(target=self._parse_str2ast)
+            thr.start()
+            thr.join()
