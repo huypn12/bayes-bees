@@ -31,7 +31,7 @@ class BeesModel(DataModel):
         self.init_eval = None
         self.trans_eval = None
         self.bscc_eval_mode = BeesModel.BSCC_MODE_CHAIN_RUN
-        self.chainruns_count = 1000
+        self.chainruns_count = config.models['chainruns_factor']
 
     @staticmethod
     def from_model_file(prism_model_filepath):
@@ -63,6 +63,7 @@ class BeesModel(DataModel):
         bees_model.bscc_ast_pfuncs = bscc_desc['bscc_ast_pfuncs']
         bees_model.bscc_count = len(bscc_desc['bscc_labels'])
         bees_model.params_count = bscc_desc['params_count']
+        bees_model.chainruns_count = config.models['chainruns_factor'] * bees_model.bscc_count
         return bees_model
 
     def get_params(self, ):
