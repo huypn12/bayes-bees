@@ -3,6 +3,7 @@ Singleton config
 """
 
 models = {
+    'use_sympy': False,
     'use_old_model': False,
     'chainruns_factor': 1000
 }
