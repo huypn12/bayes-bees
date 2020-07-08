@@ -27,7 +27,7 @@ class CompareEvals(BaseExperiment):
         super().gen_p_true()
 
     def print_log(self, mesg):
-        print(mesg)
+        logging.info(mesg)
 
     def eval_pfuncs(self, ):
         assert self.data_model is not None

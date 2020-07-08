@@ -14,6 +14,8 @@ class BaseExperiment(object):
     def load_files(self, ):
         self.data_model = BeesModel.from_files(self.model_file, self.bscc_file)
         assert self.data_model.bscc_eval_mode == BeesModel.BSCC_MODE_CHAIN_RUN
+        self.print_log("Loaded model file: {}".format(self.model_file))
+        self.print_log('Loaded BSCCs file: {}'.format(self.bscc_file))
 
     def gen_p_true(self):
         dim = self.data_model.get_params_count()
@@ -21,11 +23,16 @@ class BaseExperiment(object):
         if not config.models['use_old_model']:
             p = sorted(p)
         self.p_true = p
+        self.print_log('True parameter: {}'.format(self.p_true))
 
     def synthesize_data(self, trials_count=10000):
         self.gen_p_true()
-        m, d = self.data_model.sample(params=self.p_true,
+        m, d = self.data_model.sample(chain_params=self.p_true,
                                       trials_count=trials_count)
+        self.syn_data = {
+            'mult': m,
+            'dist': d
+        }
         self.print_log("Data multinomial: {}".format(m))
         self.print_log("Data histogram: {}".format(d))
 
