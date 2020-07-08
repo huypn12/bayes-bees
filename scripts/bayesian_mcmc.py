@@ -16,7 +16,10 @@ class BayesianMcmc(object):
             'alpha': 2,
             'beta': 2,
         }
-        self.mh_params = {'chain_length': 1000, 'hpd_alpha': 0.95}
+        self.mh_params = {
+            'chain_length': 1000,
+            'hpd_alpha': 0.95
+        }
         self.traces = []
         self.traces_bscc_dist = []
         self.data_model = model
@@ -34,7 +37,7 @@ class BayesianMcmc(object):
         for i in range(0, params_count):
             p_new[i] = np.random.beta(alpha, beta)
         # Old model p, q0, q1,...,qk-1
-        if config.models['use_old_model']:
+        if not config.models['use_old_model']:
             return sorted(p_new)
         # New model r0_,r_1,...,r_k
         return p_new
@@ -76,7 +79,7 @@ class BayesianMcmc(object):
         for i in range(0, params_count):
             trace = [t[i] for t in self.traces]
             # h = hpd(np.asarray(trace), credible_interval=0.95)
-            h = self._compute_hpd(np.asarray(trace), credible_interval=0.95)
+            h = self._compute_hpd(np.asarray(trace), 0.95)
             params_hpd.append(h)
         return params_hpd
 
@@ -123,11 +126,16 @@ class BayesianMcmc(object):
         p = self.transition()
         bscc_dist = self.data_model.eval_bscc(p)
         for i in range(self.mh_params['chain_length']):
+            cur_llh = self.llh(bscc_dist, data)
+            if math.isnan(cur_llh) or np.isinf(cur_llh):
+                p = self.transition()
+                bscc_dist = self.data_model.eval_bscc(p)
+                i -= 1
+                continue
             p_new = self.transition()
             bscc_dist_new = self.data_model.eval_bscc(p_new)
-            cur_llh = self.llh(bscc_dist, data)
             new_llh = self.llh(bscc_dist_new, data)
-            if math.isnan(cur_llh) or math.isnan(new_llh):
+            if math.isnan(new_llh) or np.isinf(new_llh):
                 i -= 1
                 continue
             if (self.is_accepted(cur_llh + np.log(self.prior(p)),
@@ -140,15 +148,16 @@ class BayesianMcmc(object):
     def summarize(self, ):
         summary = ''
         summary += 'Data model: \n' + self.data_model.summarize() + '\n'
-        summary += '....\n'
-        summary += 'Prior: Beta(alpha={},beta={})'.format(self.hyperparams['alpha'],
-                                                          self.hyperparams['beta'])
-        summary += 'Chain length: {}'.format(self.mh_params['chain_length'])
+        summary += 'Prior: Beta(alpha={},beta={})\n'.format(self.hyperparams['alpha'],
+                                                            self.hyperparams['beta'])
+        summary += 'Chain length: {}\n'.format(self.mh_params['chain_length'])
         summary += 'Estimated parameters: \n'
+        i = 0
         for it in zip(self.estimated_params['P'], self.estimated_params['HPD']):
             p = it[0],
             l_hpd, u_hpd = it[1]
-            summary += '\t P[{}] {:16.5f} ; HPD ({:16.5f}{:16.5f})\n'.format(p, l_hpd, u_hpd)
-        summary += 'Log-likelihood: {16.5f}'.format(self.estimated_params['log_llh'])
-        summary += 'AIC: {16.5f}'.format(self.estimated_params['AIC'])
+            summary += '\t P[{}] {} ; HPD ({} {})\n'.format(i, p, l_hpd, u_hpd)
+            i += 1
+        summary += 'Log-likelihood: {}\n'.format(self.estimated_params['log_llh'])
+        summary += 'AIC: {}'.format(self.estimated_params['AIC'])
         return summary

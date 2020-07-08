@@ -152,7 +152,8 @@ class BeesModel(DataModel):
     def _do_task_chainrun(self, _count):
         multinomial = [0] * self.bscc_count
         for i in range(0, _count):
-            idx = self.do_unbounded_chainrun()
+            # idx = self.do_unbounded_chainrun()
+            idx = self.do_bounded_chainrun()
             multinomial[idx] += 1
         return multinomial
 
@@ -165,7 +166,7 @@ class BeesModel(DataModel):
             idx = self.do_unbounded_chainrun()
             multinomial[idx] += 1
         """
-        total, quant = self.chainruns_count, 1000
+        total, quant = self.chainruns_count, 500
         p, q = divmod(total, quant)
         tasks = [quant] * p + [q] if q != 0 else [quant] * p
         with mp.Pool(processes=(mp.cpu_count() + 1)) as ppool:
@@ -195,6 +196,6 @@ class BeesModel(DataModel):
         summary = ''
         summary += 'Markov population model of: \n\t {} states \n\t {} BSCCs\n'.format(self.state_count, self.bscc_count)
         summary += 'P(BSCC) evaluation mode: ' + \
-            ('Rational function' if self.bscc_eval_mode == BeesModel.BSCC_MODE_PFUNCS else \
-             'Chain run') + '\n'
+            ('Rational functions' if self.bscc_eval_mode == BeesModel.BSCC_MODE_PFUNCS else \
+             'Chainrun of {} trials'.format(self.chainruns_count)) + '\n'
         return summary
