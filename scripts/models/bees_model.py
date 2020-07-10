@@ -31,7 +31,7 @@ class BeesModel(DataModel):
         self.init_eval = None
         self.trans_eval = None
         self.bscc_eval_mode = BeesModel.BSCC_MODE_CHAIN_RUN
-        self.chainruns_count = config.models['chainruns_factor']
+        self.chainruns_count = config.models['default_chainruns_count']
 
     @staticmethod
     def from_model_file(prism_model_filepath):
@@ -63,7 +63,7 @@ class BeesModel(DataModel):
         bees_model.bscc_ast_pfuncs = bscc_desc['bscc_ast_pfuncs']
         bees_model.bscc_count = len(bscc_desc['bscc_labels'])
         bees_model.params_count = bscc_desc['params_count']
-        bees_model.chainruns_count = config.models['chainruns_factor'] * bees_model.bscc_count
+        # bees_model.chainruns_count = config.models['chainruns_factor'] * bees_model.bscc_count
         return bees_model
 
     def get_params(self, ):
@@ -152,20 +152,27 @@ class BeesModel(DataModel):
     def _do_task_chainrun(self, _count):
         multinomial = [0] * self.bscc_count
         for i in range(0, _count):
-            # idx = self.do_unbounded_chainrun()
-            idx = self.do_bounded_chainrun()
+            if config.models['use_bounded_run']:
+                idx = self.do_bounded_chainrun()
+            else:
+                idx = self.do_unbounded_chainrun()
             multinomial[idx] += 1
         return multinomial
 
-    def eval_bscc_chainrun(self,):
-        # Sampling by running the parametric chain
-        self.eval_pmc_pfuncs()
+    def __do_sequential_chainruns(self,):
         multinomial = [0] * self.bscc_count
-        """ sequential code
         for i in range(0, self.chainruns_count):
-            idx = self.do_unbounded_chainrun()
+            if config.models['use_bounded_run']:
+                idx = self.do_bounded_chainrun()
+            else:
+                idx = self.do_unbounded_chainrun()
             multinomial[idx] += 1
-        """
+        norm = sum(multinomial) * 1.0
+        dist = [c / norm for c in multinomial]
+        return (multinomial, dist)
+
+    def __do_parallel_chainruns(self, ):
+        multinomial = [0] * self.bscc_count
         total, quant = self.chainruns_count, 500
         p, q = divmod(total, quant)
         tasks = [quant] * p + [q] if q != 0 else [quant] * p
@@ -175,6 +182,13 @@ class BeesModel(DataModel):
         norm = sum(multinomial) * 1.0
         dist = [c / norm for c in multinomial]
         return (multinomial, dist)
+
+    def eval_bscc_chainrun(self,):
+        # Sampling by running the parametric chain
+        self.eval_pmc_pfuncs()
+        if config.models['use_parallel_chainruns']:
+            return self.__do_sequential_chainruns()
+        return self.__do_parallel_chainruns()
 
     def sample_bscc_chainrun(self, trials_count):
         self.chainruns_count = trials_count
@@ -186,7 +200,7 @@ class BeesModel(DataModel):
         sample = None
         self.set_params(chain_params)
         if self.bscc_eval_mode == BeesModel.BSCC_MODE_PFUNCS:
-            self.eval_bscc(chain_params, trials_count)
+            self.eval_bscc(chain_params)
             sample = self.sample_bscc_pfuncs(trials_count)
         else:
             sample = self.sample_bscc_chainrun(trials_count)

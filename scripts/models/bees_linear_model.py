@@ -20,10 +20,5 @@ class BeesLinearModel(BeesModel):
         return [linear_r[0] * i + linear_r[1]
                 for i in range(0, self.chain_params_count)]
 
-    def eval_pmc_pfuncs(self, linear_r):
-        chain_r = self.eval_chain_params(linear_r)
-        return super().eval_pmc_pfuncs(chain_r)
-
-    def eval_bscc_pfuncs(self, linear_r):
-        chain_r = self.eval_chain_params(linear_r)
-        return super().eval_bscc_pfuncs(chain_r)
+    def set_params(self, chain_params):
+        self.params = self.eval_chain_params(chain_params)

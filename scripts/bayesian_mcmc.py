@@ -37,10 +37,10 @@ class BayesianMcmc(object):
         for i in range(0, params_count):
             p_new[i] = np.random.beta(alpha, beta)
         # Old model p, q0, q1,...,qk-1
-        if not config.models['use_old_model']:
-            return sorted(p_new)
+        if config.models['use_old_model']:
+            return p_new
         # New model r0_,r_1,...,r_k
-        return p_new
+        return sorted(p_new)
 
     def prior(self, p):
         eps = 1e-18
@@ -147,7 +147,7 @@ class BayesianMcmc(object):
 
     def summarize(self, ):
         summary = ''
-        summary += 'Data model: \n' + self.data_model.summarize() + '\n'
+        summary += 'Data model: \n' + self.data_model.summarize()
         summary += 'Prior: Beta(alpha={},beta={})\n'.format(self.hyperparams['alpha'],
                                                             self.hyperparams['beta'])
         summary += 'Chain length: {}\n'.format(self.mh_params['chain_length'])
