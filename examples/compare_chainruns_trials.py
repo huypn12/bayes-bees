@@ -85,7 +85,7 @@ class CompareChainrunsTrials(BaseExperiment):
         ]
         self.syn_data['mult'] = [8303, 1181, 53, 83, 125, 255]
         self.syn_data['dist'] = [0.8303, 0.1181, 0.0053, 0.0083, 0.0125, 0.0255]
-        model_chainrun_factor_list = [200, 600]
+        model_chainrun_factor_list = [400,]
         for factor in model_chainrun_factor_list:
             self.run_inference(factor)
 
@@ -103,7 +103,7 @@ def main():
     ]
     model_file, bscc_file = file_pairs[1]
     cmc = CompareChainrunsTrials(model_file, bscc_file)
-    cmc.do_experiment()
+    cmc.do_manual_experiment()
     logging.shutdown()
 
 

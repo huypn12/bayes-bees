@@ -8,7 +8,6 @@ Result quality measurement:
 In a chainrun scheme, the following parameters affect the resu
 1. Number of MCMC smaple points (MCMC chain length)
 2. Number of chainruns per trial
-3. Quality of data
 """
 
 from examples.base_experiment import BaseExperiment
@@ -68,7 +67,7 @@ class CompareMcmcChainlen(BaseExperiment):
         self.init()
         # last 1000 is to force dumping the log... sorry
         mcmc_chainlen_lst = [1000, 2000, 3000, 4000, 5000,
-                             6000, 7000, 8000, 9000, 100000, 1000]
+                             6000, 7000, 8000, 9000, 10000]
         for mcmc_chainlen in mcmc_chainlen_lst:
             self.run_inference(mcmc_chainlen)
 
@@ -84,7 +83,7 @@ def main():
         ('data/prism/bee_multiparam_synchronous_15.pm',
          'data/prism/bee_multiparam_synchronous_15.txt'),
     ]
-    model_file, bscc_file = file_pairs[2]
+    model_file, bscc_file = file_pairs[1]
     cmc = CompareMcmcChainlen(model_file, bscc_file)
     cmc.do_experiment()
     logging.shutdown()
