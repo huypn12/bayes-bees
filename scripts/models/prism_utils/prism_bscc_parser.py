@@ -101,7 +101,10 @@ class PrismBsccParser(object):
 
     def get_max_param_idx(self, pfunc_str):
         max_param_idx = 0
-        pattern = re.compile(r"(r)\[(\d*)\]")
+        if config.models['use_old_model']:
+            pattern = re.compile(r"(p)\[(\d*)\]")
+        else:
+            pattern = re.compile(r"(r)\[(\d*)\]")
         for pp in re.finditer(pattern, pfunc_str):
             idx = int(pp.group(2))
             if idx > max_param_idx:
