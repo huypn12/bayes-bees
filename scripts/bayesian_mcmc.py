@@ -28,6 +28,9 @@ class BayesianMcmc(object):
     def set_data_model(self, data_model):
         self.data_model = data_model
 
+    def set_mcmc_chainlength(self, mcmc_chainlen):
+        self.mh_params['chain_length'] = mcmc_chainlen
+
     # Proposed distribution: beta
     def transition(self, ):
         alpha = self.hyperparams['alpha']
@@ -87,7 +90,6 @@ class BayesianMcmc(object):
         """
         Code was taken from PyMC3 project
         """
-
         n = len(x)
         cred_mass = alpha
         x = np.sort(np.asarray(x))

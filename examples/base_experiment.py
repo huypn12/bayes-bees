@@ -20,9 +20,7 @@ class BaseExperiment(object):
     def gen_p_true(self):
         dim = self.data_model.get_params_count()
         p = [random.uniform(0, 1) for i in range(0, dim)]
-        if not config.models['use_old_model']:
-            p = sorted(p)
-        self.p_true = p
+        self.p_true = p if config.models['use_old_model'] else sorted(p)
         self.print_log('True parameter: {}'.format(self.p_true))
 
     def synthesize_data(self, trials_count=10000):
