@@ -74,6 +74,8 @@
   approach).
 \end{abstract}
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Preliminaries}
 \subsection{Discrete time Markov Chain}
 Assume that each bee in a colony decides its next action (to sting or not to
@@ -106,15 +108,7 @@ that is, $\mathbf{P}$ satisfies the following properties
 \item all elements are in $[0,1]$.
 \item row elements sum up to 1.
 \end{itemize}
-
-Given a model $\mathcal{M}$, the population in steady state is represented by a
-set of special states, namely \textit{terminal Strongly Connected Components}
-\begin{definition}[Terminal Strongly Connected Components]
-  Let $\mathcal{M}= (S,\mathbf{P}, S_{init}, AP, L)$ a DTMC, a state $s\in
-  S$ is a Terminal Strongly Connected Component (tSCC for short) if and only if
-  $P(s, s) = 1$ and $P(s, s') = 0 \forall s' \in S, s' \neq s$
-\end{definition}
-
+\subsection{Parametric Discrete Time Markov Chain}
 In order to generalize the stochastic matrix to encompass unknown information of
 the system, we introduce \textit{parametric DTMC}. Let $\theta =
 (\theta_1,\ldots,\theta_n) \in [0,1]^n$, we represent each element in matrix
@@ -143,6 +137,15 @@ A concrete assignment of $\theta$ on pMC induces a DTMC. Let $\phi$ be a
 specification on a pMC $\mathcal{M}$ (for example, in this project $\phi$ is the
 steady-state distribution), we estimate the model parameter $\theta$, such that
 $\mathcal{M} \models \phi$
+
+\subsection{Markov population model}
+Given a model $\mathcal{M}$, the population in steady state is represented by a
+set of special states, namely \textit{terminal Strongly Connected Components}
+\begin{definition}[Terminal Strongly Connected Components]
+  Let $\mathcal{M}= (S,\mathbf{P}, S_{init}, AP, L)$ a DTMC, a state $s\in
+  S$ is a Terminal Strongly Connected Component (tSCC for short) if and only if
+  $P(s, s) = 1$ and $P(s, s') = 0 \forall s' \in S, s' \neq s$
+\end{definition}
 
 
 \subsection{Bayesian inference}
@@ -237,14 +240,14 @@ and \cite{baron2019probability}. We summarize the necessary results in the follo
 \end{tabular}
 \end{table}
 
-\subsubsection{Markov Chain Monte Carlo method}
+\subsubsection{Metropolis-Hastings algorithm}
 In case the posterior distribution has no analytical form or its analytical form
-is difficult to sample from directly, we need to use
-\textit{Metropolis-Hastings} algorithm (MH in short). The reason of using MH
-algorithm to MH algorithm can draw samples from posterior distribution with only
-the likelihood function. Using the MH algorithm, we can estimate the parameter
-by posterior mean, without knowing the analytical form of posterior distribution
-itself.
+is difficult to sample from directly, we use \textit{Metropolis-Hastings}
+algorithm (\textit{MH} in short).\\
+Metropolis-Hastings algorithm is a \textit{Monte Carlo Markov Chain} algorithm.
+In its essential, Metropolis-Hastings algorithm draws 
+Using the MH algorithm, we can estimate the parameter by posterior mean, without
+knowing the analytical form of posterior distribution itself.
 
 \begin{algorithm}[H]
   \caption{Metropolis-Hastings Algorithm, $D$ is the observation data, $\theta$ is parameter}\label{mhalg}
@@ -309,6 +312,12 @@ In this project, we use $0.95$ credible set, i.e $\alpha=0.05$
 In this project, the HPD is calculated using PyMC3 library
 \cite{salvatier2016pymc3}
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+\section{Related works}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 \section{Modeling of bees colony}
 \subsection{Biological description}
 We consider the collective action of a bee colony. Each bee in a colony could
@@ -464,17 +473,17 @@ For a population of $n$ bees, all three types of models share two properties:
   \begin{align*}
     \sum_{i=0}^n P(FG\quad tSCC_i) = 1
   \end{align*}
+\item Acyclic, there exists no cycle in the Markov chain.
 \end{enumerate}
 
 
-\section{Related works}
+\subsubsection{Linear model}
 
 
 \section{Bayesian parameter synthesis of Markov population model}
-\subsection{Data}
-
+\subsection{Data synthesis}
 Let $n$ be the population of bee in the colony. Assume that these $n$ bees are
-in a closed environment, like a box. We use an initial stimulation, for example
+in a closed environment. We use an initial stimulation, for example
 threating the bees. Assume that all experiment have the same initial
 stimulation, we observe how many bees are dead in the steady state. This
 experiment has $n+1$ outcomes $0,1,\ldots,n$ dead bees.\\
@@ -492,7 +501,8 @@ We use the multinomial distribution as likelihood function (data model) in the
 following Bayesian inferences.
 
 \subsection{Inference of steady state distribution}
-Using the Multinomial-Dirichlet conjugation, we can infer the steady state
+Let
+Using the Multinomial-Dirichlet conjugation, we can infer  the steady state
 distribution as we observe new experiment data $D=(a_0,\ldots,a_n)$, with $a_i$
 is the number of experiment in which the population in steady-state is $i$ 
 \begin{algorithm}[H]
@@ -514,7 +524,11 @@ model parameters. However, it can support the parameter estimation presented
 \cite{hajnal2019data} to estimate the model parameters with narrower credible
 set.
 
-\subsection{Inference of model parameters using rational functions}
+
+\subsection{Evaluation of steady -state distribution}
+
+
+\subsection{Inference of model parameters with rational functions}
 We can also use Bayesian inference to estimate pMC model parameters directly.
 Given a pMC $\mathcal{M}$ with $\theta=(\theta_1,\ldots,\theta_k)$ as its model
 parameters. Since $\theta_i \in [0,1]$, we can assume that $\theta_i$ are of
@@ -559,7 +573,7 @@ Metropolis-Hastings to sample from it.
   \end{algorithmic}
 \end{algorithm}
 
-\subsection{Inference of model parameters using chain runs}
+\subsection{Inference of model parameters with DTMC sampling}
 We can also use Bayesian inference to estimate pMC model parameters directly.
 Given a pMC $\mathcal{M}$ with $\theta=(\theta_1,\ldots,\theta_k)$ as its model
 parameters. Since $\theta_i \in [0,1]$, we can assume that $\theta_i$ are of
@@ -607,33 +621,8 @@ Metropolis-Hastings to sample from it.
  
 \end{algorithm}
 
-\subsection{Accuracy measures}
-In order to evaluate the accuracy of parameter point inference, we have to
-select a distance measure from estimated parameter to true parameter. In this
-project we use two measures:
-\begin{definition}[RMSE]
-  Let $\theta = (\theta_1,\ldots,\theta_n)$ and $\hat{\theta} =
-  (\hat{\theta_1},\ldots,\hat{\theta_n})$ be vectors of $n$ real numbers, the
-  Root Mean Square Error between $p$ and $\hat{p}$ is defined as follow:
-  \begin{align*}
-    RMSE(\theta, \hat{\theta}) = \sqrt{\frac{\sum_{i=1}^n{(\theta_i - \hat{\theta_i})}}{n}}
-  \end{align*}
-\end{definition}
 
-\section{Implementation and results}
-The Bayesian inference methods are implemented in Python 3 and tested in the
-followin system configuration:
-\begin{itemize}
-\item Intel Core i5-8265U @ 1.60GHz
-\item 16GB RAM
-\item OpenSUSE Tumbleweed 20200427
-\item Anaconda 3 2019.10 for linux x86\_64
-\end{itemize}
-The following experiment on Bayesian inference use synthetic data from
-semi-synchronous models of 2, 5 and 10 bees (in order to compare the performance
-with related work in \cite{hajnal2019data}).
-
-
+\section{Benchmark}
 \subsection{Data synthesis}
 The data synthesis for $n$ bees population is conducted as follow:
 \begin{itemize}
@@ -654,6 +643,21 @@ The data synthesis for $n$ bees population is conducted as follow:
   \caption{Steady state data synthesis, semi-synchronous model of 5 bees
     population, model parameters $(0.3, 0.25, 0.35, 0.45, 0.5)$}
 \end{figure}
+
+\subsection{Evaluation measures}
+
+In order to evaluate the accuracy of parameter point inference, we have to
+select a distance measure from estimated parameter to true parameter. In this
+project we use two measures:
+\begin{definition}[RMSE]
+  Let $\theta = (\theta_1,\ldots,\theta_n)$ and $\hat{\theta} =
+  (\hat{\theta_1},\ldots,\hat{\theta_n})$ be vectors of $n$ real numbers, the
+  Root Mean Square Error between $p$ and $\hat{p}$ is defined as follow:
+  \begin{align*}
+    RMSE(\theta, \hat{\theta}) = \sqrt{\frac{\sum_{i=1}^n{(\theta_i - \hat{\theta_i})}}{n}}
+  \end{align*}
+\end{definition}
+
 
 \subsection{Inference of steady state distribution}
 This experiment is conducted on semisynchronous model of 5 bees. The polynomial
@@ -690,39 +694,11 @@ where $N$ is the sample size. Experiment configurations:
 \subsection{Inference of model parameters with rational functions}
 This experiment is conducted in 2, 5, and 10 bees population models of 2, 5, and 10
 parameters respectively. All models are semi-synchronous.\\
-\begin{lstlisting}
-  Experiment with 2 bees, 2 params, semisync
-  Finished in 2.0310990789876087 seconds, chain length 50000
-  True parameter: [0.1, 0.2]
-  Estimated parameter: [0.10183236 0.18434951]
-  RMSE: 0.00012414769020485024
-  Log likelihood: -8.4331030579051
-  AIC: 20.8662061158102
 
-  Experiment with 5 bees, 5 params, semisync
-  Finished in 7.2764098109910265 seconds, chain length 50000
-  True parameter: [0.1, 0.2, 0.4, 0.5, 0.6]
-  Estimated parameter: [
-  0.10135125 0.21855681 0.52070207 0.45761621 0.57840823
-  ]
-  RMSE: 0.0034355521925440993
-  Log likelihood: -70.33078101358842
-  AIC: 150.66156202717684
+\subsection{Inference of model parameters with DTMC sampling}
 
-  Experiment with 10 bees, 10 params, semisync
-  Finished in 602.7453691669944 seconds, chain length 50000
-  True parameter: [0.1, 0.2, 0.4, 0.5, 0.6, 0.1, 0.2, 0.4, 0.5, 0.6]
-  Estimated parameter: [
-  0.11375671 0.14925181 0.3042601  0.57028791 0.81435131
-  0.10468808 0.37077345 0.40401714 0.28729648 0.28731649
-  ]
-  RMSE: 0.02350330802802734
-  Log likelihood: -395.266357301065
-  AIC: 810.53271460213
 
-\end{lstlisting}
-
-\subsection{Inference of model parameters with chain running}
+\subsection{Comparison of DTMC sampling and rational functions evaluation}
 
 \subsection{Notes on implementation}
 A script \texttt{parse\_prism.py} is include in folder \texttt{models} to parse
@@ -734,6 +710,24 @@ expensive function \texttt{eval()} on runtime. Source code structure:
   parsed to Python classes
 \item \texttt{examples} folder contains jupyter notebook examples.
 \end{itemize}
+
+
+\section{Implementation}
+The Bayesian inference methods are implemented in Python 3 and tested in the
+followin system configuration:
+\begin{itemize}
+\item Intel Core i5-8265U @ 1.60GHz
+\item 16GB RAM
+\item OpenSUSE Tumbleweed 20200427
+\item Anaconda 3 2019.10 for linux x86\_64
+\end{itemize}
+The following experiment on Bayesian inference use synthetic data from
+semi-synchronous models of 2, 5 and 10 bees (in order to compare the performance
+with related work in \cite{hajnal2019data}).
+
+\subsection{PRISM model and result processing}
+\subsection{Metropolis-Hastings algorithm implementation}
+
 
 \section{Conclusion}
 The goal of this project is to experiment Bayesian approach on parameter
