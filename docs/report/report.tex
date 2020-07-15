@@ -118,11 +118,11 @@ which satisfies the following properties
 \begin{definition}[Bottom Strongly Connected Component]
   Let $\mathcal{M}=(S,\mathbf{P}, S_{init}, AP,L)$ a DTMC and $S'\in S$ a
   Strongly Connected Component. $S'$ is also a \textit{Bottom Strongly Connected
-    Component} if and only if there exist no state $s \in S\\S'$ that is
-  reachable from any state in $S'$.
+    Component}, or \textit{BSCC} for short, if and only if there exist no state
+  $s \in S\\S'$ that is reachable from any state in $S'$.
 \end{definition}
 
-\subsubsection{Parametric Discrete Time Markov Chain}
+\subsubsection{Parametric Discrete-time Markov Chain}
 In order to generalize the stochastic matrix to encompass unknown information of
 the system, we introduce \textit{parametric DTMC}. Let $\theta =
 (\theta_1,\ldots,\theta_n) \in [0,1]^n$, we represent each element in matrix
@@ -147,16 +147,18 @@ follow:
   \item $L: S \rightarrow 2^{AP}$ is the labelling function on states.
   \end{itemize}
 \end{definition}
-A concrete assignment of $\theta$ on pMC induces a DTMC.
+A concrete assignment of $\theta$ on pMC induces a DTMC. In this project, we
+concern about the problem of data-informed estimation of model parameter $\theta$.
 
 \subsubsection{Markov population model}
-Given a model $\mathcal{M}$, the population in steady state is represented by a
-set of special states, namely \textit{terminal Strongly Connected Components}
-\begin{definition}[Terminal Strongly Connected Components]
-  Let $\mathcal{M}= (S,\mathbf{P}, S_{init}, AP, L)$ a DTMC, a state $s\in
-  S$ is a Terminal Strongly Connected Component (tSCC for short) if and only if
-  $P(s, s) = 1$ and $P(s, s') = 0 \forall s' \in S, s' \neq s$
+In the scope of this project we concern \textit{population} of a bee colony.
+\begin{definition}[Markov population model]
+  
 \end{definition}
+
+
+\subsubsection{Steady-state distribution}
+
 
 
 \subsection{Bayesian inference}
@@ -281,7 +283,10 @@ knowing the analytical form of posterior distribution itself.
 \end{algorithm}
 The likelihood function can be implemented as log-likelihood to avoid underflow
 error. Proposal distribution defines how do we proceed to the next parameter
-value on the parameter space; it can be of any distribution family. In this
+value on the parameter space; it can be of any distribution family.
+
+\subsubsection{Selection of prior distribution}
+In this
 project,
 since parameters are in $[0,1]$, we select Beta distribution as proposal.\\
 There are different methods to select the initial value of parameter $P$. In
@@ -320,8 +325,10 @@ In this project, we use $0.95$ credible set, i.e $\alpha=0.05$
   Highest Posterior Density $(1-\alpha)100\%$ credible set (HDP for short) is the
   interval with minimum length over all Bayesian $(1-\alpha)100\%$ Credible Set.
 \end{definition}
+
 In this project, the HPD is calculated using PyMC3 library
 \cite{salvatier2016pymc3}
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
@@ -357,6 +364,21 @@ Afterward, the agent has probability to commit an action, namely \textit{sting}.
 The agent is eliminated from environment after stinging.
 
 \subsection{Markov population models for bee colony}
+Assume that we have a colony of $n$ bees initially. As aforementioned, an individual bee
+is terminated after it stings. Thus, at the end of experiment, the number of
+bees is $n'\in\{0,1,\ldots,n\}$. We model the bee colony with a DTMC
+$\mathcal{M}=(S,\mathbf{P}, S_{init}, AP,L)$, such that
+\begin{itemize}
+\item $|S_{init}|=1$
+\item There exists $n+1$ BSCCs $B_0,\ldots,B_n\in S$. These BSCCs encode the
+  population at the end of the experiment.
+\end{itemize}
+
+In a bee colony, we can also ob
+\begin{itemize}
+\item Let $P(B_i)$ be the probability of the
+\end{itemize}
+
 Semantics of Markov population models for bees colony are developed by
 \cite{hajnal2019data}. In this report we summarize three models of bees population
 \begin{enumerate}
@@ -488,14 +510,18 @@ For a population of $n$ bees, all three types of models share two properties:
   \begin{align*}
     \sum_{i=0}^n P(FG\quad tSCC_i) = 1
   \end{align*}
-\item Acyclic, there exists no cycle in the Markov chain.
 \end{enumerate}
 
 
 \subsubsection{Linear model}
+asdf
 
-
-
+\subsubsection{Steady-state distribution}
+In the bees population models, the steady state distribution is defined as
+follow:
+\begin{definition}[Steady-state distribution]
+  
+\end{definition}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Bayesian parameter synthesis of Markov population model}
@@ -524,7 +550,9 @@ model parameters. However, it can support the parameter estimation presented
 set.
 
 
-\subsection{Evaluation of steady -state distribution}
+\subsection{Evaluation of steady-state distribution}
+
+
 
 
 \subsection{Inference of model parameters with rational functions}
@@ -572,7 +600,7 @@ Metropolis-Hastings to sample from it.
   \end{algorithmic}
 \end{algorithm}
 
-\subsection{Inference of model parameters with DTMC sampling}
+\subsection{Inference of model parameter with Metropolis-Hastings algorithm}
 We can also use Bayesian inference to estimate pMC model parameters directly.
 Given a pMC $\mathcal{M}$ with $\theta=(\theta_1,\ldots,\theta_k)$ as its model
 parameters. Since $\theta_i \in [0,1]$, we can assume that $\theta_i$ are of
@@ -620,6 +648,45 @@ Metropolis-Hastings to sample from it.
  
 \end{algorithm}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Implementation}
+The Bayesian inference methods are implemented in Python 3 and tested in the
+followin system configuration:
+\begin{itemize}
+\item Intel Core i5-8265U @ 1.60GHz
+\item 16GB RAM
+\item OpenSUSE Tumbleweed 20200427
+\item Anaconda 3 2019.10 for linux x86\_64
+\end{itemize}
+The following experiment on Bayesian inference use synthetic data from
+semi-synchronous models of 2, 5 and 10 bees (in order to compare the performance
+with related work in \cite{hajnal2019data}).
+
+\subsection{PRISM model and result processing}
+asdf
+
+
+
+\subsection{Metropolis-Hastings algorithm implementation}
+A script \texttt{parse\_prism.py} is include in folder \texttt{models} to parse
+PRISM polynomial string to a Python class template. This is to avoid calling
+expensive function \texttt{eval()} on runtime. Source code structure:
+\begin{itemize}
+\item \texttt{docs} folder contains final report
+\item \texttt{impl} folder contains python implementation and PRISM results
+  parsed to Python classes
+\item \texttt{examples} folder contains jupyter notebook examples.
+\end{itemize}
+
+
+\subsection{Class design}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.6\textwidth,keepaspectratio]{figures/class_diagram.png}
+  \caption{Class diagram of the project}
+\end{figure}
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Benchmark}
@@ -657,6 +724,9 @@ project we use two measures:
   \end{align*}
 \end{definition}
 
+\subsection{Comparison of DTMC sampling and rational functions evaluation}
+Given a bee population model $\mathcal{M}$, we have two methods to obtain
+steady-state distribution:
 
 \subsection{Inference of steady state distribution}
 This experiment is conducted on semisynchronous model of 5 bees. The polynomial
@@ -697,37 +767,9 @@ parameters respectively. All models are semi-synchronous.\\
 \subsection{Inference of model parameters with DTMC sampling}
 
 
-\subsection{Comparison of DTMC sampling and rational functions evaluation}
-
-\subsection{Notes on implementation}
-A script \texttt{parse\_prism.py} is include in folder \texttt{models} to parse
-PRISM polynomial string to a Python class template. This is to avoid calling
-expensive function \texttt{eval()} on runtime. Source code structure:
-\begin{itemize}
-\item \texttt{docs} folder contains final report
-\item \texttt{impl} folder contains python implementation and PRISM results
-  parsed to Python classes
-\item \texttt{examples} folder contains jupyter notebook examples.
-\end{itemize}
 
 
-\section{Implementation}
-The Bayesian inference methods are implemented in Python 3 and tested in the
-followin system configuration:
-\begin{itemize}
-\item Intel Core i5-8265U @ 1.60GHz
-\item 16GB RAM
-\item OpenSUSE Tumbleweed 20200427
-\item Anaconda 3 2019.10 for linux x86\_64
-\end{itemize}
-The following experiment on Bayesian inference use synthetic data from
-semi-synchronous models of 2, 5 and 10 bees (in order to compare the performance
-with related work in \cite{hajnal2019data}).
-
-\subsection{PRISM model and result processing}
-\subsection{Metropolis-Hastings algorithm implementation}
-
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 \section{Conclusion}
 The goal of this project is to experiment Bayesian approach on parameter
 inference of Markov population models. The results shows that Bayesian inference
