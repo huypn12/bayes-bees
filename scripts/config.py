@@ -7,10 +7,10 @@ models = {
     'use_old_model': False,
     'use_parallel_chainruns': True,
     'use_bounded_run': True,
+    'use_uniform_prior': True,
     'default_chainruns_count': 2000,
     # __DEPRECATED__
     'chainruns_factor': 1000,
-
 }
 
 mh = {
