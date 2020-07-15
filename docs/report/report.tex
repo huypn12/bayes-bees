@@ -57,21 +57,19 @@
 \tableofcontents
 \pagebreak
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 \begin{abstract}
-  We study the collective behavior of a bee colony. Each bee in a colony could
-  sting after observing a threat in the surrounding environment, and warn other
-  bees by releasing a special substance, pheromone. By sensing the pheromone
-  released in the environment, other bees in the colony may also sting. However,
-  since stinging leads to the termination of an individual bee, it reduces the
-  total defense capability as well. The stinging behavior of bee colonies can be
-  studied by observing the changes in the bee population. In this project, we
-  use parametric Markov Chain to model the bee population. The contributions of
-  this project are (1) to show that steady-state distribution can be more
-  precisely estimated with fewer data using Bayesian inference, and (2) Bayesian
-  inference can also be used to estimate model parameters of parametric Markov
-  Chain with more scalability (lower computational cost for models with a higher
-  number of parameters, compare with the existing method with frequentist
-  approach).
+  We study the collective behavior of a bee colony. Each bee in a colony
+  possibly stings after observing a threat in the surrounding environment, and
+  warn other bees by releasing a special substance, pheromone. By sensing the
+  pheromone released in the environment, other bees in the colony may also
+  sting. However, since stinging leads to the termination of an individual bee,
+  it reduces the total defense capability as well. With parametric Discrete-time
+  Markov chain as the model, we study how the actions of a single bee change
+  with regarding to the colony size of and pheromone amount. This project
+  propose and discuss Bayesian methods to estimate parameters of bees population
+  models. It shows that the proposed methods is scalable and can deliver
+  estimations of model parameters.
 \end{abstract}
 
 
@@ -81,17 +79,16 @@
 Assume that each bee in a colony decides its next action (to sting or not to
 sting) based only on the current state of the environment, and the number of
 bees who sting or not sting can be modeled as a Markov process. To reduce the
-complexity of the model, we make another assumption that the observations on a
-bee colony are conducted in uniform time duration, hence the model is of
-discrete-time. Therefore, Discrete-Time Markov Chain is the selected
-mathematical model to describe the bee colony population. The definitions and
-notations on this section are based on \cite{baier2008principles} and \cite{hajnal2019data}
+complexity of the model, we make another assumption that the states of the bees
+colony are observed after uniform time duration, hence the model is of
+discrete-time. 
 
+\subsubsection{Definition}
 \begin{definition}[Discrete Time Markov Chain]
   A Discrete Time Markov Chain (DTMC) is a tuple $(S,\mathbf{P}, S_{init}, AP,
-  L)$
+  L)$ \cite{baier2008principles} 
   \begin{itemize}
-  \item $S$ is a countable nonemty set of \textit{states}
+  \item $S$ is a countable non-emty set of \textit{states}
   \item $\mathbf{P}:S\times S \rightarrow [0,1]$ is the \textit{transition probability}
     function, s.t $$\sum_{s'\in S}\mathbf{P}(s, s') = 1$$
   \item $S_{init}: S \rightarrow [0,1]$ is the \textit{initial distribution},
@@ -102,13 +99,30 @@ notations on this section are based on \cite{baier2008principles} and \cite{hajn
 \end{definition}
 
 The transition probability function in DTMC is given as a stochastic matrix $\mathbf{P}$,
-that is, $\mathbf{P}$ satisfies the following properties
+which satisfies the following properties
 \begin{itemize}
 \item $\mathbf{P}$ is a square matrix.
-\item all elements are in $[0,1]$.
-\item row elements sum up to 1.
+\item $\mathbf{P}_{i,j} \in [0,1]$.
+\item $\sum_j\mathbf{P}_{i,j} = 1$
 \end{itemize}
-\subsection{Parametric Discrete Time Markov Chain}
+
+\begin{definition}[Strongly Connected Component]
+  Let $\mathcal{M}=(S,\mathbf{P}, S_{init}, AP,L)$ a DTMC. A subset $S'\subset
+  S$ is strongly connected if and only if for every pair $s_1,s_2\in S'$ there
+  is a path between $s_1$ and $s_2$ which consists of only of state in $S'$. If
+  there exist no $S''\subseteq S$, such that $S\subset S''$ and $S''$ is
+  strongly connected, then $S'$ is a \textit{Strongly Connected Component}, or
+  \textit{SCC} in short.
+\end{definition}
+
+\begin{definition}[Bottom Strongly Connected Component]
+  Let $\mathcal{M}=(S,\mathbf{P}, S_{init}, AP,L)$ a DTMC and $S'\in S$ a
+  Strongly Connected Component. $S'$ is also a \textit{Bottom Strongly Connected
+    Component} if and only if there exist no state $s \in S\\S'$ that is
+  reachable from any state in $S'$.
+\end{definition}
+
+\subsubsection{Parametric Discrete Time Markov Chain}
 In order to generalize the stochastic matrix to encompass unknown information of
 the system, we introduce \textit{parametric DTMC}. Let $\theta =
 (\theta_1,\ldots,\theta_n) \in [0,1]^n$, we represent each element in matrix
@@ -133,12 +147,9 @@ follow:
   \item $L: S \rightarrow 2^{AP}$ is the labelling function on states.
   \end{itemize}
 \end{definition}
-A concrete assignment of $\theta$ on pMC induces a DTMC. Let $\phi$ be a
-specification on a pMC $\mathcal{M}$ (for example, in this project $\phi$ is the
-steady-state distribution), we estimate the model parameter $\theta$, such that
-$\mathcal{M} \models \phi$
+A concrete assignment of $\theta$ on pMC induces a DTMC.
 
-\subsection{Markov population model}
+\subsubsection{Markov population model}
 Given a model $\mathcal{M}$, the population in steady state is represented by a
 set of special states, namely \textit{terminal Strongly Connected Components}
 \begin{definition}[Terminal Strongly Connected Components]
@@ -315,7 +326,11 @@ In this project, the HPD is calculated using PyMC3 library
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 \section{Related works}
+Markov chain and
 
+Bayesian inference
+
+Bees modeling
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 \section{Modeling of bees colony}
@@ -480,26 +495,10 @@ For a population of $n$ bees, all three types of models share two properties:
 \subsubsection{Linear model}
 
 
-\section{Bayesian parameter synthesis of Markov population model}
-\subsection{Data synthesis}
-Let $n$ be the population of bee in the colony. Assume that these $n$ bees are
-in a closed environment. We use an initial stimulation, for example
-threating the bees. Assume that all experiment have the same initial
-stimulation, we observe how many bees are dead in the steady state. This
-experiment has $n+1$ outcomes $0,1,\ldots,n$ dead bees.\\
-Assume we conduct $N$ experiments, let $x_0,x_1,\ldots,x_N$ be the number of
-dead bees. Since in each experiment, we have $(0 \leq x_1,\ldots,x_N \leq n+1)$,
-we can place $x_i$ on $n+1$ bins from $0$ to $n$. Assume we model the system by
-pMC $\mathcal{M}$ with steady-state distribution $\theta_0,\ldots,\theta_n$. Let
-$a_i$ be the number of experiments which has outcome $i, 0 \leq i \leq n$, we
-obtain that $a_i$ has \textit{multinomial distribution}:
-\begin{align*}
-  P(a_0,\ldots,a_n | N, \theta_0,\ldots,\theta_n) &\sim Multinomial(a_0,\ldots,a_n | N, \theta_0,\ldots,\theta_n) \\
-                                                  &= \frac{n!}{a_0!\ldots a_n!} \theta_0^{a_0}\ldots \theta_n^{a_n}
-\end{align*}
-We use the multinomial distribution as likelihood function (data model) in the
-following Bayesian inferences.
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Bayesian parameter synthesis of Markov population model}
 \subsection{Inference of steady state distribution}
 Let
 Using the Multinomial-Dirichlet conjugation, we can infer  the steady state
@@ -622,6 +621,7 @@ Metropolis-Hastings to sample from it.
 \end{algorithm}
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Benchmark}
 \subsection{Data synthesis}
 The data synthesis for $n$ bees population is conducted as follow:
@@ -645,7 +645,6 @@ The data synthesis for $n$ bees population is conducted as follow:
 \end{figure}
 
 \subsection{Evaluation measures}
-
 In order to evaluate the accuracy of parameter point inference, we have to
 select a distance measure from estimated parameter to true parameter. In this
 project we use two measures:
