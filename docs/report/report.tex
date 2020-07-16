@@ -133,8 +133,7 @@ follow:
 
 \begin{definition}[Parametric DTMC]
   A parametric Discrete Time Markov Chain (pMC for short) is a tuple $(S,\theta,
-  \mathbf{P}_\theta, S_{init}, AP,
-  L)$
+  \mathbf{P}_\theta, S_{init}, AP, L)$
   \begin{itemize}
   \item $S$ is a countable nonemty set of \textit{states}
   \item $\theta$ is the set of model parameters
@@ -151,14 +150,20 @@ A concrete assignment of $\theta$ on pMC induces a DTMC. In this project, we
 concern about the problem of data-informed estimation of model parameter $\theta$.
 
 \subsubsection{Markov population model}
-In the scope of this project we concern \textit{population} of a bee colony.
-\begin{definition}[Markov population model]
-  
-\end{definition}
-
-
-\subsubsection{Steady-state distribution}
-
+In the scope of this project we concern \textit{population} of a bee colony with
+$N$ individuals initially.
+We model the population of a bee colony using a pMC $\mathcal{M}=(S,\theta,
+\mathbf{P}_\theta, S_{init}, AP, L)$ with the following properties:
+\begin{itemize}
+\item Each state $s\in S$ represent number of individuals in the bee colony.
+\item There exists a set of terminal states $T\subset S$, such that $t$  is
+  a BSCC for all $t\in T$, and $|T|=N+1$.
+\end{itemize}
+Assume we conduct a real biological experiment on a colony of $N$ bees. At the
+end of the observation, we observes $N'$ bees $(0\leq N' \leq N)$ bees. Let
+$tSCC_i\in T$ denotes the terminal states with $i$ bees left. As we conduct the
+experiment with the same colony size multiple times, we get a probability
+distribution over final states $T$.\\
 
 
 \subsection{Bayesian inference}
@@ -247,7 +252,7 @@ and \cite{baron2019probability}. We summarize the necessary results in the follo
 \begin{tabular}{lllll}
 \cline{1-3}
 \multicolumn{1}{|l|}{Likelihood} & \multicolumn{1}{l|}{Prior} & \multicolumn{1}{l|}{Posterior parameters} &  &  \\ \cline{1-3}
-  \multicolumn{1}{|l|}{$Binomial(k, \theta)$}  & \multicolumn{1}{l|}{$Beta(\alpha, \beta)$}  & \multicolumn{1}{l|}{$\alpha' = \alpha + \sum_{i=1}^n x_i, \beta' = \beta + nk -\sum_{i=1}^n x_i$}  &  &  \\ \cline{1-3}
+  \multicolumn{1}{|l|}{$Binomial(n, k)$}  & \multicolumn{1}{l|}{$Beta(\alpha, \beta)$}  & \multicolumn{1}{l|}{$\alpha' = \alpha + \sum_{i=1}^n x_i, \beta' = \beta + nk -\sum_{i=1}^n x_i$}  &  &  \\ \cline{1-3}
   \multicolumn{1}{|l|}{$Multinomial(n; \theta_1,\ldots,\theta_n)$}  & \multicolumn{1}{l|}{$Dirichlet(\alpha_1,\ldots,\alpha_n)$}  & \multicolumn{1}{l|}{$\alpha_i' =\alpha_i + x_i, 1 \leq i \leq n$}  &  &  \\ \cline{1-3}
                         &                        &                        &  & 
 \end{tabular}
@@ -263,19 +268,28 @@ Using the MH algorithm, we can estimate the parameter by posterior mean, without
 knowing the analytical form of posterior distribution itself.
 
 \begin{algorithm}[H]
-  \caption{Metropolis-Hastings Algorithm, $D$ is the observation data, $\theta$ is parameter}\label{mhalg}
+  \caption{Metropolis-Hastings Algorithm}\label{mhalg}
+  \hspace*{\algorithmicindent} \textbf{Input: $D$ is the observation data,} \\
+  \hspace*{\algorithmicindent} \textbf{Output: $Trace$ is the set of accepted
+    sampling point.} 
   \begin{algorithmic}[1]
     \Procedure{Metropolis-Hastings}{$D$, maxIteration}
     \State Select a proposal distribution $\pi(\theta)$
-    \State Initialize $\theta$
+    \State Draw a random initial point $\theta$
+    \State Init empty trace $Trace$
     \While{maxIteration not reached}
     \State $L \leftarrow P(D|\theta)$
-    \State Draw $\theta' $ from the proposal distribution (transition kernel).
+    \State Draw a point $\theta' $ from the proposal distribution.
     \State $L' \leftarrow P(D|\theta')$
     \If{ $\ln(L') - \ln(L) > 0$ }
-    \State  $\theta = \theta'$ (accept $\theta'$)
+    \State Add $\theta'$ to $Trace$
+    \State $\theta = \theta'$
     \Else
-    \State with probability $\epsilon$ accept $\theta'$ (avoiding local maxima)
+    \State Draw a random number $x$ from $Uniform(0,1)$
+    \If{$x \leq \epsilon$, ($\epsilon$ very small, e.g $10^{-8}$)}
+    \State Add $\theta'$ to $Trace$ (avoiding local maxima)
+    \State $\theta = \theta'$
+    \EndIf
     \EndIf
     \EndWhile
     \EndProcedure
@@ -283,24 +297,31 @@ knowing the analytical form of posterior distribution itself.
 \end{algorithm}
 The likelihood function can be implemented as log-likelihood to avoid underflow
 error. Proposal distribution defines how do we proceed to the next parameter
-value on the parameter space; it can be of any distribution family.
-
-\subsubsection{Selection of prior distribution}
-In this
-project,
-since parameters are in $[0,1]$, we select Beta distribution as proposal.\\
-There are different methods to select the initial value of parameter $P$. In
-this project, we initialize $P$ randomly. There are two advantages of using
-Markov Chain Monte Carlo in Bayesian inference:
+value on the parameter space; it can be of any distribution family.\\
+There are two advantages of using Markov Chain Monte Carlo in Bayesian inference:
 \begin{enumerate}
 \item Parameter transition only needs the computation of likelihood function.
   Therefore, Monte Carlo Markov Chain can be used in general Bayesian inference,
   in which we are not guaranteed to have an analytical form of posterior.
 \item Specifically in Metropolis-Hastings algorithm, marginal distribution is
-  cancelled out, thus make MH a computationally efficient algorithm.
+  cancelled out, thus make Metropolis-Hastings a computationally efficient algorithm.
 \end{enumerate}
 However, MH algorithm also has a drawback; its convergence becomes slower as the
 dimension of parameter $\theta$ increases.
+
+\subsubsection{Selection of prior distribution}
+Theoretically, prior can be of any distribution family. However, a selection of
+prior distribution that is too different than the actual distribution of
+parameter can leads to a false propagation of beliefs and degrade inference
+results.\\
+It is suggested by \cite{polgreen2016data} that in case of no prior knowledge
+exists to help the selection of prior distribution, Uniform distribution is
+preferable since it is less likely to propagate false beliefs to the
+inference.\\
+A systematic inference to select prior distribution family and prior
+distribution parameter (hyperparameters) is possible with \textit{Hierarchical
+  Bayes Models} \cite{allenby2005hierarchical}.
+
 
 \subsubsection{Bayesian Parameter Estimation}
 With posterior distribution $\pi(\theta|D)$ we estimate the parameter
@@ -308,11 +329,15 @@ $\hat{\theta}$ using Bayesian posterior mean:
 \begin{align*}
   \hat{\theta} = \mathbf{E}[\theta] = \int_\theta \theta \pi(\theta|D) d\theta
 \end{align*}
-In case we have samples from posterior distribution, for example when we use MH
-algorithm, the discrete form of posterior mean is used:
+In case we have samples from posterior distribution, for example the $Trace$
+from Metropolis-Hastings algorithm, for example when we use MH algorithm, the
+discrete form of posterior mean is used: 
 \begin{align*}
   \hat{\theta} = \mathbf{E}[\theta] = \sum_\theta \theta \pi(\theta|D)
 \end{align*}
+
+
+\subsubsection{Bayesian Parameter Estimation}
 \begin{definition}[Bayesian Credible Set]
   Set C is a $(1 − \alpha )100\%$ credible set for the parameter $\theta$ if the posterior
   probability for $\theta$ to belong to C equals $(1 − \alpha)$.
@@ -322,22 +347,43 @@ algorithm, the discrete form of posterior mean is used:
 \end{definition}
 In this project, we use $0.95$ credible set, i.e $\alpha=0.05$
 \begin{definition}[Highest Posterior Density credible set]
-  Highest Posterior Density $(1-\alpha)100\%$ credible set (HDP for short) is the
+  Highest Posterior Density $(1-\alpha)100\%$ credible set (HPD for short) is the
   interval with minimum length over all Bayesian $(1-\alpha)100\%$ Credible Set.
 \end{definition}
 
-In this project, the HPD is calculated using PyMC3 library
-\cite{salvatier2016pymc3}
-
+In this project, the HPD is calculated using algorithm from \textit{PyMC3}
+library \cite{salvatier2016pymc3}. For simplicity, we assume that in all cases which we concern,
+HPD is computed for unimodal distribution.
+\begin{algorithm}[H]
+  \caption{Compute Highest Posterior Density Interval}\label{mhalg}
+  \hspace*{\algorithmicindent} \textbf{Input: $S$ is samples from a distribution.} \\
+  \hspace*{\algorithmicindent} \textbf{Input: $0\leq \alpha \leq 1$} \\
+  \hspace*{\algorithmicindent} \textbf{Output: HPD interval} 
+  \begin{algorithmic}[1]
+    \Procedure{Compute HPD}{$S$}
+    \State Compute interval width $w = |S| * \alpha$
+    \State Find modal (peak) of sample points.
+    \State Return minimal interval of size $|S| - w$ which contains the modal. 
+    \EndProcedure
+  \end{algorithmic}
+\end{algorithm}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 \section{Related works}
-Markov chain and
-
-Bayesian inference
-
-Bees modeling
+The definition and model checking of DTMC and pMC is studied by
+\cite{baier2008principles}, \cite{hutschenreiter2017parametric}, and \cite{katoen2016probabilistic}.\\
+Bayesian inference of pMC parameters is studied in \cite{polgreen2016data} and
+\cite{jha2009bayesian}. In \cite{polgreen2016data}, the authors developed
+methods to synthesize parameters to satisfy a given set of PCTL properties. In
+\cite{jha2009bayesian}, the authors presented methods to perform model checking
+of biological system using Bayesian statistic. The authors in
+\cite{jha2009bayesian} uses a Bayesian hypothesis test, where $H_0$ is the null
+hypothesis that the model satisfies a PCTL $P$, and alternative hypothesis $H_1$
+is that the system does not satisfies $P$.\\
+In this project, we use bee colony model semantics from \cite{hajnal2019data}.
+The methods and implementation in this project is designed to extend the results
+of \cite{hajnal2019data} and its tool \textit{DiPS}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 \section{Modeling of bees colony}
@@ -361,7 +407,7 @@ interact with each other in a closed environment with the appearance of a factor
 \textit{pheromone}. Each agent in the colony observe the following two factors
 of the environment: (1) amount of pheromone and (2) number of other agents.
 Afterward, the agent has probability to commit an action, namely \textit{sting}.
-The agent is eliminated from environment after stinging.
+The agent is eliminated from environment after stinging.\\
 
 \subsection{Markov population models for bee colony}
 Assume that we have a colony of $n$ bees initially. As aforementioned, an individual bee
@@ -370,14 +416,9 @@ bees is $n'\in\{0,1,\ldots,n\}$. We model the bee colony with a DTMC
 $\mathcal{M}=(S,\mathbf{P}, S_{init}, AP,L)$, such that
 \begin{itemize}
 \item $|S_{init}|=1$
-\item There exists $n+1$ BSCCs $B_0,\ldots,B_n\in S$. These BSCCs encode the
-  population at the end of the experiment.
+\item There exists $n+1$ tSCCs which encode the population at the end of the experiment.
 \end{itemize}
 
-In a bee colony, we can also ob
-\begin{itemize}
-\item Let $P(B_i)$ be the probability of the
-\end{itemize}
 
 Semantics of Markov population models for bees colony are developed by
 \cite{hajnal2019data}. In this report we summarize three models of bees population
@@ -386,9 +427,6 @@ Semantics of Markov population models for bees colony are developed by
 \item Asynchronous model
 \item Semi-synchronous model
 \end{enumerate}
-In the scope of this project we do not analyze the semantics of each model.
-Instead, the inference methods presented only uses the polynomial function of
-the models' steady-state distribution. 
 
 \subsubsection*{Asynchronous model}
 In asynchronous experiment we assume that there is almost improbable for two
@@ -456,7 +494,7 @@ the pheromone concentration.\\
 \node[state]    (G)[right of=D]         {$0 1 1$};
 \path
 (A) edge    node{$(1-p)^3$}        (C)
-    edge    node{$3p(1-p)^2$}     (B)
+    edge    node{$3p(1-p)^2$}      (B)
     edge    node{$3p(1-p)^2$}      (D)
     edge    node{$p^3$}            (E)
 (B) edge    node{$(1-q)^2$}        (F)
@@ -465,7 +503,7 @@ the pheromone concentration.\\
 (D) edge    node{$(1-q)$}          (G)
     edge    node{$q$}              (E); 
   \end{tikzpicture}
-  \caption{Example synchronous model of 3 bees, 2 parameters.}
+  \caption{Synchronous model of 3 bees, 2 parameters.}
 \end{figure}
 
 
@@ -487,8 +525,8 @@ all succeeding states from initial states, the updates are of asynchronous seman
     \node[state]    (G)[right of=D]         {$0 1 1$};
     \node[state]    (H)[right of=F]         {$0 1 1$};
     \path
-(A) edge    node{$(1-p)^3$}        (B)
-    edge    node{$(3p(1-p)^2$}     (C)
+(A) edge    node{$(1-p)^3$}        (C)
+    edge    node{$3p(1-p)^2$}      (B)
     edge    node{$3p(1-p)^2$}      (D)
     edge    node{$p^3$}            (E)
 (B) edge    node{$1-q$}            (F)
@@ -498,7 +536,7 @@ all succeeding states from initial states, the updates are of asynchronous seman
 (F) edge    node{$q$}              (G)
     edge    node{$1 - q$}          (H);
   \end{tikzpicture}
-  \caption{Example semisynchronous model of 3 bees, 2 parameters}
+  \caption{Semisynchronous model of 3 bees, 2 parameters}
 \end{figure}
 
 For a population of $n$ bees, all three types of models share two properties:
@@ -512,24 +550,61 @@ For a population of $n$ bees, all three types of models share two properties:
   \end{align*}
 \end{enumerate}
 
+\subsubsection{Multiparameters model}
+Multiparameters model of $N$ bees has exactly $N$ parameters $r_0,\ldots,r_{N-1}$.
+In the semantics of multiparameter models, we assume that $r_0,\ldots,\r_N$ is
+monotonically increasing, that is, $\forall i,j\in {0,\ldots,N-1}: i < j \implies
+r_i \leq r_j$. 
+\begin{figure}[H]
+  \centering 
+  \begin{tikzpicture}[->, >=stealth', auto, semithick, node distance=3cm]
+    \tikzstyle{every state}=[fill=white,draw=black,thick,text=black,scale=1]
+    \node[state]    (A)                     {init};
+    \node[state]    (B)[right of=A]         {$0,0,1$};
+    \node[state]    (C)[above of=B]         {$0,1,1$};
+    \node[state]    (D)[below of=B]         {$1,1,1$};
+    \node[state]    (E)[below of=D]         {$0,0,0$};
+    
+    \node[state]    (F)[right of=B]         {$1,-1,-1$};
+    \node[state]    (G)[right of=D]         {$1,1,-1$};
+    \node[state]    (H)[right of=F]         {$0 1 1$};
+    \path
+(A) edge     node{$3r_0(1-r_0)^2$}      (B)
+    edge     node{$3r_0^2(1-r_0)$}      (C)
+    edge     node{$r_0^3$}              (D)
+    edge     node{$(1-r_0)^3$}          (E)
+    
+(B) edge    node{$1-q$}            (F)
+    edge    node{$q$}              (D)
+
+(D) edge    node{$(1-q)$}          (G)
+    edge    node{$q$}              (E)
+
+(F) edge    node{$q$}              (G)
+    edge    node{$1 - q$}          (H);
+  \end{tikzpicture}
+  \caption{Synchronous model of 3 bees, multiparameters}
+\end{figure}
 
 \subsubsection{Linear model}
-asdf
+Linear model is similar to multiparameter models, except:
+\begin{itemize}
+\item There is no monotonically increasing constraint on $r_0,\ldots,r_{N-1}$
+\item There are only 2 model parameters, denote as $a$ and $b$
+\item Linear constraint:
+  \begin{align*}
+    r_i = a \times i + b
+  \end{align*}
+\end{itemize}
 
-\subsubsection{Steady-state distribution}
-In the bees population models, the steady state distribution is defined as
-follow:
-\begin{definition}[Steady-state distribution]
-  
-\end{definition}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Bayesian parameter synthesis of Markov population model}
-\subsection{Inference of steady state distribution}
+\subsection{Inference of terminal state distribution}
 Let
 Using the Multinomial-Dirichlet conjugation, we can infer  the steady state
 distribution as we observe new experiment data $D=(a_0,\ldots,a_n)$, with $a_i$
-is the number of experiment in which the population in steady-state is $i$ 
+is the number of experiment in which the population at terminal state is $i$ 
 \begin{algorithm}[H]
   \caption{Estimation of steady-state distribution given a sample $S$}\label{exp_a}
   \begin{algorithmic}[1]
@@ -543,79 +618,66 @@ is the number of experiment in which the population in steady-state is $i$
 \end{algorithm}
 
 As later shown in the implementation with synthetic data, the Bayesian
-estimation of steady-state distribution converges quickly to the true parameter
+estimation of terminal state distribution converges quickly to the true parameter
 used for data synthesis. This method does not directly estimate the pMC
 model parameters. However, it can support the parameter estimation presented
 \cite{hajnal2019data} to estimate the model parameters with narrower credible
 set.
 
 
-\subsection{Evaluation of steady-state distribution}
+\subsection{Evaluation of terminal states distribution}
+Given a concrete assignment of model parameter $r_0,\ldots,r_{N-1}$, there are 2
+methods that are used in the project to evaluate terminal state distribution:
+\begin{enumerate}
+\item Rational functions.
+\item DTMC sampling.
+\end{enumerate}
 
-
-
-
-\subsection{Inference of model parameters with rational functions}
-We can also use Bayesian inference to estimate pMC model parameters directly.
-Given a pMC $\mathcal{M}$ with $\theta=(\theta_1,\ldots,\theta_k)$ as its model
-parameters. Since $\theta_i \in [0,1]$, we can assume that $\theta_i$ are of
-$Beta(\alpha, \beta)$ distribution. Note that $\alpha, \beta$ are
-hyperparameters and must be selected manually. Also note that
-$\theta_1,\ldots,\theta_k$ are not simplex, thus it is not possible to use
-Dirichlet prior. \\
-In this method, since there is no possible use of posterior conjugation, thus
-the hyperparameters estimation is hard and not in the scope of this project. Let
-$f_i = P (FG\quad tSCC_i)$ are polynomial functions of steady-state
-distribution, we denote $\epsilon_i = f_i(\theta)$ as evaluations of the
-polynomial function with a concrete assignment of $\theta$. The steady-state
-distribution has then $Multinomial(N, \epsilon = (\epsilon_0,\ldots,\epsilon_n))$ with $N$
-is the sample size of experiment data $D$. The posterior distribution has the
-following form:
-\begin{align*}
-  \pi(\theta|D) \sim Multinomial(N, (\epsilon_0,\ldots,\epsilon_n))\pi(\theta_1)\ldots\pi(\theta_k)
-\end{align*}
-As the posterior $\pi(\theta|D)$ has no analytical form, we use
-Metropolis-Hastings to sample from it.
+\textit{Rational functions} are functions of model parameter that represent the
+probability of finally globally reach each terminal state. The function is
+delivered by PRISM model checker thanks to it capability of symbolic model
+checking \cite{KNP11}.\\
+However, it is not always possible to deduct rational functions from a given
+model, due to the technical limitation (time, memory) and the limitation of
+PRISM itself. In our conducted experiment, PRISM is capable of deliver rational
+functions up to a population of 15 bees. For a population of more bees, we use
+the second approach, \textit{DTMC sampling}.\\
+DTMC sampling has advantages over rational function. First, it is less
+computationally expensive to evaluate a parametric DTMC thanks to its simpler
+symbolic experession. Second, DTMC sampling is \textit{parallelizable}; sampling
+can be done with as many processor cores as possible. The second advantage makes
+DTMC sampling \textit{scalable}, compare to the rational function evaluation
+approach, which is not scallable due to its nature of deep recursion.
 \begin{algorithm}[H]
-  \caption{Estimation of model parameters given a sample $D$}\label{exp_b}
+  \caption{Evaluate terminal state distribution by DTMC sampling}
+  \hspace*{\algorithmicindent} \textbf{Input: Population model $\mathcal{M}$ of
+    $N$ individuals, assignment of model parameter $r$, number of DTMC samples $K$ } \\
+  \hspace*{\algorithmicindent} \textbf{Output: $D$ terminal state distribution} 
   \begin{algorithmic}[1]
-    \Procedure{Estimate $\theta$}{$S$}
-    \State Select hyperparameter $\alpha, \beta$
-    \State Select $Beta(\alpha, \beta)$ as proposal distribution (transition
-    kernel) for $\theta_i, 1\leq i \leq n$
-    \State Initialize $\theta$
-    \While{maxIteration not reached}
-    \State Evaluate $\epsilon = (f_0(\theta),\ldots,f_n(\theta))$
-    \State $L \leftarrow Multinomial(D|\epsilon)$
-    \State Draw $\theta'$ from the proposal distribution.
-    \State Evaluate $\epsilon' = (f_0(\theta),\ldots,f_n(\theta))$
-    \State $L' \leftarrow P(D|\epsilon')$
-    \If{ $\ln(L') - \ln(L) > 0$ }
-    \State  $\theta = \theta'$ (accept $\theta'$)
-    \Else
-    \State with probability $\epsilon$ accept $\theta'$ (avoiding local maxima)
-    \EndIf
-    \EndWhile
+    \Procedure{Estimate $p_i = P(tSCC_i)$}{$S$}
+    \State Initialize $D=[0,\ldots,0]$ as an array of $N+1$ entries
+    \State Initialize $p_0=p_1=\ldots=p_n=0$
+    \State Update $\alpha_i = \alpha_i + a_i, 1 \leq i \leq n$
+    \State Update $p_i = \alpha_i / \sum_{i=1}^n \alpha_i, 1 \leq i \leq n$
     \EndProcedure
   \end{algorithmic}
 \end{algorithm}
 
+
+
 \subsection{Inference of model parameter with Metropolis-Hastings algorithm}
 We can also use Bayesian inference to estimate pMC model parameters directly.
-Given a pMC $\mathcal{M}$ with $\theta=(\theta_1,\ldots,\theta_k)$ as its model
-parameters. Since $\theta_i \in [0,1]$, we can assume that $\theta_i$ are of
-$Beta(\alpha, \beta)$ distribution. Note that $\alpha, \beta$ are
-hyperparameters and must be selected manually. Also note that
-$\theta_1,\ldots,\theta_k$ are not simplex, thus it is not possible to use
-Dirichlet prior. \\
+Given a pMC $\mathcal{M}$ with $r=(r_0,\ldots,r_{N-1})$ as its model
+parameters, $\theta_i \in [0,1]$. Note that $\theta_1,\ldots,\theta_k$ are not
+simplex, thus it is not possible to use Dirichlet prior in this case. \\
 In this method, since there is no possible use of posterior conjugation, thus
 the hyperparameters estimation is hard and not in the scope of this project. Let
 $f_i = P (FG\quad tSCC_i)$ are polynomial functions of steady-state
 distribution, we denote $\epsilon_i = f_i(\theta)$ as evaluations of the
 polynomial function with a concrete assignment of $\theta$. The steady-state
-distribution has then $Multinomial(N, \epsilon = (\epsilon_0,\ldots,\epsilon_n))$ with $N$
-is the sample size of experiment data $D$. The posterior distribution has the
-following form:
+distribution has then $Multinomial(N, \epsilon =
+(\epsilon_0,\ldots,\epsilon_n))$ with $N$ is the sample size of experiment data
+$D$. The posterior distribution has the following form:
 \begin{align*}
   \pi(\theta|D) \sim Multinomial(N, (\epsilon_0,\ldots,\epsilon_n))\pi(\theta_1)\ldots\pi(\theta_k)
 \end{align*}
@@ -647,6 +709,87 @@ Metropolis-Hastings to sample from it.
 %% TODO: result description
  
 \end{algorithm}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Benchmark}
+\subsection{Data synthesis}
+The data synthesis for $n$ bees population is conducted as follow:
+\begin{itemize}
+\item Select a pMC model $\mathcal{M}$ to model the population of . Let
+  $\bar{p}=p_1,\ldots,p_n$ is the model parameter vector.
+\item Assign a concrete value for $\bar{p}$, called $\bar{p}_{true}$
+\item From $\mathcal{M}$, deliver the rational functions of $f_i(\bar{p}) =
+  P(FG\quad tSCC_i)$, $0 \leq i \leq n$. (using PRISM Model Checker \cite{KNP11})
+\item Evaluate concrete value $\theta_i = f_i(\bar{p}_{true})$
+\item Draw sample $S$ from multinomial distribution $Multinomial(N,
+  \theta=(\theta_0,\ldots,theta_n))$
+\item $S$ is the synthetic result for the experiment 3.1
+\end{itemize}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.6\textwidth,keepaspectratio]{figures/data_synthesis.png}
+  \caption{Steady state data synthesis, semi-synchronous model of 5 bees
+    population, model parameters $(0.3, 0.25, 0.35, 0.45, 0.5)$}
+\end{figure}
+
+\subsection{Evaluation measures}
+In order to evaluate the accuracy of parameter point inference, we have to
+select a distance measure from estimated parameter to true parameter. In this
+project we use two measures:
+\begin{definition}[Root Mean-Square Error]
+  Let $\theta = (\theta_1,\ldots,\theta_n)$ and $\hat{\theta} =
+  (\hat{\theta_1},\ldots,\hat{\theta_n})$ be vectors of $n$ real numbers, the
+  Root Mean Square Error between $p$ and $\hat{p}$ is defined as follow:
+  \begin{align*}
+    RMSE(\theta, \hat{\theta}) = \sqrt{\frac{\sum_{i=1}^n{(\theta_i - \hat{\theta_i})}}{n}}
+  \end{align*}
+\end{definition}
+
+\subsection{Comparison of DTMC sampling and rational functions evaluation}
+Given a bee population model $\mathcal{M}$, we have two methods to obtain
+steady-state distribution:
+
+\subsection{Inference of terminal state distribution}
+This experiment is conducted on semisynchronous model of 5 bees. The polynomial
+functions of steady-state distribution is generated by PRISM and parsed into
+Python 3 source code
+(\texttt{semisync\_5bees.py}). The source code for this
+experiment is on Jupyter Notebook file \texttt{visualization.ipynb}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.6\textwidth,keepaspectratio]{figures/point_estimation.png}
+  \caption{Bayesian estimation of steady state distribution. Blue cross is true
+    steady state evaluation.}
+\end{figure}
+In order to compare with the work by \cite{hajnal2019data}, we also visualize
+the interval calculated by the following formula:
+\begin{align*}
+  \theta_i \pm (z_{\alpha / 2}\sqrt{\frac{\theta_i(1-\theta_i)}{N}})
+\end{align*}
+where $N$ is the sample size. Experiment configurations:
+\begin{itemize}
+\item true model parameter: $[0.3, 0.25, 0.35, 0.45, 0.5]$
+\item tSCC distribution evaluation: $[0.1680, 0.1139, 0.2089, 0.2371, 0.1940, 0.0778]$ 
+\end{itemize}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.6\textwidth,keepaspectratio]{figures/interval_estimation.png}
+  \caption{Comparision of Bayesian Highest Posterior Density 95\% (red bar) and interval
+    estimated using method in \cite{hajnal2019data} (green bar). Red cross is
+    true steady state evaluation.}
+\end{figure}
+
+
+\subsection{Inference of model parameters with rational functions}
+This experiment is conducted in 2, 5, and 10 bees population models of 2, 5, and 10
+parameters respectively. All models are semi-synchronous.\\
+
+\subsection{Inference of model parameters with DTMC sampling}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Implementation}
@@ -687,88 +830,6 @@ expensive function \texttt{eval()} on runtime. Source code structure:
 \end{figure}
 
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Benchmark}
-\subsection{Data synthesis}
-The data synthesis for $n$ bees population is conducted as follow:
-\begin{itemize}
-\item Select a pMC model $\mathcal{M}$ to model the population of . Let
-  $\bar{p}=p_1,\ldots,p_n$ is the model parameter vector.
-\item Assign a concrete value for $\bar{p}$, called $\bar{p}_{true}$
-\item From $\mathcal{M}$, deliver the rational functions of $f_i(\bar{p}) =
-  P(FG\quad tSCC_i)$, $0 \leq i \leq n$. (using PRISM Model Checker \cite{KNP11})
-\item Evaluate concrete value $\theta_i = f_i(\bar{p}_{true})$
-\item Draw sample $S$ from multinomial distribution $Multinomial(N,
-  \theta=(\theta_0,\ldots,theta_n))$
-\item $S$ is the synthetic result for the experiment 3.1
-\end{itemize}
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.6\textwidth,keepaspectratio]{figures/data_synthesis.png}
-  \caption{Steady state data synthesis, semi-synchronous model of 5 bees
-    population, model parameters $(0.3, 0.25, 0.35, 0.45, 0.5)$}
-\end{figure}
-
-\subsection{Evaluation measures}
-In order to evaluate the accuracy of parameter point inference, we have to
-select a distance measure from estimated parameter to true parameter. In this
-project we use two measures:
-\begin{definition}[RMSE]
-  Let $\theta = (\theta_1,\ldots,\theta_n)$ and $\hat{\theta} =
-  (\hat{\theta_1},\ldots,\hat{\theta_n})$ be vectors of $n$ real numbers, the
-  Root Mean Square Error between $p$ and $\hat{p}$ is defined as follow:
-  \begin{align*}
-    RMSE(\theta, \hat{\theta}) = \sqrt{\frac{\sum_{i=1}^n{(\theta_i - \hat{\theta_i})}}{n}}
-  \end{align*}
-\end{definition}
-
-\subsection{Comparison of DTMC sampling and rational functions evaluation}
-Given a bee population model $\mathcal{M}$, we have two methods to obtain
-steady-state distribution:
-
-\subsection{Inference of steady state distribution}
-This experiment is conducted on semisynchronous model of 5 bees. The polynomial
-functions of steady-state distribution is generated by PRISM and parsed into
-Python 3 source code
-(\texttt{semisync\_5bees.py}). The source code for this
-experiment is on Jupyter Notebook file \texttt{visualization.ipynb}
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.6\textwidth,keepaspectratio]{figures/point_estimation.png}
-  \caption{Bayesian estimation of steady state distribution. Blue cross is true
-    steady state evaluation.}
-\end{figure}
-In order to compare with the work by \cite{hajnal2019data}, we also visualize
-the interval calculated by the following formula:
-\begin{align*}
-  \theta_i \pm (z_{\alpha / 2}\sqrt{\frac{\theta_i(1-\theta_i)}{N}})
-\end{align*}
-where $N$ is the sample size. Experiment configurations:
-\begin{itemize}
-\item true model parameter: $[0.3, 0.25, 0.35, 0.45, 0.5]$
-\item tSCC distribution evaluation: $[0.1680, 0.1139, 0.2089, 0.2371, 0.1940, 0.0778]$ 
-\end{itemize}
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.6\textwidth,keepaspectratio]{figures/interval_estimation.png}
-  \caption{Comparision of Bayesian Highest Posterior Density 95\% (red bar) and interval
-    estimated using method in \cite{hajnal2019data} (green bar). Red cross is
-    true steady state evaluation.}
-\end{figure}
-
-
-\subsection{Inference of model parameters with rational functions}
-This experiment is conducted in 2, 5, and 10 bees population models of 2, 5, and 10
-parameters respectively. All models are semi-synchronous.\\
-
-\subsection{Inference of model parameters with DTMC sampling}
-
-
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 \section{Conclusion}
 The goal of this project is to experiment Bayesian approach on parameter
@@ -791,6 +852,9 @@ However, there are still problems
 However, we believe that the method can be developed further to overcome these limitations.
 
 
+
+
+\newpage
 \printbibliography
 
 \end{document}
