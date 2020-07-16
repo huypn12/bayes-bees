@@ -656,9 +656,6 @@ approach, which is not scallable due to its nature of deep recursion.
   \begin{algorithmic}[1]
     \Procedure{Estimate $p_i = P(tSCC_i)$}{$S$}
     \State Initialize $D=[0,\ldots,0]$ as an array of $N+1$ entries
-    \State Initialize $p_0=p_1=\ldots=p_n=0$
-    \State Update $\alpha_i = \alpha_i + a_i, 1 \leq i \leq n$
-    \State Update $p_i = \alpha_i / \sum_{i=1}^n \alpha_i, 1 \leq i \leq n$
     \EndProcedure
   \end{algorithmic}
 \end{algorithm}
@@ -667,12 +664,12 @@ approach, which is not scallable due to its nature of deep recursion.
 
 \subsection{Inference of model parameter with Metropolis-Hastings algorithm}
 We can also use Bayesian inference to estimate pMC model parameters directly.
-Given a pMC $\mathcal{M}$ with $r=(r_0,\ldots,r_{N-1})$ as its model
+Given a pMC $\mathcal{M}$ with $\theta=(\theta_1,\ldots,\theta_{K})$ as its model
 parameters, $\theta_i \in [0,1]$. Note that $\theta_1,\ldots,\theta_k$ are not
 simplex, thus it is not possible to use Dirichlet prior in this case. \\
 In this method, since there is no possible use of posterior conjugation, thus
-the hyperparameters estimation is hard and not in the scope of this project. Let
-$f_i = P (FG\quad tSCC_i)$ are polynomial functions of steady-state
+the hyperparameters estimation is not in the scope of this project. Let
+$f_i = P (FG\quad tSCC_i)$ be estimation of terminal state
 distribution, we denote $\epsilon_i = f_i(\theta)$ as evaluations of the
 polynomial function with a concrete assignment of $\theta$. The steady-state
 distribution has then $Multinomial(N, \epsilon =
@@ -684,50 +681,49 @@ $D$. The posterior distribution has the following form:
 As the posterior $\pi(\theta|D)$ has no analytical form, we use
 Metropolis-Hastings to sample from it.
 \begin{algorithm}[H]
-  \caption{Estimation of model parameters given a sample $D$}\label{exp_b}
+  \caption{Estimation of pMC parameters given a sample $D$}\label{exp_b}
   \begin{algorithmic}[1]
-    \Procedure{Estimate $\theta$}{$S$}
-    \State Select hyperparameter $\alpha, \beta$
-    \State Select $Beta(\alpha, \beta)$ as proposal distribution (transition
-    kernel) for $\theta_i, 1\leq i \leq n$
-    \State Initialize $\theta$
+    \Procedure{Metropolis-Hastings}{$D$, maxIteration}
+    \State Select a proposal distribution $\pi(\theta)$
+    \State Draw a random initial point $\theta$
+    \State Init empty trace $Trace$
     \While{maxIteration not reached}
-    \State Evaluate $\epsilon = (f_0(\theta),\ldots,f_n(\theta))$
-    \State $L \leftarrow Multinomial(D|\epsilon)$
-    \State Draw $\theta'$ from the proposal distribution.
-    \State Evaluate $\epsilon' = (f_0(\theta),\ldots,f_n(\theta))$
-    \State $L' \leftarrow P(D|\epsilon')$
+    \State $L \leftarrow P(D|\theta)$
+    \State Draw a point $\theta'$ from the proposal distribution.
+    \State $L' \leftarrow P(D|\theta')$
     \If{ $\ln(L') - \ln(L) > 0$ }
-    \State  $\theta = \theta'$ (accept $\theta'$)
+    \State Add $\theta'$ to $Trace$
+    \State $\theta = \theta'$
     \Else
-    \State with probability $\epsilon$ accept $\theta'$ (avoiding local maxima)
+    \State Draw a random number $x$ from $Uniform(0,1)$
+    \If{$x \leq \epsilon$, ($\epsilon$ very small, e.g $10^{-8}$)}
+    \State Add $\theta'$ to $Trace$ (avoiding local maxima)
+    \State $\theta = \theta'$
+    \EndIf
     \EndIf
     \EndWhile
     \EndProcedure
   \end{algorithmic}
-
-%% TODO: result description
- 
 \end{algorithm}
 
-
+From the $Trace$ returned by the algorithm, we estimate parameter 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Benchmark}
 \subsection{Data synthesis}
 The data synthesis for $n$ bees population is conducted as follow:
 \begin{itemize}
-\item Select a pMC model $\mathcal{M}$ to model the population of . Let
-  $\bar{p}=p_1,\ldots,p_n$ is the model parameter vector.
-\item Assign a concrete value for $\bar{p}$, called $\bar{p}_{true}$
-\item From $\mathcal{M}$, deliver the rational functions of $f_i(\bar{p}) =
-  P(FG\quad tSCC_i)$, $0 \leq i \leq n$. (using PRISM Model Checker \cite{KNP11})
-\item Evaluate concrete value $\theta_i = f_i(\bar{p}_{true})$
+\item Select a pMC model $\mathcal{M}$ to model the population of. Let
+  $\theta=\theta_1,\ldots,theta_k$ is the model parameter.
+\item Assign a concrete value for $\theta$ which satisfies model's constraint
+  for parameter, $\theta_{true}$
+\item From $\mathcal{M}$, evaluate terminal state distribution of $f_i(\theta) =
+  P(FG\quad tSCC_i)$, $0 \leq i \leq n$.
 \item Draw sample $S$ from multinomial distribution $Multinomial(N,
-  \theta=(\theta_0,\ldots,theta_n))$
-\item $S$ is the synthetic result for the experiment 3.1
+  (f_0(\theta),\ldots,f_N(\theta)))$
 \end{itemize}
 
+For example, selecting 
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.6\textwidth,keepaspectratio]{figures/data_synthesis.png}
@@ -736,7 +732,17 @@ The data synthesis for $n$ bees population is conducted as follow:
 \end{figure}
 
 \subsection{Evaluation measures}
-In order to evaluate the accuracy of parameter point inference, we have to
+In order to evaluate the inference result, we consider three aspects:
+\begin{enumerate}
+\item \textit{Accuracy:} distance from estimated parameter to true parameter
+  used to synthesize sample data.
+\item \textit{Precision:} width of the Highest Posterior Density corresponding
+  to an estimation.
+\item \textit{}
+\end{enumerate}
+
+
+accuracy of parameter point inference, we have to
 select a distance measure from estimated parameter to true parameter. In this
 project we use two measures:
 \begin{definition}[Root Mean-Square Error]
@@ -793,20 +799,7 @@ parameters respectively. All models are semi-synchronous.\\
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Implementation}
-The Bayesian inference methods are implemented in Python 3 and tested in the
-followin system configuration:
-\begin{itemize}
-\item Intel Core i5-8265U @ 1.60GHz
-\item 16GB RAM
-\item OpenSUSE Tumbleweed 20200427
-\item Anaconda 3 2019.10 for linux x86\_64
-\end{itemize}
-The following experiment on Bayesian inference use synthetic data from
-semi-synchronous models of 2, 5 and 10 bees (in order to compare the performance
-with related work in \cite{hajnal2019data}).
-
 \subsection{PRISM model and result processing}
-asdf
 
 
 
@@ -828,6 +821,16 @@ expensive function \texttt{eval()} on runtime. Source code structure:
   \includegraphics[width=0.6\textwidth,keepaspectratio]{figures/class_diagram.png}
   \caption{Class diagram of the project}
 \end{figure}
+
+\subsection{Test environment}
+The Bayesian inference methods are implemented in Python 3 and tested in the
+followin system configuration:
+\begin{itemize}
+\item Intel Core i5-8265U @ 1.60GHz
+\item 16GB RAM
+\item OpenSUSE Tumbleweed 20200427
+\item Anaconda 3 2019.10 for linux x86\_64
+\end{itemize}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
@@ -854,6 +857,7 @@ However, we believe that the method can be developed further to overcome these l
 
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 \newpage
 \printbibliography
 
