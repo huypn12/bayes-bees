@@ -31,8 +31,20 @@ class BayesianMcmc(object):
     def set_mcmc_chainlength(self, mcmc_chainlen):
         self.mh_params['chain_length'] = mcmc_chainlen
 
-    # Proposed distribution: beta
+    def transition_uniform(self, ):
+        params_count = self.data_model.get_params_count()
+        p_new = [0] * params_count
+        for i in range(0, params_count):
+            p_new[i] = np.random.uniform(0, 1)
+        # Old model p, q0, q1,...,qk-1
+        if config.models['use_old_model']:
+            return p_new
+        # New model r0_,r_1,...,r_k
+        return sorted(p_new)
+
     def transition(self, ):
+        if config.models['use_uniform_prior']:
+            return self.transition_uniform()
         alpha = self.hyperparams['alpha']
         beta = self.hyperparams['beta']
         params_count = self.data_model.get_params_count()
