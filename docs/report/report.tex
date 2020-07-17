@@ -269,9 +269,9 @@ knowing the analytical form of posterior distribution itself.
 
 \begin{algorithm}[H]
   \caption{Metropolis-Hastings Algorithm}\label{mhalg}
-  \hspace*{\algorithmicindent} \textbf{Input: $D$ is the observation data,} \\
-  \hspace*{\algorithmicindent} \textbf{Output: $Trace$ is the set of accepted
-    sampling point.} 
+  \hspace*{\algorithmicindent} \textbf{Input:} $D$ is the observation data, \\
+  \hspace*{\algorithmicindent} \textbf{Output:} $Trace$ is the set of accepted
+    sampling point.
   \begin{algorithmic}[1]
     \Procedure{Metropolis-Hastings}{$D$, maxIteration}
     \State Select a proposal distribution $\pi(\theta)$
@@ -356,9 +356,9 @@ library \cite{salvatier2016pymc3}. For simplicity, we assume that in all cases w
 HPD is computed for unimodal distribution.
 \begin{algorithm}[H]
   \caption{Compute Highest Posterior Density Interval}\label{mhalg}
-  \hspace*{\algorithmicindent} \textbf{Input: $S$ is samples from a distribution.} \\
-  \hspace*{\algorithmicindent} \textbf{Input: $0\leq \alpha \leq 1$} \\
-  \hspace*{\algorithmicindent} \textbf{Output: HPD interval} 
+  \hspace*{\algorithmicindent} \textbf{Input:} $S$ is samples from a distribution. \\
+  \hspace*{\algorithmicindent} \textbf{Input:} $0\leq \alpha \leq 1$ \\
+  \hspace*{\algorithmicindent} \textbf{Output:} HPD interval 
   \begin{algorithmic}[1]
     \Procedure{Compute HPD}{$S$}
     \State Compute interval width $w = |S| * \alpha$
@@ -568,6 +568,10 @@ r_i \leq r_j$.
     \node[state]    (F)[right of=B]         {$1,-1,-1$};
     \node[state]    (G)[right of=D]         {$1,1,-1$};
     \node[state]    (H)[right of=F]         {$0 1 1$};
+    \node[state]    (I)[right of=B]         {$1,-1,-1$};
+    \node[state]    (J)[right of=D]         {$1,1,-1$};
+    \node[state]    (K)[right of=F]         {$0 1 1$};
+    \node[state]    (L)[right of=B]         {$1,-1,-1$};
     \path
 (A) edge     node{$3r_0(1-r_0)^2$}      (B)
     edge     node{$3r_0^2(1-r_0)$}      (C)
@@ -650,12 +654,17 @@ DTMC sampling \textit{scalable}, compare to the rational function evaluation
 approach, which is not scallable due to its nature of deep recursion.
 \begin{algorithm}[H]
   \caption{Evaluate terminal state distribution by DTMC sampling}
-  \hspace*{\algorithmicindent} \textbf{Input: Population model $\mathcal{M}$ of
-    $N$ individuals, assignment of model parameter $r$, number of DTMC samples $K$ } \\
-  \hspace*{\algorithmicindent} \textbf{Output: $D$ terminal state distribution} 
+  \hspace*{\algorithmicindent} \textbf{Input:} Population model $\mathcal{M}$ of
+    $N$ individuals\\ Assignment of model parameter $r$\\ Number of DTMC samples $nSamples$\\
+  \hspace*{\algorithmicindent} \textbf{Output:} $D$ terminal state distribution
   \begin{algorithmic}[1]
     \Procedure{Estimate $p_i = P(tSCC_i)$}{$S$}
     \State Initialize $D=[0,\ldots,0]$ as an array of $N+1$ entries
+    \While{not reached $nSamples$}
+    \State Get terminal state $i$, $0\leq i \leq N+1$ by simulating evaluated
+    model $\mathcal{M}$
+    \State Increase $D[i]$ by 1
+    \EndWhile
     \EndProcedure
   \end{algorithmic}
 \end{algorithm}
@@ -723,13 +732,7 @@ The data synthesis for $n$ bees population is conducted as follow:
   (f_0(\theta),\ldots,f_N(\theta)))$
 \end{itemize}
 
-For example, selecting 
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.6\textwidth,keepaspectratio]{figures/data_synthesis.png}
-  \caption{Steady state data synthesis, semi-synchronous model of 5 bees
-    population, model parameters $(0.3, 0.25, 0.35, 0.45, 0.5)$}
-\end{figure}
+%% TODO: example of data synthesis
 
 \subsection{Evaluation measures}
 In order to evaluate the inference result, we consider three aspects:
@@ -738,13 +741,13 @@ In order to evaluate the inference result, we consider three aspects:
   used to synthesize sample data.
 \item \textit{Precision:} width of the Highest Posterior Density corresponding
   to an estimation.
-\item \textit{}
+\item \textit{Cost:} how does physical computation time increases as the size of
+  population increases.
 \end{enumerate}
 
 
-accuracy of parameter point inference, we have to
-select a distance measure from estimated parameter to true parameter. In this
-project we use two measures:
+To measure \textit{accuracy}, the distance from estimated parameter to true parameter, we use Root
+Mean-Squared Error.
 \begin{definition}[Root Mean-Square Error]
   Let $\theta = (\theta_1,\ldots,\theta_n)$ and $\hat{\theta} =
   (\hat{\theta_1},\ldots,\hat{\theta_n})$ be vectors of $n$ real numbers, the
