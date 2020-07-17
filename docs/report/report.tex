@@ -557,25 +557,21 @@ monotonically increasing, that is, $\forall i,j\in {0,\ldots,N-1}: i < j \implie
 r_i \leq r_j$. 
 \begin{figure}[H]
   \centering 
-  \begin{tikzpicture}[->, >=stealth', auto, semithick, node distance=3cm]
+  \begin{tikzpicture}[->, >=stealth', auto, semithick, node distance=5cm]
     \tikzstyle{every state}=[fill=white,draw=black,thick,text=black,scale=1]
     \node[state]    (A)                     {init};
-    \node[state]    (B)[right of=A]         {$0,0,1$};
-    \node[state]    (C)[above of=B]         {$0,1,1$};
-    \node[state]    (D)[below of=B]         {$1,1,1$};
-    \node[state]    (E)[below of=D]         {$0,0,0$};
+    \node[state]    (B)[above of=A]         {$0,0,1$};
+    \node[state]    (C)[below of=A]         {$0,1,1$};
+    \node[state]    (D)[right of=A]         {$1,1,1$};
+    \node[state]    (E)[left of=A]         {$0,0,0$};
     
-    \node[state]    (F)[right of=B]         {$1,-1,-1$};
-    \node[state]    (G)[right of=D]         {$1,1,-1$};
+    \node[state]    (F)[right of=D]         {$1,-1,-1$};
+    \node[state]    (G)[right of=B]         {$1,1,-1$};
     
-    \node[state]    (H)[right of=F]         {$0,1,1$};
-    \node[state]    (I)[right of=G]         {$1,-1,-1$};
-    \node[state]    (J)[below of=H]         {$1,1,-1$};
-    \node[state]    (K)[below of=J]         {$0 1 1$};
-    \node[state]    (L)[right of=B]         {$1,-1,-1$};
+    \node[state]    (H)[below of=F]         {$1,1,-2$};
     \path
-(A) edge     node{$3r_0(1-r_0)^2$}      (B)
-    edge     node{$3r_0^2(1-r_0)$}      (C)
+(A) edge[bend left]     node{$3r_0(1-r_0)^2$}      (B)
+    edge[bend right]     node{$3r_0^2(1-r_0)$}      (C)
     edge     node{$r_0^3$}              (D)
     edge     node{$(1-r_0)^3$}          (E)
     
@@ -584,9 +580,9 @@ r_i \leq r_j$.
     edge    node{$(\frac{r_1-r_0}{1-r_0})^2$}                                    (D)
     
 (C) edge    node{$1-\frac{r_2-r_0}{1-r_1}$}          (H)
-    edge    node{$\frac{r_2-r_0}{1-r_1}$}            (E)
+    edge    node{$\frac{r_2-r_0}{1-r_1}$}            (D)
 (F) edge    node{$1-\frac{r_2-r_0}{1-r_1}$}          (H)
-    edge    node{$\frac{r_2-r_0}{1-r_1}$}            (E);
+    edge    node{$\frac{r_2-r_0}{1-r_1}$}            (D);
   \end{tikzpicture}
   \caption{Synchronous model of 3 bees, multiparameters}
 \end{figure}
@@ -824,7 +820,7 @@ Suggested number of chainrun: 1000 * number of bscc
 
 
 \subsection{Ter}
-\textbf{Experiment setup:}
+\subsubsection{Experiment setup:}
 
 
 
@@ -837,7 +833,7 @@ Sampling results
 Runtime
 
 
-\subsubsection{Analysis}
+\subsection{Factors with impacts to inference results}
 There are factors that have impact on inference results:
 \begin{enumerate}
 \item 
