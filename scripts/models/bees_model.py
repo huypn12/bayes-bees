@@ -4,6 +4,7 @@ from .prism_utils.prism_dtmc_parser import PrismDtmcParser
 from scripts import config
 
 import math
+import random
 import multiprocessing as mp
 import numpy as np
 from asteval import Interpreter
@@ -149,7 +150,8 @@ class BeesModel(DataModel):
             state_idx = np.random.choice(self.state_count, 1, p=p_next)[0]
         return bscc_idx
 
-    def _do_task_chainrun(self, _count):
+    def _do_task_chainrun(self, _seed, _count):
+        np.random.seed(_seed)
         multinomial = [0] * self.bscc_count
         for i in range(0, _count):
             if config.models['use_bounded_run']:
@@ -176,8 +178,9 @@ class BeesModel(DataModel):
         total, quant = self.chainruns_count, 500
         p, q = divmod(total, quant)
         tasks = [quant] * p + [q] if q != 0 else [quant] * p
+        seeds = [random.randint(1, 100) for i in range(0, len(tasks))]
         with mp.Pool(processes=(mp.cpu_count() + 1)) as ppool:
-            results = ppool.map(self._do_task_chainrun, tasks)
+            results = ppool.starmap(self._do_task_chainrun, zip(seeds, tasks))
             multinomial = [sum(x) for x in zip(*results)]
         norm = sum(multinomial) * 1.0
         dist = [c / norm for c in multinomial]
@@ -187,8 +190,8 @@ class BeesModel(DataModel):
         # Sampling by running the parametric chain
         self.eval_pmc_pfuncs()
         if config.models['use_parallel_chainruns']:
-            return self.__do_sequential_chainruns()
-        return self.__do_parallel_chainruns()
+            return self.__do_parallel_chainruns()
+        return self.__do_sequential_chainruns()
 
     def sample_bscc_chainrun(self, trials_count):
         self.chainruns_count = trials_count
