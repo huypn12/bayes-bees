@@ -777,38 +777,41 @@ This experiment is conducted on multiparameters, synchronous model of 5 bees.
 \begin{itemize}
 \item \textbf{Model file:} \texttt{bee\_multiparams\_synchronous5.pm}
 \item \textbf{PRISM result file:} \texttt{bee\_multiparams\_synchronous5.txt}
-\item \textbf{True parameter:}
-
+\item \textbf{True parameter:} \texttt{[0.25, 0.3, 0.35, 0.45, 0.5]}
+\item \textbf{True tSCC distribution:} \texttt{[0.2373046875, 0.300125, 0.240296875, 0.1210, 0.076953125, 0.0243203125]}
 \end{itemize}
 In order to compare with the work by \cite{hajnal2019data}, we also visualize
 the interval calculated by the following formula:
 \begin{align*}
   \theta_i \pm (z_{\alpha / 2}\sqrt{\frac{\theta_i(1-\theta_i)}{N}})
 \end{align*}
-where $N$ is the sample size. Experiment configurations:
-\begin{itemize}
-\item true model parameter: $[0.3, 0.25, 0.35, 0.45, 0.5]$
-\item tSCC distribution evaluation: $[0.1680, 0.1139, 0.2089, 0.2371, 0.1940, 0.0778]$ 
-\end{itemize}
+where $N$ is the sample size.
  
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.6\textwidth,keepaspectratio]{figures/point_estimation.png}
-  \caption{Bayesian estimation of steady state distribution. Blue cross is true
-    steady state evaluation.}
-\end{figure}
 \subsubsection{Results}
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.6\textwidth,keepaspectratio]{figures/interval_estimation.png}
-  \caption{Comparision of Bayesian Highest Posterior Density 95\% (red bar) and interval
-    estimated using method in \cite{hajnal2019data} (green bar). Red cross is
-    true steady state evaluation.}
+  \includegraphics[width=0.5\textwidth,keepaspectratio]{figures/ex1_1.png}
+  \caption{First batch.}
 \end{figure}
 
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.5\textwidth,keepaspectratio]{figures/ex1_2.png}
+  \caption{Second batch}
+\end{figure}
 
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.5\textwidth,keepaspectratio]{figures/ex1_3.png}
+  \caption{Sixth batch}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.5\textwidth,keepaspectratio]{figures/ex1_4.png}
+  \caption{Tenth batch}
+\end{figure}
 
 \subsection{Comparison of DTMC sampling and rational functions evaluation}
 \subsubsection{Experiment setup:}
