@@ -773,7 +773,6 @@ In the following experiments, we use the three measures (\textit{accuracy},
 \subsection{Inference of terminal state distribution}
 \subsubsection{Experiment setup}
 This experiment is conducted on multiparameters, synchronous model of 5 bees.
-
 \begin{itemize}
 \item \textbf{Model file:} \texttt{bee\_multiparams\_synchronous5.pm}
 \item \textbf{PRISM result file:} \texttt{bee\_multiparams\_synchronous5.txt}
@@ -785,10 +784,17 @@ the interval calculated by the following formula:
 \begin{align*}
   \theta_i \pm (z_{\alpha / 2}\sqrt{\frac{\theta_i(1-\theta_i)}{N}})
 \end{align*}
-where $N$ is the sample size.
- 
-\subsubsection{Results}
+where $N$ is the sample size. We setup the experiment as follow:
+\begin{enumerate}
+\item Generate a sample terminal state data of 10 experiments.
+\item Estimate terminal states distribution using Bayesian
+\item Estimate terminal states and frequentist approach using accummulated data.
+\item Visualize the estimated terminal state distribution from both Bayesian and
+  Frequentist approach.
+\item Go back to 1.
+\end{enumerate}
 
+\subsubsection{Results}
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.7\textwidth,keepaspectratio]{figures/ex1_1.png}
@@ -799,21 +805,27 @@ where $N$ is the sample size.
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.7\textwidth,keepaspectratio]{figures/ex1_2.png}
-  \caption{Second batch. Estimation changes significantly.}
+  \caption{Second batch. Estimation changes significantly; Bayesian conjugation
+    gives narrower confidence intervals.}
 \end{figure}
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.7\textwidth,keepaspectratio]{figures/ex1_3.png}
-  \caption{Sixth batch. Estimation improved; Bayesian conjugation gives narrower
-  confidence intervals.}
+  \caption{Sixth batch. Estimation improved.}
 \end{figure}
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.7\textwidth,keepaspectratio]{figures/ex1_4.png}
-  \caption{Tenth batch}
+  \caption{Tenth batch. At this batch, the difference between Bayesian and
+    frequentist estimation is not significant, as now long-run property is satisfied.}
 \end{figure}
+
+\subsubsection{Conclusion}
+With Bayesian Conjugation Multinomial-Dirichlet, we can estimate more precise
+terminal state distribution than relying only on long-run property as in
+frequentist approach.
 
 \subsection{Compare DTMC sampling and rational functions}
 \subsubsection{Experiment setup:}
@@ -837,9 +849,12 @@ Sampling results
 
 Runtime
 
-\subsection{Impacto of Metropolis-Hastings parameter selection}
+\subsection{Impact of Metropolis-Hastings parameter selection}
+
+\subsection{Impact of prior distribution selection}
 
 \subsection{Impact of data quality to inferences}
+
 
 \subsection{Linear model}
 
@@ -886,6 +901,10 @@ followin system configuration:
 \item \texttt{docs} folder contains final report
 \item \texttt{scripts} folder contains python implementation.
 \item \texttt{examples} folder contains experiment schemes.
+  \begin{itemize}
+  \item \texttt{examples/evidence} contains log of the examples that are used as
+    data for this report.
+  \end{itemize}
 \end{itemize}
 
 
@@ -899,7 +918,7 @@ biological property, such as the probability of a bee sting, given a certain
 amount of pheromone, the parameter estimation presented in this project helps
 biologists to better understand the biological mechanism.\\
 As it is shown on benchmark, the implementation in this project is capable of
-estimating parameters in both cases, when rational functions is available and is
+estimating parameters in both cases, when rational functions are available and is
 not available. As the size of rational function increases exponentially starting
 from populations of 15 bees, and PRISM fails to give rational function for model
 of 20 bees, the implementation in this project, which can work given only the
