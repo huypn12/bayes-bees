@@ -286,7 +286,7 @@ knowing the analytical form of posterior distribution itself.
     \State $\theta = \theta'$
     \Else
     \State Draw a random number $x$ from $Uniform(0,1)$
-    \If{$x \leq \epsilon$, ($\epsilon$ very small, e.g $10^{-8}$)}
+    \If{$x \leq \xi$, ($\xi$ very small, e.g $10^{-8}$)}
     \State Add $\theta'$ to $Trace$ (avoiding local maxima)
     \State $\theta = \theta'$
     \EndIf
@@ -337,7 +337,7 @@ discrete form of posterior mean is used:
 \end{align*}
 
 
-\subsubsection{Bayesian Parameter Estimation}
+\subsubsection{Bayesian Credible Set}
 \begin{definition}[Bayesian Credible Set]
   Set C is a $(1 − \alpha )100\%$ credible set for the parameter $\theta$ if the posterior
   probability for $\theta$ to belong to C equals $(1 − \alpha)$.
@@ -699,15 +699,17 @@ Metropolis-Hastings to sample from it.
     \State Draw a random initial point $\theta$
     \State Init empty trace $Trace$
     \While{maxIteration not reached}
-    \State $L \leftarrow P(D|\theta)$
+    \State Evaluate $\epsilon \leftarrow (f_0(\theta),\ldots,f_N(\theta))$
+    \State $L \leftarrow Multinomial(D|\epsilon)$
     \State Draw a point $\theta'$ from the proposal distribution.
-    \State $L' \leftarrow P(D|\theta')$
+    \State Evaluate $\epsilon' \leftarrow (f_0(\theta'),\ldots,f_N(\theta'))$
+    \State $L' \leftarrow Multinomial(D|\epsilon')$
     \If{ $\ln(L') - \ln(L) > 0$ }
     \State Add $\theta'$ to $Trace$
     \State $\theta = \theta'$
     \Else
     \State Draw a random number $x$ from $Uniform(0,1)$
-    \If{$x \leq \epsilon$, ($\epsilon$ very small, e.g $10^{-8}$)}
+    \If{$x \leq \xi $, ($\xi$ very small, e.g $10^{-8}$)}
     \State Add $\theta'$ to $Trace$ (avoiding local maxima)
     \State $\theta = \theta'$
     \EndIf
@@ -829,35 +831,108 @@ frequentist approach.
 
 \subsection{Compare DTMC sampling and rational functions}
 \subsubsection{Experiment setup:}
+Given different models and their corresponding (synthesized) true parameters, we
+compare the accuracy and cost of estimating terminal state distribution by DTMC
+sampling and rational functions evaluation.
+\begin{enumerate}
+\item Multiparameters, synchronous, 3 bees
+  \begin{itemize}
+  \item Model: \texttt{bee\_multiparams\_synchronous\_3.pm}
+  \item Rational functions: \texttt{bee\_multiparams\_synchronous\_3.txt}
+  \item True parameters: \texttt{[0.13816683073844171, 0.43244787684875174, 0.9883355614905787]} 
+  \end{itemize}
+\item Multiparameters, synchronous, 5 bees
+  \begin{itemize}
+  \item Model: \texttt{bee\_multiparams\_synchronous\_5.pm}
+  \item Rational functions: \texttt{bee\_multiparams\_synchronous\_5.txt}
+  \item True parameters: \texttt{[0.07309162012783865, 0.0732745394348604,
+      0.3454227397545041, 0.5755326160799704, 0.7400394821424422]}
+  \end{itemize}
+\item Multiparameters, synchronous, 10 bees
+  \begin{itemize}
+  \item Model: \texttt{bee\_multiparams\_synchronous\_10.pm}
+  \item Rational functions: \texttt{bee\_multiparams\_synchronous\_10.txt}
+  \item True parameters: \texttt{[0.0010163431033164416, 0.14606188527823205,
+      0.21868312430906223, 0.29198765300886687, 0.36577363178466926,
+      0.48812228794389945, 0.5244272612264091, 0.7505607627245182,
+      0.8753562816925659, 0.9045785878228252] }
+  \end{itemize}
+\item Multiparameters, synchronous, 15 bees
+  \begin{itemize}
+  \item Model: \texttt{bee\_multiparams\_synchronous\_15.pm}
+  \item Rational functions: \texttt{bee\_multiparams\_synchronous\_15.txt}
+  \item True parameters: \texttt{[0.06187489978768601, 0.08936613780246316,
+      0.10191039750975828, 0.3515471096412084, 0.5311583575817167,
+      0.5652253809036302, 0.6564729149073196, 0.6672538977242365,
+      0.6715846867598035, 0.7099157316864673, 0.7108067756300934,
+      0.7839472728483634, 0.8458734212454695, 0.853911885975256,
+      0.8668668044007563]}
+  \end{itemize}
+\end{enumerate}
+Evaluation by DTMC sampling is conducted with sample size of $2000, 4000, 8000,
+10000$. We show that the distance between rational function evaluation and DTMC
+sampling reduces as the sample size increases.
 
 \subsubsection{Results}
-Sampling results
+Detailed evaluation results is logged to
+\texttt{example/log/evidence/compare\_eval\_methods\_log.txt}. In this report,
+first we observe the distance measured in RMSE between estimation by DTMC
+sampling and rational functions evaluation.
 
-Runtime
 
+The rational function evaluation time can be reduced by using factorized
+rational functions.
 
-Suggested number of chainrun: 1000 * number of bscc
+However, the 
 
-\subsubsection{Analysis of long run property}
 
 
 \subsection{Inference of model parameters}
-\subsubsection{Experiment setup:}
+\subsubsection{Experiment setup}
+We shows examples of parameter inference for different bees model in both DTMC
+sampling and rational functions evaluation methods.
+
+
 
 \subsubsection{Results}
+The detailed results are
+stored in
 Sampling results
 
 Runtime
 
-\subsection{Impact of Metropolis-Hastings parameter selection}
 
 \subsection{Impact of prior distribution selection}
+\subsubsection{Experiment setup}
+This experiment is to show the impact of prior distribution selection on a given
+bees model. In this particular setup, we use multiparameters, synchoronous 5
+bees model, and two different priors $Uniform(0,1)$ and $Beta(\alpha, \beta)$.
 
-\subsection{Impact of data quality to inferences}
 
+\subsubsection{Result}
+
+ For example, in the case of linear model, certain assumption can be made on
+ model parameters so that we can limit the parameter space. 
 
 \subsection{Linear model}
-
+\subsubsection{Experiment setup}
+Linear models use the same model sematics to 
+\begin{enumerate}
+\item Multiparameters, synchronous, 3 bees
+  \begin{itemize}
+  \item Model: \texttt{bee\_multiparams\_synchronous\_3.pm}
+  \item Rational functions: \texttt{bee\_multiparams\_synchronous\_3.txt}
+  \item True parameters: \texttt{[0.13816683073844171, 0.43244787684875174,
+      0.9883355614905787]}
+  \end{itemize}
+\item Multiparameters, synchronous, 5 bees
+  \begin{itemize}
+  \item Model: \texttt{bee\_multiparams\_synchronous\_5.pm}
+  \item Rational functions: \texttt{bee\_multiparams\_synchronous\_5.txt}
+  \item True parameters: \texttt{[0.07309162012783865, 0.0732745394348604,
+      0.3454227397545041, 0.5755326160799704, 0.7400394821424422]}
+  \end{itemize}
+\end{enumerate}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Implementation}
@@ -927,8 +1002,10 @@ implementation proves that it has significant scalability.\\
 However compare to parameter synthesis method presented in \cite{hajnal2019data}, the
 implementation in this project does not give a detailed analysis of parameter
 space. Thus, \cite{hajnal2019data} has several advantage for model of less than
-15 bees, espescially in the case of 2-parameters model, where it shows a very
-detailed analysis of accepted regions and rejected regions on parameter space.\\
+15 bees, espescially in the case of 2-parameters model and linear, where it shows a very
+detailed analysis of accepted regions and rejected regions on parameter space.
+We suggest that the implementation in this project should be intergrated to the
+tool DiPS in \cite{hajnal2019data} as an extension, so user can use it as an option.\\
 There are still problems, which are not completely solved in the scope of this project:
 \begin{enumerate}
 \item \textit{Number or parameters}: Accuracy and precision of an estimation
@@ -937,7 +1014,7 @@ There are still problems, which are not completely solved in the scope of this p
 \item \textit{Selection of prior:} a false selection of prior distribution and
   its parameters could propagate false beliefs over the whole inference. So far
   we have been using Uniform distribution by default to prevent 
-  However, this project has not coped with the problem of hyperparameters
+  This project has not coped with the problem of hyperparameters
   estimation.
 \end{enumerate}
 
