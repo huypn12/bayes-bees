@@ -880,10 +880,11 @@ first we observe the distance measured in RMSE between estimation by DTMC
 sampling and rational functions evaluation.
 
 
-The rational function evaluation time can be reduced by using factorized
-rational functions.
+The rational function evaluation time can be reduced by factorizing rational
+functions to their simpler form with the help of \cite{meurer2017sympy}
 
-However, the 
+However, the time needed to process rational functions with factorization
+increases exponentially to the footprint of rational functions.
 
 
 
@@ -902,7 +903,10 @@ Sampling results
 Runtime
 
 
-\subsection{Impact of prior distribution selection}
+\subsection{Data quality}
+
+
+\subsection{Prior distribution selection}
 \subsubsection{Experiment setup}
 This experiment is to show the impact of prior distribution selection on a given
 bees model. In this particular setup, we use multiparameters, synchoronous 5
