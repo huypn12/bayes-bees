@@ -797,6 +797,10 @@ where $N$ is the sample size. We setup the experiment as follow:
 \end{enumerate}
 
 \subsubsection{Results}
+The following results are from experiment with 5 bees model. Blue line
+segments visualize result from Bayesian conjugation. Green line segments
+visualizes result from Frequentist approach. The blue (green) slash in the
+middle of each line segment visualize corresponding point estimation.
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.8\textwidth,keepaspectratio]{figures/ex1_1.png}
@@ -929,12 +933,7 @@ functions to their simpler form with the help of \cite{meurer2017sympy}. \\
 \end{table}
 
 The time needed to process rational functions with factorization
-increases exponentially to the footprint of rational functions. It must be
-noticed that the cost of factorization, while very high, is paid only once at
-the model processing, an later the reduction in rational functions evaluation is
-significant, as the number of rational functions evaluation is linear to the
-Metropolis-Hastings chain length.
-
+increases exponentially to the footprint of rational functions. 
 \begin{table}[H]
   \begin{tabular}{|l|l|l|l|l|l|}
     \hline
@@ -947,6 +946,10 @@ Metropolis-Hastings chain length.
   \caption{Physical runtime comparison of parsing rational functions, with and
     without factorization, measured in seconds}
 \end{table}
+It must be noticed that the cost of factorization, while very high, is paid only
+once at the model processing, an later the reduction in rational functions
+evaluation is significant, as the number of rational functions evaluation is
+linear to the Metropolis-Hastings chain length.
 
 \subsubsection{Conclusion}
 DTMC sampling can be used as an alternative method for terminal state
@@ -966,43 +969,81 @@ sampling and rational functions evaluation methods.
 \subsubsection{Results}
 The detailed results are stored in
 
-
-\subsection{Data quality}
-\subsubsection{Experiment}
-This experiment is to show that data quality has impact on inference result
+\subsubsection{Impact of Metropolis-Hastings chain length}
 
 
-\subsection{Prior distribution selection}
-\subsubsection{Experiment setup}
+\subsubsection{Impact of prior distribution selection}
 This experiment is to show the impact of prior distribution selection on a given
 bees model. In this particular setup, we use multiparameters, synchoronous 5
 bees model, and two different priors $Uniform(0,1)$ and $Beta(\alpha, \beta)$.
 
 
-\subsubsection{Result}
-
-\subsubsection{Conclusion}
 As the results show, the selection of prior distribution has a strong impact on 
 For example, in the case of linear model, certain assumption can be made on
 model parameters so that we can limit the parameter space. 
 
+\subsubsection{Impact of data quality}
+
 \subsection{Linear model}
 \subsubsection{Experiment setup}
-Linear models use the same model sematics to 
+Linear models use the same model sematics to multiparameters model. The
+difference is that it assume that parameters are linearly related.
 \begin{enumerate}
-\item Multiparameters, synchronous, 3 bees
-  \begin{itemize}
-  \item Model: \texttt{bee\_multiparams\_synchronous\_3.pm}
-  \item Rational functions: \texttt{bee\_multiparams\_synchronous\_3.txt}
-  \item True parameters: \texttt{[]}
-  \end{itemize}
 \item Multiparameters, synchronous, 5 bees
   \begin{itemize}
   \item Model: \texttt{bee\_multiparams\_synchronous\_5.pm}
   \item Rational functions: \texttt{bee\_multiparams\_synchronous\_5.txt}
-  \item True parameters: \texttt{[]}
+  \item True parameters: \texttt{[0.1, 0.2]}
+  \item Synthetic data ($10000$ trials): \texttt{[3253, 2421, 1763, 1257, 870, 436]}
+  \end{itemize}
+\item Multiparameters, synchronous, 10 bees
+  \begin{itemize}
+  \item Model: \texttt{bee\_multiparams\_synchronous\_10.pm}
+  \item Rational functions: \texttt{bee\_multiparams\_synchronous\_10.txt}
+  \item True parameters: \texttt{[0.01, 0.02]}
+  \item Synthetic data ($10000$ trials): \texttt{[8161, 1523, 267, 46, 3, 0, 0, 0, 0, 0, 0]}
   \end{itemize}
 \end{enumerate}
+
+As linear constraint in linear model imposes that $r_i = a\times i + b$, in
+which $a$ and $b$ are model parameters. This results in two important beliefs on
+prior distribution:
+\begin{enumerate}
+\item Values range in $[0,1]$
+\item Strongly skewed to small values of $a$ and $b$ in range $[0,1]$, otherwise it results in
+  $r_i>1$, which is invalid.
+\end{enumerate}
+Using these observations as our prior beliefs, we select the distribution
+$Beta(\alpha=1,\beta=10)$ as prior distribution.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.5\textwidth,keepaspectratio]{figures/beta_1_10.png}
+  \caption{$Beta(\alpha=1,\beta=10)$ prior distribution. The distribution is
+    skewed to lower values of rang $[0,1]$.}
+\end{figure}
+
+\subsubsection{Results}
+The following results are from experiment with 5 bees  and 10 bees models. The
+green bars visualize HPD of estimations, with a dash in betwwen to visualize the
+point estimation.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.7\textwidth,keepaspectratio]{figures/linear_1.png}
+  \caption{Inference of Linear 5 bees model.}
+\end{figure}
+Result with 10 bees model.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.7\textwidth,keepaspectratio]{figures/linear_2.png}
+  \caption{Inference of Linear 10 bees model.}
+\end{figure}
+
+\subsubsection{Conclusion}
+Linear model helps to reduce the number of model parameters by enforcing a
+linear constraint, thus all multiparameters model reduced into 2 parameters.
+With the proper selection of prior distribution to avoid too many invalid
+parameter evaluation, parameters of linear models can be estimated with high
+likelihood and relatively cheap physical runtime cost.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Implementation}
@@ -1070,13 +1111,17 @@ of 20 bees, the implementation in this project, which can work given only the
 model, shows an advantage. Also, with the parallelization of DTMC sampling, the
 implementation proves that it has significant scalability for models of large
 populations.\\
-However compare to parameter synthesis method presented in \cite{hajnal2019data}, the
-implementation in this project does not give a detailed analysis of parameter
-space. Thus, \cite{hajnal2019data} has several advantage for model of less than
-15 bees, espescially in the case of 2-parameters model and linear, where it shows a very
-detailed analysis of accepted regions and rejected regions on parameter space.
+For linear models and 2 parameters model, while the implementation in this
+project only gives point estimations and their corresponding credible set, the
+parameter synthesis method presented in \cite{hajnal2019data} gives a very
+detailed analysis of accepted regions and rejected regions on parameter space
+and does not need to manually select a proper prior distribution. Thus, while
+the implementation in this project is still faster, \cite{hajnal2019data} has
+more advantages.\\
 We suggest that the implementation in this project should be intergrated to the
-tool DiPS in \cite{hajnal2019data} as an extension, so user can use it as an option.\\
+tool DiPS in \cite{hajnal2019data} as an extension, so user can use it as an
+option. By doing so, we can exploit the advantages of both methods depend on
+particular situations.\\
 There are still problems, which are not completely solved in the scope of this project:
 \begin{enumerate}
 \item \textit{Number or parameters}: Accuracy and precision of an estimation
