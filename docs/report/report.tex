@@ -913,9 +913,20 @@ result from long-run property.
   \caption{Physical runtime comparison, measured in seconds}
 \end{table}
 
-The rational function evaluation time can be
-reduced by factorizing rational functions to their simpler form with the help of
-\cite{meurer2017sympy}. \\
+The rational function evaluation time can be reduced by factorizing rational
+functions to their simpler form with the help of \cite{meurer2017sympy}. \\
+\begin{table}[H]
+  \begin{tabular}{|l|l|l|l|l|l|}
+    \hline
+    Model   & Non-factorized  & Factorized  \\ \hline
+    3 bees  & 0.000396   & 0.000368 \\ \hline
+    5 bees  & 0.004574   & 0.000744 \\ \hline
+    10 bees & 0.070688   & 0.036026 \\ \hline
+    15 bees & 2.935404   & 1.215543 \\ \hline
+  \end{tabular}
+  \caption{Physical runtime comparison of evaluation non-factorized and
+    factorized rational functions, measured in seconds}
+\end{table}
 
 The time needed to process rational functions with factorization
 increases exponentially to the footprint of rational functions. It must be
@@ -924,8 +935,27 @@ the model processing, an later the reduction in rational functions evaluation is
 significant, as the number of rational functions evaluation is linear to the
 Metropolis-Hastings chain length.
 
+\begin{table}[H]
+  \begin{tabular}{|l|l|l|l|l|l|}
+    \hline
+    Model   & Non-factorized rational functions & Factorized rational functions \\ \hline
+    3 bees  & 0.002133   & 0.040748 \\ \hline
+    5 bees  & 0.024780   & 0.167829 \\ \hline
+    10 bees & 0.326980   & 20.498155 \\ \hline
+    15 bees & 8.906071   & 10649.155044 \\ \hline
+  \end{tabular}
+  \caption{Physical runtime comparison of parsing rational functions, with and
+    without factorization, measured in seconds}
+\end{table}
+
 \subsubsection{Conclusion}
-As we use 
+DTMC sampling can be used as an alternative method for terminal state
+distribution evaluation. It is due to the long-run property that as we do more
+chain simulations, the estimated terminal state distribution becomes closer to
+the distribution evaluated from rational functions. DTMC sampling has a
+significant advantage that it does not need a symbolic model checker to deliver
+rational functions; it also eliminates the overhead that is induced by reading
+and parsing large rational functions.
 
 
 \subsection{Inference of model parameters}
@@ -952,6 +982,7 @@ bees model, and two different priors $Uniform(0,1)$ and $Beta(\alpha, \beta)$.
 \subsubsection{Result}
 
 \subsubsection{Conclusion}
+As the results show, the selection of prior distribution has a strong impact on 
 For example, in the case of linear model, certain assumption can be made on
 model parameters so that we can limit the parameter space. 
 
