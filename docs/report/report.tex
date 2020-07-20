@@ -252,7 +252,7 @@ and \cite{baron2019probability}. We summarize the necessary results in the follo
 \begin{tabular}{lllll}
 \cline{1-3}
 \multicolumn{1}{|l|}{Likelihood} & \multicolumn{1}{l|}{Prior} & \multicolumn{1}{l|}{Posterior parameters} &  &  \\ \cline{1-3}
-  \multicolumn{1}{|l|}{$Binomial(n, k)$}  & \multicolumn{1}{l|}{$Beta(\alpha, \beta)$}  & \multicolumn{1}{l|}{$\alpha' = \alpha + \sum_{i=1}^n x_i, \beta' = \beta + nk -\sum_{i=1}^n x_i$}  &  &  \\ \cline{1-3}
+  \multicolumn{1}{|l|}{$Binomial(n, k)$}  & \multicolumn{1}{l|}{$Beta(\alpha, \beta)$}  & \multicolumn{1}{l|}{\begin{tabular}[x]{@{}c@{}}$\alpha' = \alpha + \sum_{i=1}^n x_i$\\$\beta' = \beta + nk -\sum_{i=1}^n x_i$\end{tabular}}  &  &  \\ \cline{1-3}
   \multicolumn{1}{|l|}{$Multinomial(n; \theta_1,\ldots,\theta_n)$}  & \multicolumn{1}{l|}{$Dirichlet(\alpha_1,\ldots,\alpha_n)$}  & \multicolumn{1}{l|}{$\alpha_i' =\alpha_i + x_i, 1 \leq i \leq n$}  &  &  \\ \cline{1-3}
                         &                        &                        &  & 
 \end{tabular}
@@ -428,7 +428,7 @@ Semantics of Markov population models for bees colony are developed by
 \item Semi-synchronous model
 \end{enumerate}
 
-\subsubsection*{Asynchronous model}
+\subsubsection{Asynchronous model}
 In asynchronous experiment we assume that there is almost improbable for two
 bees to sting simultaneously, and any bees release pheromone immediately after
 its death. By that observation we can assume that each bee
@@ -474,7 +474,7 @@ sting at different level of pheromone.\\
 \end{figure}
 
 
-\subsubsection*{Synchronous model}
+\subsubsection{Synchronous model}
 In \textit{fully synchronous} experiment we assume that the number of stinging
 bees is only counted after a fixed amount of time, so that without loss of
 generality we can assume the pheromone diffuse almost immediately among the bee
@@ -508,7 +508,7 @@ the pheromone concentration.\\
 
 
 
-\subsubsection*{Semi-synchronous model}
+\subsubsection{Semi-synchronous model}
 In \textit{Semisynchronous model}, we assume that the behaviour is initally
 synchronous. That means, at the initial states we do synchronous update. From
 all succeeding states from initial states, the updates are of asynchronous semantics.
@@ -799,27 +799,27 @@ where $N$ is the sample size. We setup the experiment as follow:
 \subsubsection{Results}
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.7\textwidth,keepaspectratio]{figures/ex1_1.png}
+  \includegraphics[width=0.8\textwidth,keepaspectratio]{figures/ex1_1.png}
   \caption{First batch of data. The Bayesian conjugation method suffers from
-    initial fase beliefs.}
+    initial false beliefs.}
 \end{figure}
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.7\textwidth,keepaspectratio]{figures/ex1_2.png}
-  \caption{Second batch. Estimation changes significantly; Bayesian conjugation
-    gives narrower confidence intervals.}
+  \includegraphics[width=0.8\textwidth,keepaspectratio]{figures/ex1_2.png}
+  \caption{Second batch. Estimation changes significantly as we have a prior
+    belief from previous batch.}
 \end{figure}
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.7\textwidth,keepaspectratio]{figures/ex1_3.png}
-  \caption{Sixth batch. Estimation improved.}
+  \includegraphics[width=0.8\textwidth,keepaspectratio]{figures/ex1_3.png}
+  \caption{Sixth batch. Estimation improved; Bayesian Credible Sets are narrower.}
 \end{figure}
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.7\textwidth,keepaspectratio]{figures/ex1_4.png}
+  \includegraphics[width=0.8\textwidth,keepaspectratio]{figures/ex1_4.png}
   \caption{Tenth batch. At this batch, the difference between Bayesian and
     frequentist estimation is not significant, as now long-run property is satisfied.}
 \end{figure}
@@ -879,13 +879,53 @@ Detailed evaluation results is logged to
 first we observe the distance measured in RMSE between estimation by DTMC
 sampling and rational functions evaluation.
 
+\begin{table}[H]
+  \begin{tabular}{|l|l|l|l|l|}
+    \hline
+    Model   & 2000 samples          & 4000 samples          & 8000 samples          & 10000 samples         \\ \hline
+    3 bees  & 0.00722 & 0.00582 & 0.01149 & 0.00356 \\ \hline
+    5 bees  & 0.00319 & 0.00347 & 0.00176 & 0.00269 \\ \hline
+    10 bees & 0.00515 & 0.00523 & 0.00212 & 0.00213 \\ \hline
+    15 bees & 0.00321 & 0.00162 & 0.00182 & 0.00181 \\ \hline
+  \end{tabular}
+  \caption{RMSE distance between estimation by DTMC sampling and rational functions evaluation.}
+\end{table}
 
-The rational function evaluation time can be reduced by factorizing rational
-functions to their simpler form with the help of \cite{meurer2017sympy}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.5\textwidth,keepaspectratio]{figures/ex2_1.png}
+  \caption{RMSE distance between estimation by DTMC sampling and rational functions evaluation.}
+\end{figure}
 
-However, the time needed to process rational functions with factorization
-increases exponentially to the footprint of rational functions.
+As the results show, as we do DTMC sampling with more chain simulations, the
+distance between DTMC sampling and rational functions evaluation decreases as a
+result from long-run property.
 
+\begin{table}[H]
+  \begin{tabular}{|l|l|l|l|l|l|}
+    \hline
+    Model   & Rational function  & 2000 samples & 4000 samples  & 8000 samples  & 10000 samples  \\ \hline
+    3 bees  & 0.000396   & 0.222496  & 0.318133 & 0.625835 & 0.955569 \\ \hline
+    5 bees  & 0.004574   & 0.349875  & 0.427233 & 0.870164 & 0.923021 \\ \hline
+    10 bees & 0.070688   & 0.990263  & 1.527305 & 2.642697 & 4.104111 \\ \hline
+    15 bees & 2.935404   & 28.32838  & 47.95574 & 86.77052 & 104.0558 \\ \hline
+  \end{tabular}
+  \caption{Physical runtime comparison, measured in seconds}
+\end{table}
+
+The rational function evaluation time can be
+reduced by factorizing rational functions to their simpler form with the help of
+\cite{meurer2017sympy}. \\
+
+The time needed to process rational functions with factorization
+increases exponentially to the footprint of rational functions. It must be
+noticed that the cost of factorization, while very high, is paid only once at
+the model processing, an later the reduction in rational functions evaluation is
+significant, as the number of rational functions evaluation is linear to the
+Metropolis-Hastings chain length.
+
+\subsubsection{Conclusion}
+As we use 
 
 
 \subsection{Inference of model parameters}
@@ -893,17 +933,13 @@ increases exponentially to the footprint of rational functions.
 We shows examples of parameter inference for different bees model in both DTMC
 sampling and rational functions evaluation methods.
 
-
-
 \subsubsection{Results}
-The detailed results are
-stored in
-Sampling results
-
-Runtime
+The detailed results are stored in
 
 
 \subsection{Data quality}
+\subsubsection{Experiment}
+This experiment is to show that data quality has impact on inference result
 
 
 \subsection{Prior distribution selection}
@@ -915,8 +951,9 @@ bees model, and two different priors $Uniform(0,1)$ and $Beta(\alpha, \beta)$.
 
 \subsubsection{Result}
 
- For example, in the case of linear model, certain assumption can be made on
- model parameters so that we can limit the parameter space. 
+\subsubsection{Conclusion}
+For example, in the case of linear model, certain assumption can be made on
+model parameters so that we can limit the parameter space. 
 
 \subsection{Linear model}
 \subsubsection{Experiment setup}
@@ -926,15 +963,13 @@ Linear models use the same model sematics to
   \begin{itemize}
   \item Model: \texttt{bee\_multiparams\_synchronous\_3.pm}
   \item Rational functions: \texttt{bee\_multiparams\_synchronous\_3.txt}
-  \item True parameters: \texttt{[0.13816683073844171, 0.43244787684875174,
-      0.9883355614905787]}
+  \item True parameters: \texttt{[]}
   \end{itemize}
 \item Multiparameters, synchronous, 5 bees
   \begin{itemize}
   \item Model: \texttt{bee\_multiparams\_synchronous\_5.pm}
   \item Rational functions: \texttt{bee\_multiparams\_synchronous\_5.txt}
-  \item True parameters: \texttt{[0.07309162012783865, 0.0732745394348604,
-      0.3454227397545041, 0.5755326160799704, 0.7400394821424422]}
+  \item True parameters: \texttt{[]}
   \end{itemize}
 \end{enumerate}
 
@@ -1002,7 +1037,8 @@ not available. As the size of rational function increases exponentially starting
 from populations of 15 bees, and PRISM fails to give rational function for model
 of 20 bees, the implementation in this project, which can work given only the
 model, shows an advantage. Also, with the parallelization of DTMC sampling, the
-implementation proves that it has significant scalability.\\
+implementation proves that it has significant scalability for models of large
+populations.\\
 However compare to parameter synthesis method presented in \cite{hajnal2019data}, the
 implementation in this project does not give a detailed analysis of parameter
 space. Thus, \cite{hajnal2019data} has several advantage for model of less than
