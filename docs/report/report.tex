@@ -967,37 +967,78 @@ and parsing large rational functions.
 We shows examples of parameter inference for different bees model in both DTMC
 sampling and rational functions evaluation methods. Other setups:
 \begin{itemize}
-\item \textit{Prior distribution}: $Uniform(0, 1)$
-\item \textit{Metropolis-Hastings chain length}: $2000$
-\item \textit{tSCC distribution evaluation mode}: rational functions evaluation.
+\item Prior distribution: $Uniform(0, 1)$
+\item Metropolis-Hastings chain length: $500$
+\item Number of simulations in DTMC sampling mode: $1000$.
 \end{itemize}
 
-
 \subsubsection{Results}
-The detailed results are stored in
+Results with 3 bees model, multiparameters, synchronous.
+Results with 3 bees model, multiparameters, synchronous.
+Results with 3 bees model, multiparameters, synchronous.
+Results with 3 bees model, multiparameters, synchronous.
+For large population models which due to the technical issues PRISM cannot
+deliver rational functions, we can only use DTMC sampling to estimate terminal
+state. However, as it has been shown on the comparison betwwen rational function
+evaluation and DTMC sampling, cost for a DTMC simulation also increases as the
+number of states in the DTMC increases. 
 
-\subsubsection{tSCC distribution estimation DTMC sampling}
-Here is the result for 10 and 15 bees, chain run.
+\subsubsection{Conclusion}
+The experiment shows the results on parameter inferecence for agnostic models of
+3, 5, 10, and 15 bees.
 
 
-Also here, 20 bees.
+\subsection{Selection of Metropolis-Hastings chain length}
+\subsubsection{Experiment setup}
+Chain length in Metropolis-Hastings algorithm is the number of accepted point
+that is added to the sample set, which is returned by the algorithm. In this
+experiment we evaluate the impact of different Metropolis-Hastings chain length
+to parameter estimation.\\
+We use 10 bees, multiparameterrs, synchronous model. Using the same true
+parameter and synthetic data, we do the parameter inference in different
+Metropolis-Hastings trace length, and observe the changes in parameter estimation.
+\subsubsection{Result}
 
+\subsubsection{Conclusion}
+From the results of experiment, we cannot conclude that increasing
+Metropolis-Hastings tra
 
-\subsubsection{Impact of Metropolis-Hastings chain length}
-
-
-\subsubsection{Impact of prior distribution selection}
+\subsection{Selection of prior distribution}
+\subsubsection{Experiment setup}
 This experiment is to show the impact of prior distribution selection on a given
-bees model. In this particular setup, we use multiparameters, synchoronous 5
-bees model, and two different priors $Uniform(0,1)$ and $Beta(\alpha, \beta)$.
+bees model. In this particular setup, we compare $Uniform(0,1)$ and
+$Beta(\alpha, \beta)$. Other settings: 
+\begin{itemize}
+\item Metropolis-Hastings chain length: $500$
+\item Terminal state distribution evaluation: rational functions evaluation.
+\end{itemize}
+
+\subsubsection{Result}
 
 
+\subsubsection{Conclusion}
 As the results show, the selection of prior distribution has a strong impact on 
 For example, in the case of linear model, certain assumption can be made on
 model parameters so that we can limit the parameter space. 
 
-\subsubsection{Impact of data quality}
-
+\subsection{Impact of data quality}
+An advantage of using synthetic data over real data obtained from biological
+experiment is that:
+\begin{itemize}
+\item We know the trrue parameters.
+\item We have control over data quality.
+\end{itemize}
+Biological experiment, in this project is the experiment with bees, is not able
+to be conducted massively, for example $1000$ experiments, due to the time and
+effort cost. To few experiments to guarantee the long-run property leads to
+incorrect parameter inference. In this experiment, we evaluate the impact of
+low quality data (too few experiment data) to parameter inference. 
+\subsubsection{Experiment setup}
+Experiment is conducted as follow
+\begin{itemize}
+\item 
+\end{itemize}
+\subsubsection{Result}
 
 \subsubsection{Conclusion}
 
@@ -1120,26 +1161,25 @@ biological system that is modelled, each parameters represent a real-world
 biological property, such as the probability of a bee sting, given a certain
 amount of pheromone, the parameter estimation presented in this project helps
 biologists to better understand the biological mechanism.\\
-As it is shown on benchmark, the implementation in this project is capable of
-estimating parameters in both cases, when rational functions are available and is
-not available. As the size of rational function increases exponentially starting
-from populations of 15 bees, and PRISM fails to give rational function for model
-of 20 bees, the implementation in this project, which can work given only the
-model, shows an advantage. Also, with the parallelization of DTMC sampling, the
+
+The implementation in this project is capable of estimating parameters in both
+cases, when rational functions are available and is not available. This is an
+advantage in case that model checker cannot deliver rational functions due to
+technical issues. Also, with the parallelization of DTMC sampling, the
 implementation proves that it has significant scalability for models of large
-populations.\\
-For linear models and 2 parameters model, while the implementation in this
-project only gives point estimations and their corresponding credible set, the
-parameter synthesis method presented in \cite{hajnal2019data} gives a very
-detailed analysis of accepted regions and rejected regions on parameter space
-and does not need to manually select a proper prior distribution. Thus, while
-the implementation in this project is still faster, \cite{hajnal2019data} has
-more advantages.\\
-We suggest that the implementation in this project should be intergrated to the
-tool DiPS in \cite{hajnal2019data} as an extension, so user can use it as an
-option. By doing so, we can exploit the advantages of both methods depend on
-particular situations.\\
-There are still problems, which are not completely solved in the scope of this project:
+populations. The implementation also works with linear models and 2 parameters
+model, with significant reduction of physical runtime.\\
+
+While the implementation in this project only gives point estimations and their
+corresponding credible set, the parameter synthesis method presented in
+\cite{hajnal2019data} gives a detailed analysis of accepted regions and rejected
+regions on parameter space and does not need to manually select a proper prior
+distribution. We suggest that the implementation in this project should be
+intergrated to the tool DiPS in \cite{hajnal2019data} as an extension, so user
+can use it as an option. By doing so, we can exploit the advantages of both
+methods depend on particular situations.\\
+There are still problems, which are not completely solved in the scope of this
+project:
 \begin{enumerate}
 \item \textit{Number or parameters}: Accuracy and precision of an estimation
   decreases, while the computational cost increases, as the number of model
@@ -1152,7 +1192,12 @@ There are still problems, which are not completely solved in the scope of this p
 \item Using \textit{STORM} \cite{dehnert2017storm} as a more effective model
   checker in stead of PRISM. STORM is capable of handling rational functions
   with larger footprint and factorizing these functions. However due to
-  technical problems and time constraint, \textit{STORM} is not used in this project.
+  technical problems and time constraint, \textit{STORM} is not used in this
+  project.
+\item There is still a problem of number overflow that appears randomly in case
+  of evaluation of parametric DTMC in large model (for example, 20 bees
+  multiparameters, synchronous). However, the root cause of this issue is
+  unknown and thus it is not solved.
 \end{enumerate}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
