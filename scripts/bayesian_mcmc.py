@@ -162,8 +162,12 @@ class BayesianMcmc(object):
     def summarize(self, ):
         summary = ''
         summary += 'Data model: \n' + self.data_model.summarize()
-        summary += 'Prior: Beta(alpha={},beta={})\n'.format(self.hyperparams['alpha'],
-                                                            self.hyperparams['beta'])
+        if config.models['use_uniform_prior']:
+            summary += 'Prior: Uniform(0,1)\n'
+        else:
+            summary += 'Prior: Beta(alpha={},beta={})\n'.format(
+                self.hyperparams['alpha'],
+                self.hyperparams['beta'])
         summary += 'Chain length: {}\n'.format(self.mh_params['chain_length'])
         summary += 'Estimated parameters: \n'
         i = 0
