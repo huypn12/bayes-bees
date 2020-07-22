@@ -974,14 +974,14 @@ sampling and rational functions evaluation methods. Other setups:
 
 \subsubsection{Results}
 Results with 3 bees model, multiparameters, synchronous.
-Results with 3 bees model, multiparameters, synchronous.
-Results with 3 bees model, multiparameters, synchronous.
-Results with 3 bees model, multiparameters, synchronous.
+Results with 5 bees model, multiparameters, synchronous.
+Results with 10 bees model, multiparameters, synchronous.
+Results with 15 bees model, multiparameters, synchronous.
 For large population models which due to the technical issues PRISM cannot
 deliver rational functions, we can only use DTMC sampling to estimate terminal
 state. However, as it has been shown on the comparison betwwen rational function
 evaluation and DTMC sampling, cost for a DTMC simulation also increases as the
-number of states in the DTMC increases. 
+number of states in the DTMC increases.\\
 
 \subsubsection{Conclusion}
 The experiment shows the results on parameter inferecence for agnostic models of
@@ -996,12 +996,43 @@ experiment we evaluate the impact of different Metropolis-Hastings chain length
 to parameter estimation.\\
 We use 10 bees, multiparameterrs, synchronous model. Using the same true
 parameter and synthetic data, we do the parameter inference in different
-Metropolis-Hastings trace length, and observe the changes in parameter estimation.
+Metropolis-Hastings trace length, and observe the changes in parameter
+estimation.
+\begin{itemize}
+\item Model: 10 beesm, 
+\end{itemize}
 \subsubsection{Result}
+Results compiled from log file \texttt{examples/logs/evidences/compare_mcmc_chainlen_log.txt}.\\
+Precision of inference results with different Metropolis-Hastings chain length in
+the set $(1000, 2000, 3000, 4000, 5000)$ is visualized in the following figure. 
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth,keepaspectratio]{figures/compare_mcmc_chainlength.png}
+  \caption{HPD of inference result. Green lines from left to right visualize the
+  HPD of inference with Metropolis-Hastings chain length $1000, 2000, 3000,
+  4000, 5000$. The red cross visualizes true parameter.}
+\end{figure}
+Accuracy and runtime:
+\begin{table}[H]
+  \begin{tabular}{|l|l|l|}
+    \hline
+    MH Chainlength & RMSE                 & Run time (s) \\ \hline
+    1000           & 0.050052749138867626 & 63.83112     \\ \hline
+    2000           & 0.03084112520832641  & 125.08478    \\ \hline
+    3000           & 0.0601108203086657   & 183.794119   \\ \hline
+    4000           & 0.04131949555520387  & 246.105021   \\ \hline
+    5000           & 0.051880135378818214 & 306.694507   \\ \hline
+  \end{tabular}
+  \caption{Accuracy (measured by RMSE) and run time (in seconds), inference of
+    10 bees, multiparameters, synchronous model with different
+    Metropolis-Hastings chain length.}
+\end{table}
 
 \subsubsection{Conclusion}
 From the results of experiment, we cannot conclude that increasing
-Metropolis-Hastings tra
+Metropolis-Hastings chain length also increases parameter estimation accuracy.
+It is because that there are too many outliers in the results. Due to the fact
+that 
 
 \subsection{Selection of prior distribution}
 \subsubsection{Experiment setup}
@@ -1022,10 +1053,11 @@ For example, in the case of linear model, certain assumption can be made on
 model parameters so that we can limit the parameter space. 
 
 \subsection{Impact of data quality}
+\subsubsection{Experiment setup}
 An advantage of using synthetic data over real data obtained from biological
 experiment is that:
 \begin{itemize}
-\item We know the trrue parameters.
+\item We know the true parameters.
 \item We have control over data quality.
 \end{itemize}
 Biological experiment, in this project is the experiment with bees, is not able
@@ -1033,7 +1065,6 @@ to be conducted massively, for example $1000$ experiments, due to the time and
 effort cost. To few experiments to guarantee the long-run property leads to
 incorrect parameter inference. In this experiment, we evaluate the impact of
 low quality data (too few experiment data) to parameter inference. 
-\subsubsection{Experiment setup}
 Experiment is conducted as follow
 \begin{itemize}
 \item 
@@ -1064,7 +1095,7 @@ difference is that it assume that parameters are linearly related.
 \end{enumerate}
 
 As linear constraint in linear model imposes that $r_i = a\times i + b$, in
-which $a$ and $b$ are model parameters. This results in two important beliefs on
+which $a$ and $b$ are model parameters. This results in two important observations on
 prior distribution:
 \begin{enumerate}
 \item Values range in $[0,1]$
