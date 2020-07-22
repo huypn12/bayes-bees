@@ -12,6 +12,7 @@ In a chainrun scheme, the following parameters affect the resu
 
 from examples.base_experiment import BaseExperiment
 
+from scripts import config
 from scripts.bayesian_mcmc import BayesianMcmc
 from scripts.models.bees_model import BeesModel
 
@@ -33,19 +34,20 @@ def setup_logging():
 class CompareMcmcChainlen(BaseExperiment):
     def __init__(self, model_file, bscc_file):
         super().__init__(model_file, bscc_file)
+        config.models['use_sympy'] = False
+        config.models['use_uniform_prior'] = True
 
     def print_log(self, mesg):
         logging.info(mesg)
 
     def init(self,):
         super().load_files()
+        super().gen_p_true()
         super().synthesize_data()
         self.data_model.bscc_eval_mode = BeesModel.BSCC_MODE_PFUNCS
 
     def create_model(self, mcmc_chainlen):
         mcmc = BayesianMcmc(self.data_model)
-        mcmc.hyperparams['alpha'] = 2
-        mcmc.hyperparams['alpha'] = 2
         mcmc.mh_params['chain_length'] = mcmc_chainlen
         return mcmc
 
@@ -66,8 +68,7 @@ class CompareMcmcChainlen(BaseExperiment):
         # Same setup of MCMC and data, different number of MCMC chainrun
         self.init()
         # last 1000 is to force dumping the log... sorry
-        mcmc_chainlen_lst = [1000, 2000, 3000, 4000, 5000,
-                             6000, 7000, 8000, 9000, 10000]
+        mcmc_chainlen_lst = [1000, 2000, 3000, 4000, 5000]
         for mcmc_chainlen in mcmc_chainlen_lst:
             self.run_inference(mcmc_chainlen)
 
@@ -83,7 +84,7 @@ def main():
         ('data/prism/bee_multiparam_synchronous_15.pm',
          'data/prism/bee_multiparam_synchronous_15.txt'),
     ]
-    model_file, bscc_file = file_pairs[1]
+    model_file, bscc_file = file_pairs[2]
     cmc = CompareMcmcChainlen(model_file, bscc_file)
     cmc.do_experiment()
     logging.shutdown()

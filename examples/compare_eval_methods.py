@@ -51,7 +51,7 @@ class CompareEvals(BaseExperiment):
         stop = timeit.default_timer()
         self.print_log('Rational functions, ETA {}'.format(stop - start))
         self.print_log('Rational functions evals to {}'.format(self.data_model.bscc_eval))
-        chainruns = [500, 1000, 2000]
+        chainruns = [2000, 4000, 8000, 10000]
         for c in chainruns:
             start = timeit.default_timer()
             self.eval_chainrun(c)

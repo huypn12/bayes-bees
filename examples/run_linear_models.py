@@ -19,14 +19,13 @@ def setup_logging():
     logging.basicConfig(level=logging.DEBUG, filename=logfile)
 
 
-def run_linear_3bees():
-    dtmc_filepath = 'data/prism/bee_multiparam_synchronous_3.pm'
-    bscc_filepath = 'data/prism/bee_multiparam_synchronous_3.txt'
+def run_linear(dtmc_filepath, bscc_filepath, p_true):
     logging.info(dtmc_filepath)
     logging.info(bscc_filepath)
+    config.models['use_uniform_prior'] = False
     model = BeesLinearModel.from_files(dtmc_filepath, bscc_filepath)
     model.bscc_eval_mode = BeesLinearModel.BSCC_MODE_PFUNCS
-    p_true = [0.1, 0.2]
+    # p_true = [0.1, 0.2]
     logging.info('P true: {}'.format(p_true))
     m, f = model.sample(chain_params=p_true, trials_count=10000)
     logging.info("Data multinomial: {}".format(m))
@@ -47,7 +46,12 @@ def run_linear_3bees():
 
 def main():
     setup_logging()
-    run_linear_3bees()
+    file_pair = ('data/prism/bee_multiparam_synchronous_5.pm',
+                 'data/prism/bee_multiparam_synchronous_5.txt')
+    run_linear(*file_pair, [0.1, 0.2])
+    file_pair = ('data/prism/bee_multiparam_synchronous_10.pm',
+                 'data/prism/bee_multiparam_synchronous_10.txt')
+    run_linear(*file_pair, [0.01, 0.02])
     logging.shutdown()
 
 

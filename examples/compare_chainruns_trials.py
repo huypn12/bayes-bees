@@ -41,6 +41,7 @@ class CompareChainrunsTrials(BaseExperiment):
 
     def init(self,):
         super().load_files()
+        super().gen_p_true()
         super().synthesize_data()
 
     def create_model(self, mcmc_chainlen):

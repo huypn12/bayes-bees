@@ -29,6 +29,7 @@ class RunOldBees(BaseExperiment):
         super().load_files()
         self.data_model.bscc_eval_mode = BeesModel.BSCC_MODE_PFUNCS
         print(self.data_model.bscc_eval)
+        super().gen_p_true()
         super().synthesize_data()
 
     def print_log(self, mesg):

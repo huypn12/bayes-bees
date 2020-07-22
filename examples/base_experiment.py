@@ -24,7 +24,6 @@ class BaseExperiment(object):
         self.print_log('True parameter: {}'.format(self.p_true))
 
     def synthesize_data(self, trials_count=10000):
-        self.gen_p_true()
         m, d = self.data_model.sample(chain_params=self.p_true,
                                       trials_count=trials_count)
         self.syn_data = {
@@ -34,7 +33,10 @@ class BaseExperiment(object):
         self.print_log("Data multinomial: {}".format(m))
         self.print_log("Data histogram: {}".format(d))
 
+    def set_syn_data(self, p_true, syn_data):
+        self.p_true = p_true
+        self.syn_data = syn_data
+
     def print_log(self, mesg):
         # @override
         print(mesg)
-
