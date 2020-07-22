@@ -973,6 +973,7 @@ sampling and rational functions evaluation methods. Other setups:
 \end{itemize}
 
 \subsubsection{Results}
+Results compiled from log file \texttt{examples/logs/evidences/run_normal_log.txt}.\\
 Results with 3 bees model, multiparameters, synchronous.
 Results with 5 bees model, multiparameters, synchronous.
 Results with 10 bees model, multiparameters, synchronous.
@@ -1031,11 +1032,13 @@ Accuracy and runtime:
 \subsubsection{Conclusion}
 From the results of experiment, we cannot conclude that increasing
 Metropolis-Hastings chain length also increases parameter estimation accuracy.
-It is because that there are too many outliers in the results. Due to the fact
-that 
+It is because that there are too many outliers in the results. However, as it
+can be seen from the visualization, increase the Metropolis-Hastings
+chainlength, in general, can improve the precision of the inference.
 
 \subsection{Selection of prior distribution}
 \subsubsection{Experiment setup}
+Results compiled from log file \texttt{examples/logs/evidences/compare_prior_log.txt}.\\
 This experiment is to show the impact of prior distribution selection on a given
 bees model. In this particular setup, we compare $Uniform(0,1)$ and
 $Beta(\alpha, \beta)$. Other settings: 
@@ -1071,6 +1074,7 @@ Experiment is conducted as follow
 \end{itemize}
 \subsubsection{Result}
 
+Results compiled from log file \texttt{examples/logs/evidences/compare_data_quality_log.txt}.\\
 \subsubsection{Conclusion}
 
 \subsection{Linear model}
