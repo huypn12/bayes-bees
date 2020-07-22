@@ -1,0 +1,36 @@
+INFO:root:data/prism/bee_multiparam_synchronous_5.pm
+INFO:root:data/prism/bee_multiparam_synchronous_5.txt
+INFO:root:P true: [0.1, 0.2]
+INFO:root:Data multinomial: [3253, 2421, 1763, 1257, 870, 436]
+INFO:root:Data histogram: [0.3253, 0.2421, 0.1763, 0.1257, 0.087, 0.0436]
+INFO:root:Finished in 2.3576660429999947 seconds
+INFO:root:Data model: 
+Markov population model of: 
+	 22 states 
+	 6 BSCCs
+P(BSCC) evaluation mode: Rational functions
+Prior: Beta(alpha=1,beta=10)
+Chain length: 2000
+Estimated parameters: 
+	 P[0] (0.092014759787157,) ; HPD (0.07126146881263244 0.09201475978715701)
+	 P[1] (0.20614608892292768,) ; HPD (0.20208406272211638 0.20614608892292768)
+Log-likelihood: -27.847835682332516
+AIC: 59.69567136466503
+INFO:root:data/prism/bee_multiparam_synchronous_10.pm
+INFO:root:data/prism/bee_multiparam_synchronous_10.txt
+INFO:root:P true: [0.01, 0.02]
+INFO:root:Data multinomial: [8161, 1523, 267, 46, 3, 0, 0, 0, 0, 0, 0]
+INFO:root:Data histogram: [0.8161, 0.1523, 0.0267, 0.0046, 0.0003, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+INFO:root:Finished in 129.908486229 seconds
+INFO:root:Data model: 
+Markov population model of: 
+	 67 states 
+	 11 BSCCs
+P(BSCC) evaluation mode: Rational functions
+Prior: Beta(alpha=1,beta=10)
+Chain length: 2000
+Estimated parameters: 
+	 P[0] (0.009878094156066811,) ; HPD (0.0030054741914741423 0.06276919527006122)
+	 P[1] (0.020278274487981494,) ; HPD (0.015933001960112683 0.03753113305344973)
+Log-likelihood: -14.8138796419953
+AIC: 33.6277592839906

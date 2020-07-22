@@ -88,7 +88,7 @@ def main():
         experiment.do_experiment_pfuncs()
         experiment.do_experiment_sim()
 
-        
+
 def manual():
     fp = ('data/prism/bee_multiparam_synchronous_15.pm',
           'data/prism/bee_multiparam_synchronous_15.txt')
