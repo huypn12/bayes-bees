@@ -35,21 +35,55 @@ class BeesModel(DataModel):
         self.chainruns_count = config.models['default_chainruns_count']
 
     @staticmethod
-    def from_model_file(prism_model_filepath):
+    def get_desc_from_model_file(prism_model_filepath):
         parser = PrismDtmcParser(prism_model_filepath)
         parser.process()
         return parser.get_pmc_desc()
 
     @staticmethod
-    def from_result_file(prism_result_filepath):
+    def get_desc_from_result_file(prism_result_filepath):
         parser = PrismBsccParser(prism_result_filepath)
         parser.process()
         return parser.get_bscc_desc()
 
     @staticmethod
+    def from_model_file(prism_model_filepath):
+        pmc_desc = BeesModel.get_desc_from_model_file(prism_model_filepath)
+        bees_model = BeesModel()
+        bees_model.state_labels = pmc_desc['state_labels']
+        bees_model.state_count = len(pmc_desc['state_labels'])
+        bees_model.init_ast_pfuncs = pmc_desc['init_ast_pfuncs']
+        bees_model.init_eval = [0] * bees_model.state_count
+        bees_model.trans_ast_pfuncs = pmc_desc['trans_ast_pfuncs']
+        bees_model.trans_eval = [
+            [0] * bees_model.state_count
+            for i in range(0, bees_model.state_count)
+        ]
+        bees_model.params_count = pmc_desc['params_count']
+        bees_model.bscc_labels = pmc_desc['bscc_labels']
+        bees_model.bscc_count = len(pmc_desc['bscc_labels'])
+        bees_model.bscc_eval_mode = BeesModel.BSCC_MODE_CHAIN_RUN
+        # cfactor = config.models['chainruns_factor']
+        # bees_model.chainruns_count = cfactor * bees_model.state_count
+        bees_model.chainruns_count = config.models['default_chainruns_count']
+        return bees_model
+
+    @staticmethod
+    def from_result_file(prism_result_filepath):
+        bscc_desc = BeesModel.get_desc_from_result_file(prism_result_filepath)
+        bees_model = BeesModel()
+        bees_model.state_labels = bscc_desc['state_labels']
+        bees_model.state_count = len(bscc_desc['state_labels'])
+        bees_model.bscc_labels = bscc_desc['bscc_labels']
+        bees_model.bscc_ast_pfuncs = bscc_desc['bscc_ast_pfuncs']
+        bees_model.bscc_count = len(bscc_desc['bscc_labels'])
+        bees_model.params_count = bscc_desc['params_count']
+        return bees_model
+
+    @staticmethod
     def from_files(prism_model_filepath, prism_result_filepath):
-        pmc_desc = BeesModel.from_model_file(prism_model_filepath)
-        bscc_desc = BeesModel.from_result_file(prism_result_filepath)
+        pmc_desc = BeesModel.get_desc_from_model_file(prism_model_filepath)
+        bscc_desc = BeesModel.get_desc_from_result_file(prism_result_filepath)
         bees_model = BeesModel()
         bees_model.state_labels = pmc_desc['state_labels']
         bees_model.state_count = len(pmc_desc['state_labels'])
@@ -64,7 +98,6 @@ class BeesModel(DataModel):
         bees_model.bscc_ast_pfuncs = bscc_desc['bscc_ast_pfuncs']
         bees_model.bscc_count = len(bscc_desc['bscc_labels'])
         bees_model.params_count = bscc_desc['params_count']
-        # bees_model.chainruns_count = config.models['chainruns_factor'] * bees_model.bscc_count
         return bees_model
 
     def get_params(self, ):
@@ -128,7 +161,7 @@ class BeesModel(DataModel):
                 self.trans_eval[i][j] = aeval.run(self.trans_ast_pfuncs[i][j])
 
     def do_bounded_chainrun(self,):
-        steps_count = math.ceil(math.log2(self.state_count)) + 5
+        steps_count = math.ceil(math.log2(self.state_count) * 2)
         state_idx = np.random.choice(self.state_count, 1, p=self.init_eval)[0]
         for i in range(0, steps_count):
             p_next = self.trans_eval[state_idx]
@@ -140,7 +173,7 @@ class BeesModel(DataModel):
     def do_unbounded_chainrun(self,):
         bscc_idx = -1
         state_idx = np.random.choice(self.state_count, 1, p=self.init_eval)[0]
-        max_steps = int(1e6)
+        max_steps = int(1e3)
         for i in range(0, max_steps):
             label = self.state_labels[state_idx]
             if label in self.bscc_labels:

@@ -42,6 +42,7 @@ class PrismDtmcParser(object):
         self.state_list = []
         self.edge_list = []
         self.bscc_list = []
+        self.param_list = []
         self.init_str_pfuncs = []
         self.init_ast_pfuncs = []
         self.trans_str_pfuncs = []
@@ -52,7 +53,9 @@ class PrismDtmcParser(object):
             'init_ast_pfuncs': self.init_ast_pfuncs,
             'trans_ast_pfuncs': self.trans_ast_pfuncs,
             'state_labels': self.state_list,
-            'bscc_labels': self.bscc_list
+            'bscc_labels': self.bscc_list,
+            'params': self.param_list,
+            'params_count': len(self.param_list)
         }
 
     def process(self,):
@@ -60,6 +63,11 @@ class PrismDtmcParser(object):
         self.build_init_vector()
         self.build_trans_matrix()
         self.parse_str2ast()
+
+    def process_params_declaration(self, decl_str):
+        m = re.search(r'([r])_(\d*)', decl_str)
+        param = self.replace_var(m.group(0))
+        self.param_list.append(param)
 
     def process_state_label(self, sstate):
         sstate = sstate.replace('(', '').replace(')', '')
@@ -159,6 +167,8 @@ class PrismDtmcParser(object):
             line = line.rstrip().lstrip()
             if line[0:2] == '[]':
                 self.process_gcommand_line(line)
+            elif line[0:12] == 'const double':
+                self.process_params_declaration(line)
 
     def build_init_vector(self, ):
         init_state_label = None
