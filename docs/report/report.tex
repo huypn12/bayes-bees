@@ -380,7 +380,8 @@ methods to synthesize parameters to satisfy a given set of PCTL properties. In
 of biological system using Bayesian statistic. The authors in
 \cite{jha2009bayesian} uses a Bayesian hypothesis test, where $H_0$ is the null
 hypothesis that the model satisfies a PCTL $P$, and alternative hypothesis $H_1$
-is that the system does not satisfies $P$.\\
+is that the system does not satisfies $P$. Similar approach to the parameter
+estimation in this project is described by \cite{hussain2015automated}.\\
 In this project, we use bee colony model semantics from \cite{hajnal2019data}.
 The methods and implementation in this project is designed to extend the results
 of \cite{hajnal2019data} and its tool \textit{DiPS}.
@@ -879,7 +880,7 @@ Evaluation by DTMC sampling is conducted with sample size of $2000, 4000, 8000,
 sampling reduces as the sample size increases.
 
 \subsubsection{Results}
-Detailed evaluation results is logged to
+Results compiled from log file
 \texttt{example/log/evidence/compare\_eval\_methods\_log.txt}. In this report,
 first we observe the distance measured in RMSE between estimation by DTMC
 sampling and rational functions evaluation.
@@ -907,6 +908,7 @@ distance between DTMC sampling and rational functions evaluation decreases as a
 result from long-run property.
 
 \begin{table}[H]
+  \centering
   \begin{tabular}{|l|l|l|l|l|l|}
     \hline
     Model   & Rational function  & 2000 samples & 4000 samples  & 8000 samples  & 10000 samples  \\ \hline
@@ -921,6 +923,7 @@ result from long-run property.
 The rational function evaluation time can be reduced by factorizing rational
 functions to their simpler form with the help of \cite{meurer2017sympy}. \\
 \begin{table}[H]
+  \centering
   \begin{tabular}{|l|l|l|l|l|l|}
     \hline
     Model   & Non-factorized  & Factorized  \\ \hline
@@ -936,6 +939,7 @@ functions to their simpler form with the help of \cite{meurer2017sympy}. \\
 The time needed to process rational functions with factorization
 increases exponentially to the footprint of rational functions. 
 \begin{table}[H]
+  \centering
   \begin{tabular}{|l|l|l|l|l|l|}
     \hline
     Model   & Non-factorized rational functions & Factorized rational functions \\ \hline
@@ -959,7 +963,8 @@ chain simulations, the estimated terminal state distribution becomes closer to
 the distribution evaluated from rational functions. DTMC sampling has a
 significant advantage that it does not need a symbolic model checker to deliver
 rational functions; it also eliminates the overhead that is induced by reading
-and parsing large rational functions.
+and parsing large rational functions. In the next experiment, we observe how
+does the two approaches perform on particular inference schemes.
 
 
 \subsection{Inference of model parameters}
@@ -978,41 +983,133 @@ Results with 3 bees model, multiparameters, synchronous.
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.8\textwidth,keepaspectratio]{figures/normal_3.png}
-  \caption{First batch of data. The Bayesian conjugation method suffers from
-    initial false beliefs.}
+  \caption{3 bees multiparameters synchronous model, HPD visualization.}
 \end{figure}
+\begin{table}[H]
+  \centering
+\begin{tabular}{|l|l|l|l|}
+\hline
+Model parameter & True parameter      & \begin{tabular}[c]{@{}l@{}}Estimated parameter\\ (rational function)\end{tabular} & \begin{tabular}[c]{@{}l@{}}Estimated parameter\\ (DTMC sampling)\end{tabular} \\ \hline
+$r_0$           & 0.30140990 & 0.300669                                                                & 0.3021591                                                            \\ \hline
+$r_1$           & 0.57227823 & 0.589596                                                                & 0.5638507                                                            \\ \hline
+$r_2$           & 0.94461227 & 0.962076                                                                & 0.9455878                                                            \\ \hline
+RMSE            & 0                   & 0.014206750102                                                                    & 0.00491715446                                                                 \\ \hline
+Loglikelihood   & 0                   & -53.498052206                                                                     & -46.401514225                                                                 \\ \hline
+Run time (s)    & 0                   &  0.21749672200530767                                                              & 121.51748955                                                                  \\ \hline
+\end{tabular}
+\caption{3 bees multiparameters synchronous model, detailed comparison of true
+  parameter and estimated parameter.}
+\end{table}
 
+Results with 5 bees model, multiparameters, synchronous.
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.8\textwidth,keepaspectratio]{figures/normal_5.png}
-  \caption{Second batch. Estimation changes significantly as we have a prior
-    belief from previous batch.}
+  \caption{Parameter estimation, 5 bees multiparameters synchronous model.}
 \end{figure}
+\begin{table}[H]
+\begin{tabular}{|l|l|l|l|}
+\hline
+Model parameter & True parameter     & \begin{tabular}[c]{@{}l@{}}Estimated parameter\\ (rational function)\end{tabular} & \begin{tabular}[c]{@{}l@{}}Estimated parameter\\ (DTMC sampling)\end{tabular} \\ \hline
+$r_0$           & 0.00410548 & 0.0034255                                                                & 0.00336795                                                            \\ \hline
+$r_1$           & 0.07261625 & 0.0891983                                                                & 0.19129984                                                            \\ \hline
+$r_2$           & 0.27722853 & 0.4392700                                                                & 0.43301256                                                            \\ \hline
+$r_3$           & 0.30073555 & 0.6620919                                                                & 0.55442217                                                            \\ \hline
+$r_4$           & 0.43773271 & 0.7205680                                                                & 0.71246291                                                            \\ \hline
+RMSE            & 0                  & 0.2177646255                                                                      & 0.1887795475                                                                  \\ \hline
+Loglikelihood   & 0                  & -39.9826120                                                                       & -86.78656128                                                                  \\ \hline
+Run time (s)    & 0                  & 0.67688344                                                                        & 117.2750917                                                                   \\ \hline
+\end{tabular}
+\caption{5 bees multiparameters synchronous model, detailed comparison of true
+  parameter and estimated parameter.}
+\end{table}
 
+
+Results with 10 bees model, multiparameters, synchronous.
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.8\textwidth,keepaspectratio]{figures/normal_10.png}
-  \caption{Sixth batch. Estimation improved; Bayesian Credible Sets are narrower.}
+  \caption{Parameter estimation, 10 bees multiparameters synchronous model.}
 \end{figure}
+\begin{table}[H]
+\begin{tabular}{|l|l|l|l|}
+\hline
+Model parameter              & True parameter    & \begin{tabular}[c]{@{}l@{}}Estimated parameter\\ (rational function)\end{tabular} & \begin{tabular}[c]{@{}l@{}}Estimated parameter\\ (DTMC sampling)\end{tabular} \\ \hline
+$r_0$                        & 0.01988753 & 0.01999422                                                                & 0.0298712                                                            \\ \hline
+$r_1$                        & 0.05690511 & 0.05114005                                                                & 0.0728276                                                            \\ \hline
+$r_2$                        & 0.10229544 & 0.09327574                                                                & 0.1697500                                                            \\ \hline
+$r_3$                        & 0.22326772 & 0.27035177                                                                & 0.2089572                                                            \\ \hline
+$r_4$                        & 0.28672945 & 0.37346846                                                                & 0.3799688                                                            \\ \hline
+$r_5$                        & 0.84329433 & 0.56673691                                                                & 0.6656779                                                            \\ \hline
+$r_6$                        & 0.90532951 & 0.72739922                                                                & 0.7327314                                                            \\ \hline
+$r_7$                        & 0.94130361 & 0.94022500                                                                & 0.8130210                                                            \\ \hline
+$r_8$                        & 0.94269929 & 0.97677761                                                                & 0.9024276                                                            \\ \hline
+$r_9$                        & 0.95994582 & 0.98563474                                                                & 0.9134719                                                            \\ \hline
+RMSE                         & 0                 & 0.109462677                                                                       & 0.0976613478                                                                  \\ \hline
+Loglikelihood                & 0                 & -106.2977209                                                                      & -422.776183                                                                   \\ \hline
+Run time (s)                 & 0                 & 29.64064789                                                                       & 467.36564305                                                                  \\ \hline
+\end{tabular}
+\caption{10 bees multiparameters synchronous model, detailed comparison of true
+  parameter and estimated parameter.}
+\end{table}
 
+Results with 15 bees model, multiparameters, synchronous.
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.8\textwidth,keepaspectratio]{figures/normal_15.png}
-  \caption{Tenth batch. At this batch, the difference between Bayesian and
-    frequentist estimation is not significant, as now long-run property is satisfied.}
+  \caption{Parameter estimation, 15 bees multiparameters synchronous model.}
 \end{figure}
-Results with 5 bees model, multiparameters, synchronous.
-Results with 10 bees model, multiparameters, synchronous.
-Results with 15 bees model, multiparameters, synchronous.
+\begin{table}[H]
+\begin{tabular}{|l|l|l|l|}
+\hline
+Model parameter              & True value   & \begin{tabular}[c]{@{}l@{}}Estimated value\\ (rational function)\end{tabular} & \begin{tabular}[c]{@{}l@{}}Estimated value\\ (DTMC sampling)\end{tabular} \\ \hline
+$r_0$                        & 0.0035632 & 0.0029968                                                                  & 0.00728255                                                            \\ \hline
+$r_1$                        & 0.0127627 & 0.0056601                                                                  & 0.10817395                                                            \\ \hline
+$r_2$                        & 0.0190790 & 0.0087548                                                                  & 0.14569377                                                            \\ \hline
+$r_3$                        & 0.1938155 & 0.0457109                                                                  & 0.39787762                                                            \\ \hline
+$r_4$                        & 0.3731384 & 0.1152035                                                                  & 0.40666497                                                            \\ \hline
+$r_5$                        & 0.5699428 & 0.3810238                                                                  & 0.41343634                                                            \\ \hline
+$r_6$                        & 0.6369906 & 0.4189323                                                                  & 0.46619880                                                            \\ \hline
+$r_7$                        & 0.7112844 & 0.5412502                                                                  & 0.46869001                                                            \\ \hline
+$r_8$                        & 0.7293173 & 0.6382650                                                                  & 0.47016381                                                            \\ \hline
+$r_9$                        & 0.7461703 & 0.6920756                                                                  & 0.49420054                                                            \\ \hline
+$r_{10}$                     & 0.7766676 & 0.7665053                                                                  & 0.55485392                                                            \\ \hline
+$r_{11}$                     & 0.7925775 & 0.7674665                                                                  & 0.60978170                                                            \\ \hline
+$r_{12}$                     & 0.8337539 & 0.7921175                                                                  & 0.64161756                                                            \\ \hline
+$r_{13}$                     & 0.8397448 & 0.8336828                                                                  & 0.75797911                                                            \\ \hline
+$r_{14}$                     & 0.8482724 & 0.8830980                                                                  & 0.95233200                                                            \\ \hline
+RMSE                         & 0                & 0.119918831                                                                       & 0.172843939                                                                   \\ \hline
+Loglikelihood                & 0                & -67.353440566                                                                     & $-\infty$                                                                     \\ \hline
+Run time (s)                 & 0                & 1566.1499604                                                                      & 9970.81800876                                                                 \\ \hline
+\end{tabular}
+\caption{15 bees multiparameters synchronous model, detailed comparison of true
+  parameter and estimated parameter.}
+\end{table}
+
 For large population models which due to the technical issues PRISM cannot
 deliver rational functions, we can only use DTMC sampling to estimate terminal
 state. However, as it has been shown on the comparison betwwen rational function
 evaluation and DTMC sampling, cost for a DTMC simulation also increases as the
 number of states in the DTMC increases.\\
+In 20 bees, multiparameters, synchronous model, the program failed to gives an
+estimation. It is observed that the larger population model from 20 bees have
+wide areas in parameter space that makes the evaluation of parametric DTMC
+number overflow. Because of that, due to a technical issues, an exception is
+thrown and then the whole estimation progress is discarded. This issue is
+detected very late in 20 bees model, thus a patch to fix it cannot be included
+in this report. However, it can be fixed in future release. 
 
 \subsubsection{Conclusion}
-The experiment shows the results on parameter inferecence for agnostic models of
-3, 5, 10, and 15 bees.
+The results show that the parameter estimation can be done in both cases, in
+which rational functions available and not available. In large population model,
+we can observe that both accuracy and precision decreases significantly while
+run time increases exponentially. It shows that while the Bayesian approach is
+capable of parameter estimation, it is still has high demand for computational
+resource.\\
+The results also show the impact of parameter dimension to the estimation. The
+more parameter a model as, the less accuracy of the estimation. In the next
+experiment, we survey the possibility of improving accuracy in case of high
+dimensional parameter by increasing the Metropolis-Hastings chain length.
 
 
 \subsection{Selection of Metropolis-Hastings chain length}
@@ -1026,7 +1123,14 @@ parameter and synthetic data, we do the parameter inference in different
 Metropolis-Hastings trace length, and observe the changes in parameter
 estimation.
 \begin{itemize}
-\item Model: 10 beesm, 
+\item \textbf{Model file:} \texttt{bee\_multiparams\_synchronous10.pm}
+\item \textbf{PRISM result file:} \texttt{bee\_multiparams\_synchronous10.txt}
+\item \textbf{True parameter:} \texttt{[0.012152382449267307,
+    0.06280031298108557, 0.21270070164299149, 0.4288273880974319,
+    0.5235603692706758, 0.6189846759889027, 0.826236904896725,
+    0.896104625259823900, 0.977354322046057200, 0.9872661333157495]}
+\item \textbf{Data: } \texttt{[8807, 698, 89, 25, 22, 21, 3, 6, 4, 28, 297]}
+\item \textbf{Prior: } $Uniform(0,1)$
 \end{itemize}
 \subsubsection{Result}
 Results compiled from log file \texttt{examples/logs/evidences/compare\_mcmc\_chainlen\_log.txt}.\\
@@ -1039,11 +1143,12 @@ the set $(1000, 2000, 3000, 4000, 5000)$ is visualized in the following figure.
   HPD of inference with Metropolis-Hastings chain length $1000, 2000, 3000,
   4000, 5000$. The red cross visualizes true parameter.}
 \end{figure}
-Accuracy and runtime:
+Accuracy (RMSE of true parameters and estimated parameters) and runtime:
 \begin{table}[H]
+  \centering
   \begin{tabular}{|l|l|l|}
     \hline
-    MH Chainlength & RMSE                 & Run time (s) \\ \hline
+    MH Chainlength & RMSE                & Run time (s) \\ \hline
     1000           & 0.050052749138867626 & 63.83112     \\ \hline
     2000           & 0.03084112520832641  & 125.08478    \\ \hline
     3000           & 0.0601108203086657   & 183.794119   \\ \hline
@@ -1074,35 +1179,142 @@ Biological experiment, in this project is the experiment with bees, is not able
 to be conducted massively, for example $1000$ experiments, due to the time and
 effort cost. To few experiments to guarantee the long-run property leads to
 incorrect parameter inference. In this experiment, we evaluate the impact of
-low quality data (too few experiment data) to parameter inference. 
-Experiment is conducted as follow
+low quality data (too few experiment data) to parameter inference, by comparing
+the estimated parameters from synthetic data with different number of samples.
 \begin{itemize}
-\item 
+\item \textbf{Model file:} \texttt{bee\_multiparams\_synchronous10.pm}
+\item \textbf{PRISM result file:} \texttt{bee\_multiparams\_synchronous10.txt}
+\item \textbf{True parameter:} \texttt{0.003186578075742741, 0.1529147183576044,
+    0.38326481740434626, 0.38770819078363106, 0.426928113401854,
+    0.5791164913034477, 0.7401949229822984, 0.7893002782182501,
+    0.8139393399312541, 0.8194092726880179]}
+\item Metropolis-Hastings chain length: $500$
+\item Number of samples on synthetic data: \texttt{[60, 600, 1200]}
 \end{itemize}
-\subsubsection{Result}
 
-Results compiled from log file \texttt{examples/logs/evidences/compare\_data\_quality\_log.txt}.\\
+\subsubsection{Result}
+Results compiled from log file
+\texttt{examples/logs/evidences/compare\_data\_quality\_log.txt}.\\
+Synthetic data:
+\begin{enumerate}
+\item $60$ samples: \texttt{[291, 1, 0, 1, 2, 0, 0, 1, 2, 1, 1]}
+\item $600$ samples: \texttt{[578, 3, 1, 5, 6, 0, 0, 0, 1, 2, 4]}
+\item $1200$ samples: \texttt{[1158, 7, 1, 5, 8, 2, 1, 5, 2, 6, 5]}
+\end{enumerate}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth,keepaspectratio]{figures/data_quality.png}
+  \caption{HPD of inference result. Green lines from left to right visualize the
+    HPD of inference with synthetic data of $60, 600, 1200$ samples. The red
+    cross visualizes true parameter.} 
+\end{figure}
+\begin{table}[]
+  \centering
+\begin{tabular}{|l|l|l|l|l|}
+\hline
+Parameter & True value & \begin{tabular}[c]{@{}l@{}}Estimated value\\ (60 samples)\end{tabular} & \begin{tabular}[c]{@{}l@{}}Estimated value\\ (600 samples)\end{tabular} & \begin{tabular}[c]{@{}l@{}}Estimated value\\ (1200 samples)\end{tabular} \\ \hline
+$r_0$           & 0.003186578    & 0.004829567                                                                & 0.0038323980                                                                & 0.0039312305                                                                 \\ \hline
+$r_1$           & 0.152914718    & 0.1903486210                                                               & 0.1126961934                                                                & 0.162132934                                                                  \\ \hline
+$r_2$           & 0.383264817    & 0.2796974335                                                               & 0.410108422                                                                 & 0.26012847                                                                   \\ \hline
+$r_3$           & 0.387708190    & 0.429276824                                                                & 0.433095661                                                                 & 0.322458399                                                                  \\ \hline
+$r_4$           & 0.426928113    & 0.5029768378                                                               & 0.446605941                                                                 & 0.430585479                                                                  \\ \hline
+$r_5$           & 0.579116491    & 0.557739062                                                                & 0.7055519615                                                                & 0.511957912                                                                  \\ \hline
+$r_6$           & 0.74019492     & 0.6015817381                                                               & 0.746521801                                                                 & 0.672168695                                                                  \\ \hline
+$r_7$           & 0.78930027     & 0.6739223055                                                               & 0.827529366                                                                 & 0.74397577                                                                   \\ \hline
+$r_8$           & 0.81393933     & 0.7707084766                                                               & 0.853204909                                                                 & 0.794668599                                                                  \\ \hline
+$r_9$           & 0.8194092      & 0.8265211798                                                               & 0.9605947190                                                                & 0.928872162                                                                  \\ \hline
+RMSE            & 0              & 0.07385372843                                                              & 0.066142499                                                                 & 0.06562365                                                                   \\ \hline
+Loglikelihood   & 0              & -4.06730154                                                                & -19.62834052                                                                & -26.2709813                                                                  \\ \hline
+Run time (s)    & 0              & {\color[HTML]{232627} 30.13967577}                                         & 36.0586646                                                                  & 34.144764199                                                                 \\ \hline
+\end{tabular}
+\end{table}
+As we can observe, higher number of samples (high quality data) improves
+precision not the accuracy. 
+
 \subsubsection{Conclusion}
+High quality data improves the precision of estimation. Data quality's impact on
+accuracy is not significant. Generally, Bayesian method can work with
+relatively less data than frequentist approach. The other factor, for example
+the selection of prior distribution has more impact on results' quality.
 
 \subsection{Selection of prior distribution}
 \subsubsection{Experiment setup}
 This experiment is to show the impact of prior distribution selection on a given
 bees model. In this particular setup, we compare $Uniform(0,1)$ and
-$Beta(\alpha, \beta)$. Other settings: 
+$Beta(\alpha=2, \beta=5)$. Other settings: 
 \begin{itemize}
+\item Model file: \texttt{bee\_multiparams\_synchronous10.pm}
+\item PRISM result file: \texttt{bee\_multiparams\_synchronous10.txt}
+\item True parameter: \texttt{[0.003186578075742741, 0.1529147183576044,
+    0.38326481740434626, 0.38770819078363106, 0.426928113401854,
+    0.5791164913034477, 0.7401949229822984, 0.7893002782182501,
+    0.8139393399312541, 0.8194092726880179]}
+\item Synthetic data: \texttt{[9667, 73, 9, 39, 44, 11, 4, 14, 45, 54, 40]}
 \item Metropolis-Hastings chain length: $500$
 \item Terminal state distribution evaluation: rational functions evaluation.
 \end{itemize}
+Due to the non-determinism of Metropolis-Hastings algorithm, we run the same
+scheme 5 times independently for each prior distributions and compare the mean RMSE.
 
 \subsubsection{Result}
-
 Results compiled from log file \texttt{examples/logs/evidences/compare\_prior\_log.txt}.\\
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth,keepaspectratio]{figures/prior_uniform.png}
+  \caption{HPD of inference result with $Uniform(0,1)$ prior. Green lines
+    visualizes HPDs from independent inferences. The red cross visualizes true
+    parameter. Notice that estimated parameter points are close to true values;
+    HPD also contains true values.} 
+\end{figure}
 
+\begin{table}[H]
+  \centering
+  \begin{tabular}{|l|l|l|}
+    \hline
+    Iteration & RMSE        & Log-likelihood \\ \hline
+    1         & 0.07292068  & -121.0116766   \\ \hline
+    2         & 0.06883238  & -146.3026758   \\ \hline
+    3         & 0.07390747  & -76.1765194    \\ \hline
+    4         & 0.07091452  & -133.951532    \\ \hline
+    5         & 0.064017959 & -144.5395162   \\ \hline
+    Mean      & 0.07011860  &                \\ \hline
+  \end{tabular}
+  \caption{Accuracy of parameter inference with $Uniform(0,1)$ distribution.}
+\end{table}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth,keepaspectratio]{figures/prior_beta.png}
+  \caption{HPD of inference result. Green lines visualizes HPDs from independent
+    inferences. The red cross visualizes true parameter. Notice that the
+    estimation is far from true values.}
+\end{figure}
+
+\begin{table}[H]
+  \centering
+  \begin{tabular}{|l|l|l|}
+    \hline
+    Iteration & RMSE        & Log-likelihood \\ \hline
+    1         & 0.18571786  & -463.762965    \\ \hline
+    2         & 0.24515924  & -506.7663778   \\ \hline
+    3         & 0.22866849  & -452.033270    \\ \hline
+    4         & 0.14580343  & -336.4287441   \\ \hline
+    5         & 0.27164245  & -569.2625949   \\ \hline
+    Mean      & 0.215398298 &               
+  \end{tabular}
+  \caption{Accuracy of parameter inference with $Beta(\alpha=2,\beta=5)$
+    distribution. It can be seen that accuracy is much worse than using
+    $Uniform(0,1)$. The log-likelihood is also much lower.}
+\end{table}
 \subsubsection{Conclusion}
-As the results show, the selection of prior distribution has a strong impact on 
-For example, in the case of linear model, certain assumption can be made on
-model parameters so that we can limit the parameter space. 
-
+As the results show, the selection of prior distribution has a strong impact on
+accuracy of estimation. The experiment results show that propagating a false
+belief in the form of prior distribution $Beta(\alpha=2,\beta=5)$ severely
+degrade the accuracy.\\
+However, uniform distribution is not always the best choice. For example, in the
+case of linear model, certain assumptions can be made on model parameters so that
+we can limit the parameter space; these assumptions must be encoded in the prior
+distribution to deliver an estimation.
 
 \subsection{Linear model}
 \subsubsection{Experiment setup}
@@ -1139,7 +1351,7 @@ $Beta(\alpha=1,\beta=10)$ as prior distribution.
   \centering
   \includegraphics[width=0.5\textwidth,keepaspectratio]{figures/beta_1_10.png}
   \caption{$Beta(\alpha=1,\beta=10)$ prior distribution. The distribution is
-    skewed to lower values of rang $[0,1]$.}
+    skewed to lower values of range $[0,1]$.}
 \end{figure}
 
 \subsubsection{Results}
@@ -1258,8 +1470,11 @@ project:
   project.
 \item There is still a problem of number overflow that appears randomly in case
   of evaluation of parametric DTMC in large model (for example, 20 bees
-  multiparameters, synchronous). However, the root cause of this issue is
-  unknown and thus it is not solved.
+  multiparameters, synchronous). The cause of this problem is that as the size
+  of the popupation increases over 20, the number of values in the parameter
+  space that lead to number overflow on parametric DTMC evaluation also
+  increases. This problem can be fixed technically by discarding these points; a
+  patch will be issued in the future to address this bug.
 \end{enumerate}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 

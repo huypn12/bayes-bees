@@ -1,43 +1,123 @@
 \boolfalse {citerequest}\boolfalse {citetracker}\boolfalse {pagetracker}\boolfalse {backtracker}\relax 
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {1}Preliminaries}{3}%
+\contentsline {section}{\numberline {1}Preliminaries}{4}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {1.1}Discrete time Markov Chain}{3}%
+\contentsline {subsection}{\numberline {1.1}Discrete time Markov Chain}{4}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {1.2}Bayesian inference}{5}%
+\contentsline {subsubsection}{\numberline {1.1.1}Definition}{4}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsubsection}{\numberline {1.2.1}Bayesian parameter estimation}{5}%
+\contentsline {subsubsection}{\numberline {1.1.2}Parametric Discrete-time Markov Chain}{5}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsubsection}{\numberline {1.2.2}Posterior conjugation}{6}%
+\contentsline {subsubsection}{\numberline {1.1.3}Markov population model}{6}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsubsection}{\numberline {1.2.3}Markov Chain Monte Carlo method}{7}%
+\contentsline {subsection}{\numberline {1.2}Bayesian inference}{6}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsubsection}{\numberline {1.2.4}Bayesian Parameter Estimation}{9}%
+\contentsline {subsubsection}{\numberline {1.2.1}Bayesian parameter estimation}{6}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {2}Modeling of bees colony}{9}%
+\contentsline {subsubsection}{\numberline {1.2.2}Posterior conjugation}{7}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {2.1}Biological description}{9}%
+\contentsline {subsubsection}{\numberline {1.2.3}Metropolis-Hastings algorithm}{9}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {2.2}Markov population models for bee colony}{10}%
+\contentsline {subsubsection}{\numberline {1.2.4}Selection of prior distribution}{10}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {3}Bayesian parameter synthesis of Markov population model}{14}%
+\contentsline {subsubsection}{\numberline {1.2.5}Bayesian Parameter Estimation}{10}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.1}Data}{14}%
+\contentsline {subsubsection}{\numberline {1.2.6}Bayesian Credible Set}{11}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.2}Inference of steady state distribution}{14}%
+\contentsline {section}{\numberline {2}Related works}{11}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.3}Inference of model parameters}{15}%
+\contentsline {section}{\numberline {3}Modeling of bees colony}{12}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.4}Accuracy measures}{16}%
+\contentsline {subsection}{\numberline {3.1}Biological description}{12}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4}Implementation and results}{16}%
+\contentsline {subsection}{\numberline {3.2}Markov population models for bee colony}{12}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.1}Data synthesis}{17}%
+\contentsline {subsubsection}{\numberline {3.2.1}Asynchronous model}{13}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.2}Inference of steady state distribution}{18}%
+\contentsline {subsubsection}{\numberline {3.2.2}Synchronous model}{14}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.3}Inference of model parameters}{19}%
+\contentsline {subsubsection}{\numberline {3.2.3}Semi-synchronous model}{15}%
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.4}Notes on implementation}{20}%
+\contentsline {subsubsection}{\numberline {3.2.4}Multiparameters model}{16}%
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5}Conclusion}{20}%
+\contentsline {subsubsection}{\numberline {3.2.5}Linear model}{17}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {4}Bayesian parameter synthesis of Markov population model}{18}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {4.1}Inference of terminal state distribution}{18}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {4.2}Evaluation of terminal states distribution}{18}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {4.3}Inference of model parameter with Metropolis-Hastings algorithm}{19}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {5}Benchmark}{21}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {5.1}Data synthesis}{21}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {5.2}Evaluation measures}{22}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {5.3}Inference of terminal state distribution}{22}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {5.3.1}Experiment setup}{22}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {5.3.2}Results}{23}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {5.3.3}Conclusion}{25}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {5.4}Compare DTMC sampling and rational functions}{25}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {5.4.1}Experiment setup:}{25}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {5.4.2}Results}{26}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {5.4.3}Conclusion}{28}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {5.5}Inference of model parameters}{29}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {5.5.1}Experiment setup}{29}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {5.5.2}Results}{29}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {5.5.3}Conclusion}{35}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {5.6}Selection of Metropolis-Hastings chain length}{35}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {5.6.1}Experiment setup}{35}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {5.6.2}Result}{36}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {5.6.3}Conclusion}{37}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {5.7}Impact of data quality}{37}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {5.7.1}Experiment setup}{37}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {5.7.2}Result}{38}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {5.7.3}Conclusion}{39}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {5.8}Selection of prior distribution}{39}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {5.8.1}Experiment setup}{39}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {5.8.2}Result}{40}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {5.8.3}Conclusion}{42}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {5.9}Linear model}{43}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {5.9.1}Experiment setup}{43}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {5.9.2}Results}{44}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {5.9.3}Conclusion}{46}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {6}Implementation}{46}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {6.1}Class design}{46}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {6.2}Test environment}{47}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {6.3}Directory structure}{47}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {7}Conclusion}{48}%
