@@ -22,7 +22,7 @@ class TwentyBees(BaseExperiment):
         self.model_file = model_file
         config.models['use_uniform_prior'] = True
         config.models['use_sympy'] = True
-        config.models['use_bounded_run'] = True
+        config.models['use_bounded_run'] = False
 
     # overriden
     def print_log(self, mesg):
@@ -51,8 +51,8 @@ class TwentyBees(BaseExperiment):
     def do_experiment(self, ):
         self.init()
         mcmc = BayesianMcmc(self.data_model)
-        mcmc.data_model.chainruns_count = 1000
-        mcmc.mh_params['chain_length'] = 250
+        mcmc.data_model.chainruns_count = 400
+        mcmc.mh_params['chain_length'] = 200
         self.print_log('Start inferencing, MCMC chain len {}'.format(1000))
         m = self.syn_data['mult']
         # start inferencing
