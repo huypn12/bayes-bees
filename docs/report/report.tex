@@ -973,8 +973,34 @@ sampling and rational functions evaluation methods. Other setups:
 \end{itemize}
 
 \subsubsection{Results}
-Results compiled from log file \texttt{examples/logs/evidences/run_normal_log.txt}.\\
+Results compiled from log file \texttt{examples/logs/evidences/run\_normal\_log.txt}.\\
 Results with 3 bees model, multiparameters, synchronous.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth,keepaspectratio]{figures/normal_3.png}
+  \caption{First batch of data. The Bayesian conjugation method suffers from
+    initial false beliefs.}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth,keepaspectratio]{figures/normal_5.png}
+  \caption{Second batch. Estimation changes significantly as we have a prior
+    belief from previous batch.}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth,keepaspectratio]{figures/normal_10.png}
+  \caption{Sixth batch. Estimation improved; Bayesian Credible Sets are narrower.}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth,keepaspectratio]{figures/normal_15.png}
+  \caption{Tenth batch. At this batch, the difference between Bayesian and
+    frequentist estimation is not significant, as now long-run property is satisfied.}
+\end{figure}
 Results with 5 bees model, multiparameters, synchronous.
 Results with 10 bees model, multiparameters, synchronous.
 Results with 15 bees model, multiparameters, synchronous.
@@ -1003,7 +1029,7 @@ estimation.
 \item Model: 10 beesm, 
 \end{itemize}
 \subsubsection{Result}
-Results compiled from log file \texttt{examples/logs/evidences/compare_mcmc_chainlen_log.txt}.\\
+Results compiled from log file \texttt{examples/logs/evidences/compare\_mcmc\_chainlen\_log.txt}.\\
 Precision of inference results with different Metropolis-Hastings chain length in
 the set $(1000, 2000, 3000, 4000, 5000)$ is visualized in the following figure. 
 \begin{figure}[H]
@@ -1036,25 +1062,6 @@ It is because that there are too many outliers in the results. However, as it
 can be seen from the visualization, increase the Metropolis-Hastings
 chainlength, in general, can improve the precision of the inference.
 
-\subsection{Selection of prior distribution}
-\subsubsection{Experiment setup}
-Results compiled from log file \texttt{examples/logs/evidences/compare_prior_log.txt}.\\
-This experiment is to show the impact of prior distribution selection on a given
-bees model. In this particular setup, we compare $Uniform(0,1)$ and
-$Beta(\alpha, \beta)$. Other settings: 
-\begin{itemize}
-\item Metropolis-Hastings chain length: $500$
-\item Terminal state distribution evaluation: rational functions evaluation.
-\end{itemize}
-
-\subsubsection{Result}
-
-
-\subsubsection{Conclusion}
-As the results show, the selection of prior distribution has a strong impact on 
-For example, in the case of linear model, certain assumption can be made on
-model parameters so that we can limit the parameter space. 
-
 \subsection{Impact of data quality}
 \subsubsection{Experiment setup}
 An advantage of using synthetic data over real data obtained from biological
@@ -1074,8 +1081,28 @@ Experiment is conducted as follow
 \end{itemize}
 \subsubsection{Result}
 
-Results compiled from log file \texttt{examples/logs/evidences/compare_data_quality_log.txt}.\\
+Results compiled from log file \texttt{examples/logs/evidences/compare\_data\_quality\_log.txt}.\\
 \subsubsection{Conclusion}
+
+\subsection{Selection of prior distribution}
+\subsubsection{Experiment setup}
+This experiment is to show the impact of prior distribution selection on a given
+bees model. In this particular setup, we compare $Uniform(0,1)$ and
+$Beta(\alpha, \beta)$. Other settings: 
+\begin{itemize}
+\item Metropolis-Hastings chain length: $500$
+\item Terminal state distribution evaluation: rational functions evaluation.
+\end{itemize}
+
+\subsubsection{Result}
+
+Results compiled from log file \texttt{examples/logs/evidences/compare\_prior\_log.txt}.\\
+
+\subsubsection{Conclusion}
+As the results show, the selection of prior distribution has a strong impact on 
+For example, in the case of linear model, certain assumption can be made on
+model parameters so that we can limit the parameter space. 
+
 
 \subsection{Linear model}
 \subsubsection{Experiment setup}
